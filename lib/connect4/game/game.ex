@@ -1,4 +1,7 @@
 defmodule Connect4.Game do
+  @moduledoc """
+  A GenServer holding the state of a single game.
+  """
   use GenServer
 
   @enforce_keys [:state]

@@ -1,3 +1,4 @@
+# credo:disable-for-this-file
 defmodule Connect4Web.CoreComponents do
   @moduledoc """
   Provides core UI components.
