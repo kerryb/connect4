@@ -25,7 +25,7 @@ defmodule Connect4.Game do
   def next_player(game), do: GenServer.call(game, :next_player)
 
   @spec play(GenServer.server(), player(), column()) :: any()
-  def play(game, player, column), do: GenServer.cast(game, {:play, player, column})
+  def play(game, player, column), do: GenServer.call(game, {:play, player, column})
 
   @impl GenServer
   def init(_arg) do
@@ -35,10 +35,13 @@ defmodule Connect4.Game do
   @impl GenServer
   def handle_call(:next_player, _from, game), do: {:reply, game.next_player, game}
 
-  @impl GenServer
-  def handle_cast({:play, player, _column}, game) do
+  def handle_call({:play, player, _column}, _from, %{next_player: player} = game) do
     next_player = if player == :player_1, do: :player_2, else: :player_1
     game = %{game | next_player: next_player}
-    {:noreply, game}
+    {:reply, {:ok, game}, game}
+  end
+
+  def handle_call({:play, _player, _column}, _from, game) do
+    {:reply, {:error, "Not your turn"}, game}
   end
 end
