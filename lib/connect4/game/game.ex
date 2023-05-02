@@ -9,7 +9,9 @@ defmodule Connect4.Game do
 
   @type player :: :O | :X
   @type column :: 0..6
-  @type t :: %__MODULE__{next_player: player(), grid: [[player()]]}
+  @type row :: 0..5
+  @type grid :: %{column() => %{row() => player()}}
+  @type t :: %__MODULE__{next_player: player(), grid: grid()}
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(_arg) do
@@ -18,7 +20,7 @@ defmodule Connect4.Game do
 
   @spec new :: t()
   def new do
-    %__MODULE__{next_player: :O, grid: Enum.map(0..6, fn _ -> [] end)}
+    %__MODULE__{next_player: :O, grid: %{}}
   end
 
   @spec next_player(GenServer.server()) :: player()
@@ -36,8 +38,8 @@ defmodule Connect4.Game do
   def handle_call(:next_player, _from, game), do: {:reply, game.next_player, game}
 
   def handle_call({:play, player, column}, _from, %{next_player: player} = game) do
-    grid = List.update_at(game.grid, column, &[player | &1])
-    next_player = if player == :O, do: :X, else: :O
+    grid = place(game.grid, player, column)
+    next_player = other_player(player)
     game = %{game | next_player: next_player, grid: grid}
     {:reply, {:ok, game}, game}
   end
@@ -45,4 +47,15 @@ defmodule Connect4.Game do
   def handle_call({:play, _player, _column}, _from, game) do
     {:reply, {:error, "Not your turn"}, game}
   end
+
+  defp place(grid, player, column) do
+    Map.update(grid, column, %{0 => player}, &place_in_column(&1, player))
+  end
+
+  defp place_in_column(column, player), do: Map.put(column, next_free_row(column), player)
+
+  defp next_free_row(column), do: (column |> Map.keys() |> Enum.max(&>=/2, fn -> 0 end)) + 1
+
+  defp other_player(:O), do: :X
+  defp other_player(:X), do: :O
 end

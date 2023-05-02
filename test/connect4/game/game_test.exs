@@ -28,7 +28,7 @@ defmodule Connect4.GameTest do
       {:ok, _game} = Game.play(game, :O, 3)
       {:ok, _game} = Game.play(game, :X, 2)
       {:ok, game} = Game.play(game, :O, 2)
-      assert game.grid == [[], [], [:O, :X], [:O], [], [], []]
+      assert game.grid == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
     end
   end
 end
