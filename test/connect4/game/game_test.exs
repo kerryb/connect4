@@ -23,5 +23,12 @@ defmodule Connect4.GameTest do
     test "does not allow play out of turn", %{game: game} do
       assert {:error, "Not your turn"} = Game.play(game, :X, 0)
     end
+
+    test "keeps track of moves", %{game: game} do
+      {:ok, _game} = Game.play(game, :O, 3)
+      {:ok, _game} = Game.play(game, :X, 2)
+      {:ok, game} = Game.play(game, :O, 2)
+      assert game.grid == [[], [], [:O, :X], [:O], [], [], []]
+    end
   end
 end
