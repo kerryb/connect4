@@ -4,23 +4,23 @@ defmodule Connect4.Game do
   """
   use GenServer
 
-  @enforce_keys [:next_player, :grid]
-  defstruct [:next_player, :grid]
+  @enforce_keys [:next_player, :board]
+  defstruct [:next_player, :board]
 
   @type player :: :O | :X
   @type column :: 0..6
   @type row :: 0..5
-  @type grid :: %{column() => %{row() => player()}}
-  @type t :: %__MODULE__{next_player: player(), grid: grid()}
+  @type board :: %{column() => %{row() => player()}}
+  @type t :: %__MODULE__{next_player: player(), board: board()}
 
   defimpl Inspect do
-    def inspect(game, _opts), do: rows(game.grid) <> "\n(#{game.next_player} to play)"
+    def inspect(game, _opts), do: rows(game.board) <> "\n(#{game.next_player} to play)"
 
-    defp rows(grid), do: 5..0 |> Enum.map_join("\n", &row(grid, &1))
+    defp rows(board), do: 5..0 |> Enum.map_join("\n", &row(board, &1))
 
-    defp row(grid, row), do: 0..6 |> Enum.map_join(" ", &cell(grid, row, &1))
+    defp row(board, row), do: 0..6 |> Enum.map_join(" ", &cell(board, row, &1))
 
-    defp cell(grid, row, column), do: grid |> Map.get(column, %{}) |> Map.get(row, ".")
+    defp cell(board, row, column), do: board |> Map.get(column, %{}) |> Map.get(row, ".")
   end
 
   @spec start_link(any()) :: GenServer.on_start()
@@ -30,7 +30,7 @@ defmodule Connect4.Game do
 
   @spec new :: t()
   def new do
-    %__MODULE__{next_player: :O, grid: %{}}
+    %__MODULE__{next_player: :O, board: %{}}
   end
 
   @spec next_player(GenServer.server()) :: player()
@@ -48,9 +48,9 @@ defmodule Connect4.Game do
   def handle_call(:next_player, _from, game), do: {:reply, game.next_player, game}
 
   def handle_call({:play, player, column}, _from, %{next_player: player} = game) do
-    grid = place(game.grid, player, column)
+    board = place(game.board, player, column)
     next_player = other_player(player)
-    game = %{game | next_player: next_player, grid: grid}
+    game = %{game | next_player: next_player, board: board}
     {:reply, {:ok, game}, game}
   end
 
@@ -58,8 +58,8 @@ defmodule Connect4.Game do
     {:reply, {:error, "Not your turn"}, game}
   end
 
-  defp place(grid, player, column) do
-    Map.update(grid, column, %{0 => player}, &place_in_column(&1, player))
+  defp place(board, player, column) do
+    Map.update(board, column, %{0 => player}, &place_in_column(&1, player))
   end
 
   defp place_in_column(column, player), do: Map.put(column, next_free_row(column), player)
