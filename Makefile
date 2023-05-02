@@ -18,7 +18,7 @@ compile:
 dialyzer:
 	mix dialyzer --format dialyxir
 test:
-	mix test
+	mix coveralls.html
 outdated:
 	mix hex.outdated
 update-deps:

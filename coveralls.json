@@ -1,0 +1,6 @@
+{
+  "skip_files": [
+    "connect4_web/components/core_components.ex",
+    "test/support"
+  ]
+}
