@@ -20,10 +20,6 @@ defmodule Connect4.GameTest do
       assert Game.next_player(game) == :O
     end
 
-    test "does not allow play out of turn", %{game: game} do
-      assert {:error, "Not your turn"} = Game.play(game, :X, 0)
-    end
-
     test "keeps track of moves", %{game: game} do
       {:ok, _} = Game.play(game, :O, 3)
       {:ok, _} = Game.play(game, :X, 2)
@@ -81,6 +77,16 @@ defmodule Connect4.GameTest do
       {:ok, _} = Game.play(game, :X, 6)
       {:ok, state} = Game.play(game, :O, 3)
       assert state.winner == :O
+    end
+
+    test "does not allow play out of turn", %{game: game} do
+      assert {:error, "Not your turn"} = Game.play(game, :X, 0)
+    end
+
+    test "does not allow play in an invalid column", %{game: game} do
+      assert {:error, "Column must be 0..6"} = Game.play(game, :O, -1)
+      assert {:error, "Column must be 0..6"} = Game.play(game, :O, 7)
+      assert {:error, "Column must be 0..6"} = Game.play(game, :O, "foo")
     end
   end
 

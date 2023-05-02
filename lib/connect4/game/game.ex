@@ -50,22 +50,27 @@ defmodule Connect4.Game do
   @impl GenServer
   def handle_call(:next_player, _from, game), do: {:reply, game.next_player, game}
 
-  def handle_call({:play, player, column}, _from, %{next_player: player} = game) do
-    board = place(game.board, player, column)
+  def handle_call({:play, player, column}, _from, game) do
+    cond do
+      player != game.next_player ->
+        {:reply, {:error, "Not your turn"}, game}
 
-    {next_player, winner} =
-      if won?(board, player, column) do
-        {nil, player}
-      else
-        {other_player(player), nil}
-      end
+      column not in 0..6 ->
+        {:reply, {:error, "Column must be 0..6"}, game}
 
-    game = %{game | board: board, next_player: next_player, winner: winner}
-    {:reply, {:ok, game}, game}
-  end
+      true ->
+        board = place(game.board, player, column)
 
-  def handle_call({:play, _player, _column}, _from, game) do
-    {:reply, {:error, "Not your turn"}, game}
+        {next_player, winner} =
+          if won?(board, player, column) do
+            {nil, player}
+          else
+            {other_player(player), nil}
+          end
+
+        game = %{game | board: board, next_player: next_player, winner: winner}
+        {:reply, {:ok, game}, game}
+    end
   end
 
   defp place(board, player, column) do
