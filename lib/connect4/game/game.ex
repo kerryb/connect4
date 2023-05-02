@@ -77,7 +77,10 @@ defmodule Connect4.Game do
   defp filled_row(column), do: length(Map.keys(column)) - 1
 
   defp won?(board, player, column) do
-    completed_row?(board, player, column) or completed_column?(board, player, column)
+    completed_row?(board, player, column) or
+      completed_column?(board, player, column) or
+      completed_left_diagonal?(board, player, column) or
+      completed_right_diagonal?(board, player, column)
   end
 
   defp completed_row?(board, player, column) do
@@ -94,6 +97,16 @@ defmodule Connect4.Game do
   defp completed_column?(board, player, column) do
     row_index = filled_row(board[column])
     Enum.all?(row_index..(row_index - 3), &(board[column][&1] == player))
+  end
+
+  defp completed_left_diagonal?(board, player, column) do
+    row_index = filled_row(board[column])
+    Enum.all?(0..3, &(Map.get(board, column + &1, %{})[row_index - &1] == player))
+  end
+
+  defp completed_right_diagonal?(board, player, column) do
+    row_index = filled_row(board[column])
+    Enum.all?(0..3, &(Map.get(board, column - &1, %{})[row_index - &1] == player))
   end
 
   defp other_player(:O), do: :X

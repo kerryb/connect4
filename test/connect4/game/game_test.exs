@@ -52,6 +52,36 @@ defmodule Connect4.GameTest do
       {:ok, game} = Game.play(game, :O, 2)
       assert game.winner == :O
     end
+
+    test "detects four in a row diagonally to the left as a win", %{game: game} do
+      {:ok, _game} = Game.play(game, :O, 3)
+      {:ok, _game} = Game.play(game, :X, 2)
+      {:ok, _game} = Game.play(game, :O, 2)
+      {:ok, _game} = Game.play(game, :X, 1)
+      {:ok, _game} = Game.play(game, :O, 1)
+      {:ok, _game} = Game.play(game, :X, 0)
+      {:ok, _game} = Game.play(game, :O, 1)
+      {:ok, _game} = Game.play(game, :X, 0)
+      {:ok, _game} = Game.play(game, :O, 0)
+      {:ok, _game} = Game.play(game, :X, 4)
+      {:ok, game} = Game.play(game, :O, 0)
+      assert game.winner == :O
+    end
+
+    test "detects four in a row diagonally to the right as a win", %{game: game} do
+      {:ok, _game} = Game.play(game, :O, 0)
+      {:ok, _game} = Game.play(game, :X, 1)
+      {:ok, _game} = Game.play(game, :O, 1)
+      {:ok, _game} = Game.play(game, :X, 2)
+      {:ok, _game} = Game.play(game, :O, 2)
+      {:ok, _game} = Game.play(game, :X, 3)
+      {:ok, _game} = Game.play(game, :O, 2)
+      {:ok, _game} = Game.play(game, :X, 3)
+      {:ok, _game} = Game.play(game, :O, 3)
+      {:ok, _game} = Game.play(game, :X, 6)
+      {:ok, game} = Game.play(game, :O, 3)
+      assert game.winner == :O
+    end
   end
 
   describe "Inspect implementation for Connect4.Game" do
