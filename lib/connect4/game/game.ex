@@ -8,6 +8,8 @@ defmodule Connect4.Game do
   defstruct [:state]
 
   @type state :: :player_1_to_play
+  @type player :: :player_1 | :player_2
+  @type column :: 0..6
   @type t :: %__MODULE__{state: state()}
 
   @spec start_link(any()) :: GenServer.on_start()
@@ -23,6 +25,9 @@ defmodule Connect4.Game do
   @spec state(GenServer.server()) :: state()
   def state(game), do: GenServer.call(game, :state)
 
+  @spec play(GenServer.server(), player(), column()) :: any()
+  def play(game, player, column), do: GenServer.cast(game, {:play, player, column})
+
   @impl GenServer
   def init(_arg) do
     {:ok, new()}
@@ -30,4 +35,10 @@ defmodule Connect4.Game do
 
   @impl GenServer
   def handle_call(:state, _from, game), do: {:reply, game.state, game}
+
+  @impl GenServer
+  def handle_cast({:play, _player, _column}, game) do
+    game = %{game | state: :player_2_to_play}
+    {:noreply, game}
+  end
 end
