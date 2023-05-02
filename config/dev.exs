@@ -2,8 +2,6 @@ import Config
 
 # Configure your database
 config :connect4, Connect4.Repo,
-  username: "postgres",
-  password: "postgres",
   hostname: "localhost",
   database: "connect4_dev",
   stacktrace: true,
