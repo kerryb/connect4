@@ -43,5 +43,16 @@ defmodule Connect4.GameTest do
                (X to play)
                """)
     end
+
+    test "detects four in a row horizontally as a win", %{game: game} do
+      {:ok, _game} = Game.play(game, :O, 2)
+      {:ok, _game} = Game.play(game, :X, 2)
+      {:ok, _game} = Game.play(game, :O, 3)
+      {:ok, _game} = Game.play(game, :X, 3)
+      {:ok, _game} = Game.play(game, :O, 0)
+      {:ok, _game} = Game.play(game, :X, 0)
+      {:ok, game} = Game.play(game, :O, 1)
+      assert game.winner == :O
+    end
   end
 end

@@ -4,14 +4,14 @@ defmodule Connect4.Game do
   """
   use GenServer
 
-  @enforce_keys [:next_player, :board]
-  defstruct [:next_player, :board]
+  @enforce_keys [:board, :next_player]
+  defstruct [:board, :next_player, :winner]
 
-  @type player :: :O | :X
   @type column :: 0..6
   @type row :: 0..5
   @type board :: %{column() => %{row() => player()}}
-  @type t :: %__MODULE__{next_player: player(), board: board()}
+  @type player :: :O | :X
+  @type t :: %__MODULE__{board: board(), next_player: player(), winner: player() | nil}
 
   defimpl Inspect do
     def inspect(game, _opts), do: rows(game.board) <> "\n(#{game.next_player} to play)"
@@ -49,8 +49,15 @@ defmodule Connect4.Game do
 
   def handle_call({:play, player, column}, _from, %{next_player: player} = game) do
     board = place(game.board, player, column)
-    next_player = other_player(player)
-    game = %{game | next_player: next_player, board: board}
+
+    {next_player, winner} =
+      if won?(board, player, column) do
+        {nil, player}
+      else
+        {other_player(player), nil}
+      end
+
+    game = %{game | board: board, next_player: next_player, winner: winner}
     {:reply, {:ok, game}, game}
   end
 
@@ -62,9 +69,20 @@ defmodule Connect4.Game do
     Map.update(board, column, %{0 => player}, &place_in_column(&1, player))
   end
 
-  defp place_in_column(column, player), do: Map.put(column, next_free_row(column), player)
+  defp place_in_column(column, player), do: Map.put(column, filled_row(column) + 1, player)
 
-  defp next_free_row(column), do: (column |> Map.keys() |> Enum.max(&>=/2, fn -> 0 end)) + 1
+  defp filled_row(column), do: length(Map.keys(column)) - 1
+
+  defp won?(board, player, column) do
+    row_index = filled_row(board[column])
+
+    owned_cells =
+      board
+      |> Enum.filter(fn {_, column} -> player == column[row_index] end)
+      |> Enum.map(&elem(&1, 0))
+
+    Enum.any?(0..3, fn start -> Enum.all?(start..(start + 3), &(&1 in owned_cells)) end)
+  end
 
   defp other_player(:O), do: :X
   defp other_player(:X), do: :O
