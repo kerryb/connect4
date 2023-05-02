@@ -31,7 +31,20 @@ defmodule Connect4.GameTest do
       assert game.board == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
     end
 
-    test "renders the state of the board when inspected" do
+    test "detects four in a row horizontally as a win", %{game: game} do
+      {:ok, _game} = Game.play(game, :O, 2)
+      {:ok, _game} = Game.play(game, :X, 2)
+      {:ok, _game} = Game.play(game, :O, 3)
+      {:ok, _game} = Game.play(game, :X, 3)
+      {:ok, _game} = Game.play(game, :O, 0)
+      {:ok, _game} = Game.play(game, :X, 0)
+      {:ok, game} = Game.play(game, :O, 1)
+      assert game.winner == :O
+    end
+  end
+
+  describe "Inspect implementation for Connect4.Game" do
+    test "renders the state of the board and the next player when in progress" do
       assert inspect(%Game{next_player: :X, board: %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}}) ==
                String.trim("""
                . . . . . . .
@@ -44,15 +57,26 @@ defmodule Connect4.GameTest do
                """)
     end
 
-    test "detects four in a row horizontally as a win", %{game: game} do
-      {:ok, _game} = Game.play(game, :O, 2)
-      {:ok, _game} = Game.play(game, :X, 2)
-      {:ok, _game} = Game.play(game, :O, 3)
-      {:ok, _game} = Game.play(game, :X, 3)
-      {:ok, _game} = Game.play(game, :O, 0)
-      {:ok, _game} = Game.play(game, :X, 0)
-      {:ok, game} = Game.play(game, :O, 1)
-      assert game.winner == :O
+    test "renders the state of the board and the winner when complete" do
+      assert inspect(%Game{
+               next_player: :X,
+               board: %{
+                 0 => %{0 => :O, 1 => :X},
+                 1 => %{0 => :O, 1 => :X},
+                 2 => %{0 => :O, 1 => :X},
+                 3 => %{0 => :O}
+               },
+               winner: :O
+             }) ==
+               String.trim("""
+               . . . . . . .
+               . . . . . . .
+               . . . . . . .
+               . . . . . . .
+               X X X . . . .
+               O O O O . . .
+               (O has won)
+               """)
     end
   end
 end

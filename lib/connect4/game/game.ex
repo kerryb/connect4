@@ -14,13 +14,16 @@ defmodule Connect4.Game do
   @type t :: %__MODULE__{board: board(), next_player: player(), winner: player() | nil}
 
   defimpl Inspect do
-    def inspect(game, _opts), do: rows(game.board) <> "\n(#{game.next_player} to play)"
+    def inspect(game, _opts), do: rows(game.board) <> "\n(#{state(game)})"
 
     defp rows(board), do: 5..0 |> Enum.map_join("\n", &row(board, &1))
 
     defp row(board, row), do: 0..6 |> Enum.map_join(" ", &cell(board, row, &1))
 
     defp cell(board, row, column), do: board |> Map.get(column, %{}) |> Map.get(row, ".")
+
+    defp state(%{winner: nil} = game), do: "#{game.next_player} to play"
+    defp state(%{winner: winner}), do: "#{winner} has won"
   end
 
   @spec start_link(any()) :: GenServer.on_start()
