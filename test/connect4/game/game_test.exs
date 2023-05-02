@@ -14,9 +14,9 @@ defmodule Connect4.GameTest do
     end
 
     test "alternates players’ turns", %{game: game} do
-      {:ok, _game} = Game.play(game, :O, 0)
+      {:ok, _} = Game.play(game, :O, 0)
       assert Game.next_player(game) == :X
-      {:ok, _game} = Game.play(game, :X, 0)
+      {:ok, _} = Game.play(game, :X, 0)
       assert Game.next_player(game) == :O
     end
 
@@ -25,62 +25,62 @@ defmodule Connect4.GameTest do
     end
 
     test "keeps track of moves", %{game: game} do
-      {:ok, _game} = Game.play(game, :O, 3)
-      {:ok, _game} = Game.play(game, :X, 2)
-      {:ok, game} = Game.play(game, :O, 2)
-      assert game.board == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
+      {:ok, _} = Game.play(game, :O, 3)
+      {:ok, _} = Game.play(game, :X, 2)
+      {:ok, state} = Game.play(game, :O, 2)
+      assert state.board == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
     end
 
     test "detects four in a row horizontally as a win", %{game: game} do
-      {:ok, _game} = Game.play(game, :O, 2)
-      {:ok, _game} = Game.play(game, :X, 2)
-      {:ok, _game} = Game.play(game, :O, 3)
-      {:ok, _game} = Game.play(game, :X, 3)
-      {:ok, _game} = Game.play(game, :O, 0)
-      {:ok, _game} = Game.play(game, :X, 0)
-      {:ok, game} = Game.play(game, :O, 1)
-      assert game.winner == :O
+      {:ok, _} = Game.play(game, :O, 2)
+      {:ok, _} = Game.play(game, :X, 2)
+      {:ok, _} = Game.play(game, :O, 3)
+      {:ok, _} = Game.play(game, :X, 3)
+      {:ok, _} = Game.play(game, :O, 0)
+      {:ok, _} = Game.play(game, :X, 0)
+      {:ok, state} = Game.play(game, :O, 1)
+      assert state.winner == :O
     end
 
     test "detects four in a row vertically as a win", %{game: game} do
-      {:ok, _game} = Game.play(game, :O, 2)
-      {:ok, _game} = Game.play(game, :X, 0)
-      {:ok, _game} = Game.play(game, :O, 2)
-      {:ok, _game} = Game.play(game, :X, 0)
-      {:ok, _game} = Game.play(game, :O, 2)
-      {:ok, _game} = Game.play(game, :X, 0)
-      {:ok, game} = Game.play(game, :O, 2)
-      assert game.winner == :O
+      {:ok, _} = Game.play(game, :O, 2)
+      {:ok, _} = Game.play(game, :X, 0)
+      {:ok, _} = Game.play(game, :O, 2)
+      {:ok, _} = Game.play(game, :X, 0)
+      {:ok, _} = Game.play(game, :O, 2)
+      {:ok, _} = Game.play(game, :X, 0)
+      {:ok, state} = Game.play(game, :O, 2)
+      assert state.winner == :O
     end
 
     test "detects four in a row diagonally to the left as a win", %{game: game} do
-      {:ok, _game} = Game.play(game, :O, 3)
-      {:ok, _game} = Game.play(game, :X, 2)
-      {:ok, _game} = Game.play(game, :O, 2)
-      {:ok, _game} = Game.play(game, :X, 1)
-      {:ok, _game} = Game.play(game, :O, 1)
-      {:ok, _game} = Game.play(game, :X, 0)
-      {:ok, _game} = Game.play(game, :O, 1)
-      {:ok, _game} = Game.play(game, :X, 0)
-      {:ok, _game} = Game.play(game, :O, 0)
-      {:ok, _game} = Game.play(game, :X, 4)
-      {:ok, game} = Game.play(game, :O, 0)
-      assert game.winner == :O
+      {:ok, _} = Game.play(game, :O, 3)
+      {:ok, _} = Game.play(game, :X, 2)
+      {:ok, _} = Game.play(game, :O, 2)
+      {:ok, _} = Game.play(game, :X, 1)
+      {:ok, _} = Game.play(game, :O, 1)
+      {:ok, _} = Game.play(game, :X, 0)
+      {:ok, _} = Game.play(game, :O, 1)
+      {:ok, _} = Game.play(game, :X, 0)
+      {:ok, _} = Game.play(game, :O, 0)
+      {:ok, _} = Game.play(game, :X, 4)
+      {:ok, state} = Game.play(game, :O, 0)
+      assert state.winner == :O
     end
 
     test "detects four in a row diagonally to the right as a win", %{game: game} do
-      {:ok, _game} = Game.play(game, :O, 0)
-      {:ok, _game} = Game.play(game, :X, 1)
-      {:ok, _game} = Game.play(game, :O, 1)
-      {:ok, _game} = Game.play(game, :X, 2)
-      {:ok, _game} = Game.play(game, :O, 2)
-      {:ok, _game} = Game.play(game, :X, 3)
-      {:ok, _game} = Game.play(game, :O, 2)
-      {:ok, _game} = Game.play(game, :X, 3)
-      {:ok, _game} = Game.play(game, :O, 3)
-      {:ok, _game} = Game.play(game, :X, 6)
-      {:ok, game} = Game.play(game, :O, 3)
-      assert game.winner == :O
+      {:ok, _} = Game.play(game, :O, 0)
+      {:ok, _} = Game.play(game, :X, 1)
+      {:ok, _} = Game.play(game, :O, 1)
+      {:ok, _} = Game.play(game, :X, 2)
+      {:ok, _} = Game.play(game, :O, 2)
+      {:ok, _} = Game.play(game, :X, 3)
+      {:ok, _} = Game.play(game, :O, 2)
+      {:ok, _} = Game.play(game, :X, 3)
+      {:ok, _} = Game.play(game, :O, 3)
+      {:ok, _} = Game.play(game, :X, 6)
+      {:ok, state} = Game.play(game, :O, 3)
+      assert state.winner == :O
     end
   end
 
