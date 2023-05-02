@@ -17,7 +17,8 @@ defmodule Connect4.Application do
       # Start Finch
       {Finch, name: Connect4.Finch},
       # Start the Endpoint (http/https)
-      Connect4Web.Endpoint
+      Connect4Web.Endpoint,
+      {Registry, keys: :unique, name: Connect4.GameRegistry}
       # Start a worker by calling: Connect4.Worker.start_link(arg)
       # {Connect4.Worker, arg}
     ]

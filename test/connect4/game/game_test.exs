@@ -3,100 +3,102 @@ defmodule Connect4.GameTest do
 
   alias Connect4.Game
 
+  @game_id 123
+
   setup do
-    {:ok, game} = start_supervised(Game)
-    %{game: game}
+    {:ok, _game} = start_supervised({Game, @game_id})
+    :ok
   end
 
   describe "Connect4.Game" do
-    test "starts with O’s turn", %{game: game} do
-      assert Game.next_player(game) == :O
+    test "starts with O’s turn" do
+      assert Game.next_player(@game_id) == :O
     end
 
-    test "alternates players’ turns", %{game: game} do
-      {:ok, _} = Game.play(game, :O, 0)
-      assert Game.next_player(game) == :X
-      {:ok, _} = Game.play(game, :X, 0)
-      assert Game.next_player(game) == :O
+    test "alternates players’ turns" do
+      {:ok, _} = Game.play(@game_id, :O, 0)
+      assert Game.next_player(@game_id) == :X
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      assert Game.next_player(@game_id) == :O
     end
 
-    test "keeps track of moves", %{game: game} do
-      {:ok, _} = Game.play(game, :O, 3)
-      {:ok, _} = Game.play(game, :X, 2)
-      {:ok, state} = Game.play(game, :O, 2)
+    test "keeps track of moves" do
+      {:ok, _} = Game.play(@game_id, :O, 3)
+      {:ok, _} = Game.play(@game_id, :X, 2)
+      {:ok, state} = Game.play(@game_id, :O, 2)
       assert state.board == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
     end
 
-    test "detects four in a row horizontally as a win", %{game: game} do
-      {:ok, _} = Game.play(game, :O, 2)
-      {:ok, _} = Game.play(game, :X, 2)
-      {:ok, _} = Game.play(game, :O, 3)
-      {:ok, _} = Game.play(game, :X, 3)
-      {:ok, _} = Game.play(game, :O, 0)
-      {:ok, _} = Game.play(game, :X, 0)
-      {:ok, state} = Game.play(game, :O, 1)
+    test "detects four in a row horizontally as a win" do
+      {:ok, _} = Game.play(@game_id, :O, 2)
+      {:ok, _} = Game.play(@game_id, :X, 2)
+      {:ok, _} = Game.play(@game_id, :O, 3)
+      {:ok, _} = Game.play(@game_id, :X, 3)
+      {:ok, _} = Game.play(@game_id, :O, 0)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, state} = Game.play(@game_id, :O, 1)
       assert state.winner == :O
     end
 
-    test "detects four in a row vertically as a win", %{game: game} do
-      {:ok, _} = Game.play(game, :O, 2)
-      {:ok, _} = Game.play(game, :X, 0)
-      {:ok, _} = Game.play(game, :O, 2)
-      {:ok, _} = Game.play(game, :X, 0)
-      {:ok, _} = Game.play(game, :O, 2)
-      {:ok, _} = Game.play(game, :X, 0)
-      {:ok, state} = Game.play(game, :O, 2)
+    test "detects four in a row vertically as a win" do
+      {:ok, _} = Game.play(@game_id, :O, 2)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, _} = Game.play(@game_id, :O, 2)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, _} = Game.play(@game_id, :O, 2)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, state} = Game.play(@game_id, :O, 2)
       assert state.winner == :O
     end
 
-    test "detects four in a row diagonally to the left as a win", %{game: game} do
-      {:ok, _} = Game.play(game, :O, 3)
-      {:ok, _} = Game.play(game, :X, 2)
-      {:ok, _} = Game.play(game, :O, 2)
-      {:ok, _} = Game.play(game, :X, 1)
-      {:ok, _} = Game.play(game, :O, 1)
-      {:ok, _} = Game.play(game, :X, 0)
-      {:ok, _} = Game.play(game, :O, 1)
-      {:ok, _} = Game.play(game, :X, 0)
-      {:ok, _} = Game.play(game, :O, 0)
-      {:ok, _} = Game.play(game, :X, 4)
-      {:ok, state} = Game.play(game, :O, 0)
+    test "detects four in a row diagonally to the left as a win" do
+      {:ok, _} = Game.play(@game_id, :O, 3)
+      {:ok, _} = Game.play(@game_id, :X, 2)
+      {:ok, _} = Game.play(@game_id, :O, 2)
+      {:ok, _} = Game.play(@game_id, :X, 1)
+      {:ok, _} = Game.play(@game_id, :O, 1)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, _} = Game.play(@game_id, :O, 1)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, _} = Game.play(@game_id, :O, 0)
+      {:ok, _} = Game.play(@game_id, :X, 4)
+      {:ok, state} = Game.play(@game_id, :O, 0)
       assert state.winner == :O
     end
 
-    test "detects four in a row diagonally to the right as a win", %{game: game} do
-      {:ok, _} = Game.play(game, :O, 0)
-      {:ok, _} = Game.play(game, :X, 1)
-      {:ok, _} = Game.play(game, :O, 1)
-      {:ok, _} = Game.play(game, :X, 2)
-      {:ok, _} = Game.play(game, :O, 2)
-      {:ok, _} = Game.play(game, :X, 3)
-      {:ok, _} = Game.play(game, :O, 2)
-      {:ok, _} = Game.play(game, :X, 3)
-      {:ok, _} = Game.play(game, :O, 3)
-      {:ok, _} = Game.play(game, :X, 6)
-      {:ok, state} = Game.play(game, :O, 3)
+    test "detects four in a row diagonally to the right as a win" do
+      {:ok, _} = Game.play(@game_id, :O, 0)
+      {:ok, _} = Game.play(@game_id, :X, 1)
+      {:ok, _} = Game.play(@game_id, :O, 1)
+      {:ok, _} = Game.play(@game_id, :X, 2)
+      {:ok, _} = Game.play(@game_id, :O, 2)
+      {:ok, _} = Game.play(@game_id, :X, 3)
+      {:ok, _} = Game.play(@game_id, :O, 2)
+      {:ok, _} = Game.play(@game_id, :X, 3)
+      {:ok, _} = Game.play(@game_id, :O, 3)
+      {:ok, _} = Game.play(@game_id, :X, 6)
+      {:ok, state} = Game.play(@game_id, :O, 3)
       assert state.winner == :O
     end
 
-    test "does not allow play out of turn", %{game: game} do
-      assert {:error, "Not your turn"} = Game.play(game, :X, 0)
+    test "does not allow play out of turn" do
+      assert {:error, "Not your turn"} = Game.play(@game_id, :X, 0)
     end
 
-    test "does not allow play in an invalid column", %{game: game} do
-      assert {:error, "Column must be 0..6"} = Game.play(game, :O, -1)
-      assert {:error, "Column must be 0..6"} = Game.play(game, :O, 7)
-      assert {:error, "Column must be 0..6"} = Game.play(game, :O, "foo")
+    test "does not allow play in an invalid column" do
+      assert {:error, "Column must be 0..6"} = Game.play(@game_id, :O, -1)
+      assert {:error, "Column must be 0..6"} = Game.play(@game_id, :O, 7)
+      assert {:error, "Column must be 0..6"} = Game.play(@game_id, :O, "foo")
     end
 
-    test "does not allow play in a full column", %{game: game} do
-      {:ok, _} = Game.play(game, :O, 0)
-      {:ok, _} = Game.play(game, :X, 0)
-      {:ok, _} = Game.play(game, :O, 0)
-      {:ok, _} = Game.play(game, :X, 0)
-      {:ok, _} = Game.play(game, :O, 0)
-      {:ok, _} = Game.play(game, :X, 0)
-      assert {:error, "Column is full"} = Game.play(game, :O, 0)
+    test "does not allow play in a full column" do
+      {:ok, _} = Game.play(@game_id, :O, 0)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, _} = Game.play(@game_id, :O, 0)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, _} = Game.play(@game_id, :O, 0)
+      {:ok, _} = Game.play(@game_id, :X, 0)
+      assert {:error, "Column is full"} = Game.play(@game_id, :O, 0)
     end
   end
 

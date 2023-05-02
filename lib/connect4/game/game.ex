@@ -4,6 +4,8 @@ defmodule Connect4.Game do
   """
   use GenServer
 
+  alias Connect4.GameRegistry
+
   @enforce_keys [:board, :next_player]
   defstruct [:board, :next_player, :winner]
 
@@ -27,24 +29,21 @@ defmodule Connect4.Game do
   end
 
   @spec start_link(any()) :: GenServer.on_start()
-  def start_link(_arg) do
-    GenServer.start_link(__MODULE__, nil)
+  def start_link(id) do
+    GenServer.start_link(__MODULE__, nil, name: via_tuple(id))
   end
 
-  @spec new :: t()
-  def new do
-    %__MODULE__{next_player: :O, board: %{}}
-  end
-
-  @spec next_player(GenServer.server()) :: player()
-  def next_player(game), do: GenServer.call(game, :next_player)
+  @spec next_player(any()) :: player()
+  def next_player(id), do: id |> via_tuple() |> GenServer.call(:next_player)
 
   @spec play(GenServer.server(), player(), column()) :: any()
-  def play(game, player, column), do: GenServer.call(game, {:play, player, column})
+  def play(id, player, column), do: id |> via_tuple() |> GenServer.call({:play, player, column})
+
+  defp via_tuple(id), do: {:via, Registry, {GameRegistry, id}}
 
   @impl GenServer
   def init(_arg) do
-    {:ok, new()}
+    {:ok, %__MODULE__{next_player: :O, board: %{}}}
   end
 
   @impl GenServer
