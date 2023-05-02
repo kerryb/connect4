@@ -41,6 +41,17 @@ defmodule Connect4.GameTest do
       {:ok, game} = Game.play(game, :O, 1)
       assert game.winner == :O
     end
+
+    test "detects four in a row vertically as a win", %{game: game} do
+      {:ok, _game} = Game.play(game, :O, 2)
+      {:ok, _game} = Game.play(game, :X, 0)
+      {:ok, _game} = Game.play(game, :O, 2)
+      {:ok, _game} = Game.play(game, :X, 0)
+      {:ok, _game} = Game.play(game, :O, 2)
+      {:ok, _game} = Game.play(game, :X, 0)
+      {:ok, game} = Game.play(game, :O, 2)
+      assert game.winner == :O
+    end
   end
 
   describe "Inspect implementation for Connect4.Game" do
