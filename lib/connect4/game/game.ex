@@ -100,13 +100,16 @@ defmodule Connect4.Game do
   end
 
   defp completed_left_diagonal?(board, player, column) do
-    row_index = filled_row(board[column])
-    Enum.all?(0..3, &(Map.get(board, column + &1, %{})[row_index - &1] == player))
+    completed_diagonal?(board, player, column, &Kernel.+/2)
   end
 
   defp completed_right_diagonal?(board, player, column) do
+    completed_diagonal?(board, player, column, &Kernel.-/2)
+  end
+
+  defp completed_diagonal?(board, player, column, offset_column) do
     row_index = filled_row(board[column])
-    Enum.all?(0..3, &(Map.get(board, column - &1, %{})[row_index - &1] == player))
+    Enum.all?(0..3, &(Map.get(board, offset_column.(column, &1), %{})[row_index - &1] == player))
   end
 
   defp other_player(:O), do: :X
