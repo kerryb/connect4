@@ -37,8 +37,9 @@ defmodule Connect4.Game do
   def handle_call(:state, _from, game), do: {:reply, game.state, game}
 
   @impl GenServer
-  def handle_cast({:play, _player, _column}, game) do
-    game = %{game | state: :player_2_to_play}
+  def handle_cast({:play, player, _column}, game) do
+    state = if player == :player_1, do: :player_2_to_play, else: :player_1_to_play
+    game = %{game | state: state}
     {:noreply, game}
   end
 end

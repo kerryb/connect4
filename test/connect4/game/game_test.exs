@@ -17,5 +17,11 @@ defmodule Connect4.GameTest do
       Game.play(game, :player_1, 0)
       assert Game.state(game) == :player_2_to_play
     end
+
+    test "is in the :player_1_to_play state after player 2 plays", %{game: game} do
+      Game.play(game, :player_1, 0)
+      Game.play(game, :player_2, 0)
+      assert Game.state(game) == :player_1_to_play
+    end
   end
 end
