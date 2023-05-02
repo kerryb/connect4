@@ -4,13 +4,12 @@ defmodule Connect4.Game do
   """
   use GenServer
 
-  @enforce_keys [:state]
-  defstruct [:state]
+  @enforce_keys [:next_player]
+  defstruct [:next_player]
 
-  @type state :: :player_1_to_play
   @type player :: :player_1 | :player_2
   @type column :: 0..6
-  @type t :: %__MODULE__{state: state()}
+  @type t :: %__MODULE__{next_player: player()}
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(_arg) do
@@ -19,11 +18,11 @@ defmodule Connect4.Game do
 
   @spec new :: t()
   def new do
-    %__MODULE__{state: :player_1_to_play}
+    %__MODULE__{next_player: :player_1}
   end
 
-  @spec state(GenServer.server()) :: state()
-  def state(game), do: GenServer.call(game, :state)
+  @spec next_player(GenServer.server()) :: player()
+  def next_player(game), do: GenServer.call(game, :next_player)
 
   @spec play(GenServer.server(), player(), column()) :: any()
   def play(game, player, column), do: GenServer.cast(game, {:play, player, column})
@@ -34,12 +33,12 @@ defmodule Connect4.Game do
   end
 
   @impl GenServer
-  def handle_call(:state, _from, game), do: {:reply, game.state, game}
+  def handle_call(:next_player, _from, game), do: {:reply, game.next_player, game}
 
   @impl GenServer
   def handle_cast({:play, player, _column}, game) do
-    state = if player == :player_1, do: :player_2_to_play, else: :player_1_to_play
-    game = %{game | state: state}
+    next_player = if player == :player_1, do: :player_2, else: :player_1
+    game = %{game | next_player: next_player}
     {:noreply, game}
   end
 end
