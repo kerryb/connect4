@@ -30,5 +30,18 @@ defmodule Connect4.GameTest do
       {:ok, game} = Game.play(game, :O, 2)
       assert game.grid == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
     end
+
+    test "renders the state of the board when inspected" do
+      assert inspect(%Game{next_player: :X, grid: %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}}) ==
+               String.trim("""
+               . . . . . . .
+               . . . . . . .
+               . . . . . . .
+               . . . . . . .
+               . . O . . . .
+               . . X O . . .
+               (X to play)
+               """)
+    end
   end
 end
