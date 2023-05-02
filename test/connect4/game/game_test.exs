@@ -88,6 +88,16 @@ defmodule Connect4.GameTest do
       assert {:error, "Column must be 0..6"} = Game.play(game, :O, 7)
       assert {:error, "Column must be 0..6"} = Game.play(game, :O, "foo")
     end
+
+    test "does not allow play in a full column", %{game: game} do
+      {:ok, _} = Game.play(game, :O, 0)
+      {:ok, _} = Game.play(game, :X, 0)
+      {:ok, _} = Game.play(game, :O, 0)
+      {:ok, _} = Game.play(game, :X, 0)
+      {:ok, _} = Game.play(game, :O, 0)
+      {:ok, _} = Game.play(game, :X, 0)
+      assert {:error, "Column is full"} = Game.play(game, :O, 0)
+    end
   end
 
   describe "Inspect implementation for Connect4.Game" do

@@ -58,6 +58,9 @@ defmodule Connect4.Game do
       column not in 0..6 ->
         {:reply, {:error, "Column must be 0..6"}, game}
 
+      game.board |> Map.get(column, %{}) |> filled_row() == 5 ->
+        {:reply, {:error, "Column is full"}, game}
+
       true ->
         board = place(game.board, player, column)
 
