@@ -77,6 +77,10 @@ defmodule Connect4.Game do
   defp filled_row(column), do: length(Map.keys(column)) - 1
 
   defp won?(board, player, column) do
+    completed_row?(board, player, column)
+  end
+
+  defp completed_row?(board, player, column) do
     row_index = filled_row(board[column])
 
     owned_cells =
