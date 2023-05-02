@@ -9,23 +9,19 @@ defmodule Connect4.GameTest do
   end
 
   describe "Connect4.Game" do
-    test "starts with player 1’s turn", %{game: game} do
-      assert Game.next_player(game) == :player_1
+    test "starts with O’s turn", %{game: game} do
+      assert Game.next_player(game) == :O
     end
 
-    test "is player 2’s turn after player 1 plays", %{game: game} do
-      {:ok, _game} = Game.play(game, :player_1, 0)
-      assert Game.next_player(game) == :player_2
-    end
-
-    test "is player 1’s turn after player 2 plays", %{game: game} do
-      {:ok, _game} = Game.play(game, :player_1, 0)
-      {:ok, _game} = Game.play(game, :player_2, 0)
-      assert Game.next_player(game) == :player_1
+    test "alternates players’ turns", %{game: game} do
+      {:ok, _game} = Game.play(game, :O, 0)
+      assert Game.next_player(game) == :X
+      {:ok, _game} = Game.play(game, :X, 0)
+      assert Game.next_player(game) == :O
     end
 
     test "does not allow play out of turn", %{game: game} do
-      assert {:error, "Not your turn"} = Game.play(game, :player_2, 0)
+      assert {:error, "Not your turn"} = Game.play(game, :X, 0)
     end
   end
 end

@@ -7,7 +7,7 @@ defmodule Connect4.Game do
   @enforce_keys [:next_player]
   defstruct [:next_player]
 
-  @type player :: :player_1 | :player_2
+  @type player :: :O | :X
   @type column :: 0..6
   @type t :: %__MODULE__{next_player: player()}
 
@@ -18,7 +18,7 @@ defmodule Connect4.Game do
 
   @spec new :: t()
   def new do
-    %__MODULE__{next_player: :player_1}
+    %__MODULE__{next_player: :O}
   end
 
   @spec next_player(GenServer.server()) :: player()
@@ -36,7 +36,7 @@ defmodule Connect4.Game do
   def handle_call(:next_player, _from, game), do: {:reply, game.next_player, game}
 
   def handle_call({:play, player, _column}, _from, %{next_player: player} = game) do
-    next_player = if player == :player_1, do: :player_2, else: :player_1
+    next_player = if player == :O, do: :X, else: :O
     game = %{game | next_player: next_player}
     {:reply, {:ok, game}, game}
   end
