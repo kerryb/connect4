@@ -7,6 +7,18 @@ The idea is that developers/pairs/teams sign up on the site, are given a unique
 URL, then compete in a tournament against each other by writing programs that
 interface with a simple HTTP API.
 
+## Getting Started
+
+  * Install appropriate versions of Erlang and Elixir (if you use
+    [ASDF](https://github.com/asdf-vm/asdf) you can just run `asdf install`)
+  * Install [PostgreSQL](https://www.postgresql.org/), eg `brew install
+    postgresql`
+  * Run `make setup`
+
+## Running the Build
+
+Just run `make`.
+
 ## Standard Phoenix Stuff
 
 To start your Phoenix server:
