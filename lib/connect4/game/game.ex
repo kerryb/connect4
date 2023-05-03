@@ -5,6 +5,7 @@ defmodule Connect4.Game do
   use GenServer
 
   alias Connect4.GameRegistry
+  alias Phoenix.PubSub
 
   @enforce_keys [:board, :next_player]
   defstruct [:board, :next_player, :winner]
@@ -66,9 +67,11 @@ defmodule Connect4.Game do
         {next_player, winner} =
           cond do
             tied?(board) ->
+              PubSub.broadcast!(Connect4.PubSub, "games", {:completed, :tie, board})
               {nil, :tie}
 
             won?(board, player, column) ->
+              PubSub.broadcast!(Connect4.PubSub, "games", {:completed, player, board})
               {nil, player}
 
             true ->

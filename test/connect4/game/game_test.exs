@@ -2,6 +2,7 @@ defmodule Connect4.GameTest do
   use ExUnit.Case, async: true
 
   alias Connect4.Game
+  alias Phoenix.PubSub
 
   @game_id 123
 
@@ -72,6 +73,12 @@ defmodule Connect4.GameTest do
     test "does not allow play in a full column" do
       play_moves(O: 0, X: 0, O: 0, X: 0, O: 0, X: 0)
       assert {:error, "Column is full"} = play_move(:O, 0)
+    end
+
+    test "broadcasts a message on completion" do
+      PubSub.subscribe(Connect4.PubSub, "games")
+      %{board: board} = play_moves(O: 2, X: 2, O: 3, X: 3, O: 0, X: 0, O: 1)
+      assert_receive {:completed, :O, ^board}
     end
 
     defp play_moves(moves) do
