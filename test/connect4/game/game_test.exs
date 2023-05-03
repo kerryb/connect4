@@ -1,7 +1,7 @@
-defmodule Connect4.GameTest do
+defmodule Connect4.Game.GameTest do
   use ExUnit.Case, async: true
 
-  alias Connect4.Game
+  alias Connect4.Game.Game
   alias Phoenix.PubSub
 
   @game_id 123
@@ -11,7 +11,7 @@ defmodule Connect4.GameTest do
     :ok
   end
 
-  describe "Connect4.Game" do
+  describe "Connect4.Game.Game" do
     test "starts with O’s turn" do
       assert Game.next_player(@game_id) == :O
     end
@@ -113,7 +113,7 @@ defmodule Connect4.GameTest do
     defp play_move(player, column), do: Game.play(@game_id, player, column)
   end
 
-  describe "Inspect implementation for Connect4.Game" do
+  describe "Inspect implementation for Connect4.Game.Game" do
     test "renders the state of the board and the next player when in progress" do
       assert inspect(%Game{next_player: :X, board: %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}}) ==
                String.trim("""

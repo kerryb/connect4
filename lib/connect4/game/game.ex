@@ -1,4 +1,4 @@
-defmodule Connect4.Game do
+defmodule Connect4.Game.Game do
   @moduledoc """
   A GenServer holding the state of a single game.
   """

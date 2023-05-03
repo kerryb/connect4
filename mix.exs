@@ -44,6 +44,8 @@ defmodule Connect4.MixProject do
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:ecto_sql, "~> 3.6"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
+      {:ex_machina, "~> 2.7", only: [:dev, :test]},
+      {:faker, "~> 0.17", only: [:dev, :test]},
       {:finch, "~> 0.13"},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},

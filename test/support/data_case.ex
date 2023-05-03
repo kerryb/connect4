@@ -28,6 +28,7 @@ defmodule Connect4.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Connect4.DataCase
+      import Connect4.Factory
     end
   end
 
