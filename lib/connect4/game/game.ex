@@ -13,7 +13,7 @@ defmodule Connect4.Game do
   @type row :: 0..5
   @type board :: %{column() => %{row() => player()}}
   @type player :: :O | :X
-  @type t :: %__MODULE__{board: board(), next_player: player(), winner: player() | nil}
+  @type t :: %__MODULE__{board: board(), next_player: player(), winner: player() | :tie | nil}
 
   defimpl Inspect do
     def inspect(game, _opts), do: rows(game.board) <> "\n(#{state(game)})"
@@ -64,10 +64,15 @@ defmodule Connect4.Game do
         board = place(game.board, player, column)
 
         {next_player, winner} =
-          if won?(board, player, column) do
-            {nil, player}
-          else
-            {other_player(player), nil}
+          cond do
+            tied?(board) ->
+              {nil, :tie}
+
+            won?(board, player, column) ->
+              {nil, player}
+
+            true ->
+              {other_player(player), nil}
           end
 
         game = %{game | board: board, next_player: next_player, winner: winner}
@@ -82,6 +87,10 @@ defmodule Connect4.Game do
   defp place_in_column(column, player), do: Map.put(column, filled_row(column) + 1, player)
 
   defp filled_row(column), do: length(Map.keys(column)) - 1
+
+  defp tied?(board), do: Enum.all?(0..6, &column_full?(board, &1))
+
+  defp column_full?(board, column_no), do: board |> Map.get(column_no, %{}) |> filled_row() == 5
 
   defp won?(board, player, column) do
     completed_row?(board, player, column) or

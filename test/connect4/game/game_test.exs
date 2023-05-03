@@ -48,6 +48,17 @@ defmodule Connect4.GameTest do
       assert state.winner == :O
     end
 
+    test "is a tie if the board is filled with no lines being made" do
+      play_moves(O: 0, X: 0, O: 0, X: 0, O: 0, X: 0)
+      play_moves(O: 1, X: 1, O: 1, X: 1, O: 1, X: 1)
+      play_moves(O: 2, X: 2, O: 2, X: 2, O: 2, X: 2)
+      play_moves(O: 4, X: 3, O: 3, X: 3, O: 3, X: 3, O: 3)
+      play_moves(X: 4, O: 4, X: 4, O: 4, X: 4)
+      play_moves(O: 5, X: 5, O: 5, X: 5, O: 5, X: 5)
+      state = play_moves(O: 6, X: 6, O: 6, X: 6, O: 6, X: 6)
+      assert state.winner == :tie
+    end
+
     test "does not allow play out of turn" do
       assert {:error, "Not your turn"} = play_move(:X, 0)
     end
