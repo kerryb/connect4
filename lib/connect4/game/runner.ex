@@ -13,6 +13,7 @@ defmodule Connect4.Game.Runner do
 
   use GenServer
 
+  alias Connect4.Game.Game
   alias Connect4.Game.Queries.GameQueries
 
   @spec start_link(any()) :: GenServer.on_start()
@@ -20,10 +21,14 @@ defmodule Connect4.Game.Runner do
     GenServer.start_link(__MODULE__, opts)
   end
 
-  @spec start_game(String.t(), String.t()) :: :ok | {:error, any()}
+  @spec start_game(String.t(), String.t()) :: {:ok, integer()} | {:error, any()}
   def start_game(player_o_code, player_x_code) do
-    GameQueries.insert_from_codes(player_o_code, player_x_code)
-    :ok
+    with {:ok, game} <- GameQueries.insert_from_codes(player_o_code, player_x_code),
+         {:ok, _pid} <- Game.start_link(id: game.id) do
+      {:ok, game.id}
+    else
+      error -> error
+    end
   end
 
   @impl GenServer

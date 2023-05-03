@@ -3,6 +3,7 @@ defmodule Connect4.Game.RunnerTest do
 
   alias Connect4.Game.Runner
   alias Connect4.Game.Schema.Game
+  alias Connect4.GameRegistry
   alias Connect4.Repo
 
   setup do
@@ -16,8 +17,13 @@ defmodule Connect4.Game.RunnerTest do
     test "saves a new game to the database", %{player_1_id: player_1_id, player_2_id: player_2_id} do
       Runner.start_game("foo", "bar")
 
-      assert [%{player_o_id: player_1_id, player_x_id: player_2_id, winner_id: nil}] =
+      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner_id: nil}] =
                Repo.all(Game)
+    end
+
+    test "creates a game server" do
+      {:ok, id} = Runner.start_game("foo", "bar")
+      assert [{_pid, nil}] = Registry.lookup(GameRegistry, id)
     end
   end
 end
