@@ -2,6 +2,7 @@ defmodule Connect4.Game.Queries.GameQueries do
   @moduledoc """
   Queries for interacting with `Connect4.Game.Schema.Game` records.
   """
+
   import Ecto.Query
 
   alias Connect4.Game.Schema.{Game, Player}

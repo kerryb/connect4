@@ -10,6 +10,7 @@ defmodule Connect4.Game.Runner do
   During the game, the runner holds a reference to it in memory, rather than
   querying the database for every move.
   """
+
   use GenServer
 
   alias Connect4.Game.Queries.GameQueries

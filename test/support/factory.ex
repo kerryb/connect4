@@ -2,6 +2,7 @@ defmodule Connect4.Factory do
   @moduledoc """
   Factory definitions for tests.
   """
+
   use ExMachina.Ecto, repo: Connect4.Repo
 
   def player_factory do
