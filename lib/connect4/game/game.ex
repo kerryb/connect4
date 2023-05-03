@@ -8,13 +8,19 @@ defmodule Connect4.Game do
   alias Phoenix.PubSub
 
   @enforce_keys [:board, :next_player]
-  defstruct [:board, :next_player, :winner]
+  defstruct [:board, :next_player, :winner, :timeout, :timer_ref]
 
   @type column :: 0..6
   @type row :: 0..5
   @type board :: %{column() => %{row() => player()}}
   @type player :: :O | :X
-  @type t :: %__MODULE__{board: board(), next_player: player(), winner: player() | :tie | nil}
+  @type t :: %__MODULE__{
+          board: board(),
+          next_player: player(),
+          winner: player() | :tie | nil,
+          timeout: integer() | nil,
+          timer_ref: reference() | nil
+        }
 
   defimpl Inspect do
     def inspect(game, _opts), do: rows(game.board) <> "\n(#{state(game)})"
@@ -30,8 +36,8 @@ defmodule Connect4.Game do
   end
 
   @spec start_link(any()) :: GenServer.on_start()
-  def start_link(id) do
-    GenServer.start_link(__MODULE__, nil, name: via_tuple(id))
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: via_tuple(opts[:id]))
   end
 
   @spec next_player(any()) :: player()
@@ -43,8 +49,17 @@ defmodule Connect4.Game do
   defp via_tuple(id), do: {:via, Registry, {GameRegistry, id}}
 
   @impl GenServer
-  def init(_arg) do
-    {:ok, %__MODULE__{next_player: :O, board: %{}}}
+  def init(opts) do
+    game = %__MODULE__{next_player: :O, board: %{}}
+
+    case opts[:timeout] do
+      nil ->
+        {:ok, game}
+
+      timeout ->
+        timer_ref = start_timer(timeout, nil)
+        {:ok, %{game | timeout: timeout, timer_ref: timer_ref}}
+    end
   end
 
   @impl GenServer
@@ -64,23 +79,48 @@ defmodule Connect4.Game do
       true ->
         board = place(game.board, player, column)
 
-        {next_player, winner} =
+        {next_player, winner, timer_ref} =
           cond do
             tied?(board) ->
-              PubSub.broadcast!(Connect4.PubSub, "games", {:completed, :tie, board})
-              {nil, :tie}
+              broadcast(:tie, board)
+              {nil, :tie, nil}
 
             won?(board, player, column) ->
-              PubSub.broadcast!(Connect4.PubSub, "games", {:completed, player, board})
-              {nil, player}
+              broadcast(player, board)
+              {nil, player, nil}
 
             true ->
-              {other_player(player), nil}
+              {other_player(player), nil, start_timer(game.timeout, game.timer_ref)}
           end
 
-        game = %{game | board: board, next_player: next_player, winner: winner}
+        game = %{
+          game
+          | board: board,
+            next_player: next_player,
+            winner: winner,
+            timer_ref: timer_ref
+        }
+
         {:reply, {:ok, game}, game}
     end
+  end
+
+  @impl GenServer
+  def handle_info(:timeout, game) do
+    winner = other_player(game.next_player)
+    broadcast(winner, game.board)
+    {:noreply, %{game | next_player: nil, winner: winner}}
+  end
+
+  defp start_timer(nil, _old_timer_ref), do: nil
+
+  defp start_timer(timeout, old_timer_ref) do
+    if old_timer_ref, do: Process.cancel_timer(old_timer_ref)
+    Process.send_after(self(), :timeout, timeout)
+  end
+
+  defp broadcast(winner, board) do
+    PubSub.broadcast!(Connect4.PubSub, "games", {:completed, winner, board})
   end
 
   defp place(board, player, column) do
