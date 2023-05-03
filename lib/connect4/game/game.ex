@@ -7,14 +7,15 @@ defmodule Connect4.Game.Game do
   alias Connect4.GameRegistry
   alias Phoenix.PubSub
 
-  @enforce_keys [:board, :next_player]
-  defstruct [:board, :next_player, :winner, :timeout, :timer_ref]
+  @enforce_keys [:id, :board, :next_player]
+  defstruct [:id, :board, :next_player, :winner, :timeout, :timer_ref]
 
   @type column :: 0..6
   @type row :: 0..5
   @type board :: %{column() => %{row() => player()}}
   @type player :: :O | :X
   @type t :: %__MODULE__{
+          id: GenServer.server(),
           board: board(),
           next_player: player(),
           winner: player() | :tie | nil,
@@ -50,7 +51,7 @@ defmodule Connect4.Game.Game do
 
   @impl GenServer
   def init(opts) do
-    game = %__MODULE__{next_player: :O, board: %{}}
+    game = %__MODULE__{id: opts[:id], next_player: :O, board: %{}}
 
     case opts[:timeout] do
       nil ->
@@ -82,11 +83,11 @@ defmodule Connect4.Game.Game do
         {next_player, winner, timer_ref} =
           cond do
             tied?(board) ->
-              broadcast(:tie, board)
+              broadcast_completion(game.id, :tie, board)
               {nil, :tie, nil}
 
             won?(board, player, column) ->
-              broadcast(player, board)
+              broadcast_completion(game.id, player, board)
               {nil, player, nil}
 
             true ->
@@ -108,7 +109,7 @@ defmodule Connect4.Game.Game do
   @impl GenServer
   def handle_info(:timeout, game) do
     winner = other_player(game.next_player)
-    broadcast(winner, game.board)
+    broadcast_completion(game.id, winner, game.board)
     {:noreply, %{game | next_player: nil, winner: winner}}
   end
 
@@ -119,8 +120,8 @@ defmodule Connect4.Game.Game do
     Process.send_after(self(), :timeout, timeout)
   end
 
-  defp broadcast(winner, board) do
-    PubSub.broadcast!(Connect4.PubSub, "games", {:completed, winner, board})
+  defp broadcast_completion(id, winner, board) do
+    PubSub.broadcast!(Connect4.PubSub, "games", {:completed, id, winner, board})
   end
 
   defp place(board, player, column) do

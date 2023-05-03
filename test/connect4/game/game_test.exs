@@ -78,7 +78,7 @@ defmodule Connect4.Game.GameTest do
     test "broadcasts a message on completion" do
       PubSub.subscribe(Connect4.PubSub, "games")
       %{board: board} = play_moves(O: 2, X: 2, O: 3, X: 3, O: 0, X: 0, O: 1)
-      assert_receive {:completed, :O, ^board}
+      assert_receive {:completed, @game_id, :O, ^board}
     end
 
     test "when a timeout is given, defaults if a player doesn’t make a move in that number of ms" do
@@ -86,7 +86,7 @@ defmodule Connect4.Game.GameTest do
       stop_supervised!(Game)
       start_supervised!({Game, id: "timeout-test", timeout: 100})
       Process.sleep(110)
-      assert_received {:completed, :X, _board}
+      assert_received {:completed, "timeout-test", :X, _board}
     end
 
     test "resets the timeout each time a move is played" do
@@ -100,7 +100,7 @@ defmodule Connect4.Game.GameTest do
       Process.sleep(60)
       {:ok, _} = Game.play("timeout-test", :O, 0)
       Process.sleep(110)
-      assert_received {:completed, :O, _board}
+      assert_received {:completed, "timeout-test", :O, _board}
     end
 
     defp play_moves(moves) do
@@ -115,7 +115,11 @@ defmodule Connect4.Game.GameTest do
 
   describe "Inspect implementation for Connect4.Game.Game" do
     test "renders the state of the board and the next player when in progress" do
-      assert inspect(%Game{next_player: :X, board: %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}}) ==
+      assert inspect(%Game{
+               id: @game_id,
+               next_player: :X,
+               board: %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
+             }) ==
                String.trim("""
                . . . . . . .
                . . . . . . .
@@ -129,6 +133,7 @@ defmodule Connect4.Game.GameTest do
 
     test "renders the state of the board and the winner when complete" do
       assert inspect(%Game{
+               id: @game_id,
                next_player: :X,
                board: %{
                  0 => %{0 => :O, 1 => :X},
