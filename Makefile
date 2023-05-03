@@ -18,6 +18,7 @@ compile:
 dialyzer:
 	mix dialyzer --format dialyxir
 test:
+	MIX_ENV=test mix ecto.reset
 	mix coveralls.html
 outdated:
 	mix hex.outdated
