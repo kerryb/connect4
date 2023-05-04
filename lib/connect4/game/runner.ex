@@ -19,24 +19,24 @@ defmodule Connect4.Game.Runner do
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: Keyword.get(opts, :name, __MODULE__))
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  @spec start_game(String.t(), String.t(), integer(), GenServer.server()) ::
+  @spec start_game(String.t(), String.t(), integer()) ::
           {:ok, integer()} | {:error, any()}
-  def start_game(player_o_code, player_x_code, timeout, pid \\ __MODULE__) do
-    GenServer.call(pid, {:start_game, player_o_code, player_x_code, timeout})
+  def start_game(player_o_code, player_x_code, timeout \\ :timer.minutes(1)) do
+    GenServer.call(__MODULE__, {:start_game, player_o_code, player_x_code, timeout})
   end
 
-  @spec play(String.t(), integer(), GenServer.server()) :: {:ok, Game.board()} | {:error, any()}
-  def play(player_code, column, pid \\ __MODULE__) do
-    GenServer.call(pid, {:play, player_code, column})
+  @spec play(String.t(), integer()) :: {:ok, Game.board()} | {:error, any()}
+  def play(player_code, column) do
+    GenServer.call(__MODULE__, {:play, player_code, column})
   end
 
-  @spec find_game(String.t(), GenServer.server()) ::
+  @spec find_game(String.t()) ::
           {:ok, Game.player(), Game.t()} | {:error, String.t()}
-  def find_game(player_code, pid \\ __MODULE__) do
-    GenServer.call(pid, {:find_game, player_code})
+  def find_game(player_code) do
+    GenServer.call(__MODULE__, {:find_game, player_code})
   end
 
   @impl GenServer

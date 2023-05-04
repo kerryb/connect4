@@ -5,29 +5,32 @@ defmodule Connect4.Application do
 
   use Application
 
+  @env Application.compile_env(:connect4, :env)
+
   @impl true
   def start(_type, _args) do
-    children = [
-      # Start the Telemetry supervisor
-      Connect4Web.Telemetry,
-      # Start the Ecto repository
-      Connect4.Repo,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: Connect4.PubSub},
-      # Start Finch
-      {Finch, name: Connect4.Finch},
-      # Start the Endpoint (http/https)
-      Connect4Web.Endpoint,
-      {Registry, keys: :unique, name: Connect4.GameRegistry},
-      Connect4.Game.Runner
-      # Start a worker by calling: Connect4.Worker.start_link(arg)
-      # {Connect4.Worker, arg}
-    ]
-
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Connect4.Supervisor]
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link(children(@env), opts)
+  end
+
+  defp children(:test), do: default_children()
+  defp children(_), do: default_children() ++ non_test_children()
+
+  defp default_children do
+    [
+      Connect4Web.Telemetry,
+      Connect4.Repo,
+      {Phoenix.PubSub, name: Connect4.PubSub},
+      {Finch, name: Connect4.Finch},
+      Connect4Web.Endpoint,
+      {Registry, keys: :unique, name: Connect4.GameRegistry}
+    ]
+  end
+
+  defp non_test_children do
+    [Connect4.Game.Runner]
   end
 
   # Tell Phoenix to update the endpoint configuration

@@ -8,7 +8,8 @@
 import Config
 
 config :connect4,
-  ecto_repos: [Connect4.Repo]
+  ecto_repos: [Connect4.Repo],
+  env: config_env()
 
 # Configures the endpoint
 config :connect4, Connect4Web.Endpoint,

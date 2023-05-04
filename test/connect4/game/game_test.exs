@@ -2,12 +2,16 @@ defmodule Connect4.Game.GameTest do
   use ExUnit.Case, async: true
 
   alias Connect4.Game.Game
+  alias Connect4.Repo
+  alias Ecto.Adapters.SQL.Sandbox
   alias Phoenix.PubSub
 
   @game_id 123
 
   setup do
-    start_supervised!({Game, id: @game_id})
+    Application.ensure_all_started(:connect4)
+    {:ok, pid} = start_supervised({Game, timeout: 100, id: @game_id})
+    Sandbox.allow(Repo, self(), pid)
     :ok
   end
 
@@ -71,7 +75,7 @@ defmodule Connect4.Game.GameTest do
     end
 
     test "does not allow play in an invalid column" do
-      assert {:error, "Column must be 0..6"} = play_move(:O, -1)
+      assert {:error, "Column must be 0..6"} = play_move(:O, @game_id)
       assert {:error, "Column must be 0..6"} = play_move(:O, 7)
       assert {:error, "Column must be 0..6"} = play_move(:O, "foo")
     end
@@ -87,26 +91,22 @@ defmodule Connect4.Game.GameTest do
       assert_receive {:completed, @game_id, :O, ^board}
     end
 
-    test "when a timeout is given, defaults if a player doesn’t make a move in that number of ms" do
+    test "counts as a loss if a player doesn’t make a move within <timeout> ms" do
       PubSub.subscribe(Connect4.PubSub, "games")
-      stop_supervised!(Game)
-      start_supervised!({Game, id: -1, timeout: 100})
       Process.sleep(110)
-      assert_received {:completed, -1, :X, _board}
+      assert_received {:completed, @game_id, :X, _board}
     end
 
     test "resets the timeout each time a move is played" do
       PubSub.subscribe(Connect4.PubSub, "games")
-      stop_supervised!(Game)
-      start_supervised!({Game, id: -1, timeout: 100})
       Process.sleep(60)
-      {:ok, _} = Game.play(-1, :O, 0)
+      {:ok, _} = Game.play(@game_id, :O, 0)
       Process.sleep(60)
-      {:ok, _} = Game.play(-1, :X, 0)
+      {:ok, _} = Game.play(@game_id, :X, 0)
       Process.sleep(60)
-      {:ok, _} = Game.play(-1, :O, 0)
+      {:ok, _} = Game.play(@game_id, :O, 0)
       Process.sleep(110)
-      assert_received {:completed, -1, :O, _board}
+      assert_received {:completed, @game_id, :O, _board}
     end
 
     defp play_moves(moves) do

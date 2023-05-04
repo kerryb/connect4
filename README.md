@@ -19,10 +19,6 @@ interface with a simple HTTP API.
 
 Just run `make`.
 
-**Note:** the tests are currently a bit flaky (issues with test-managed
-database connections and servers running in the background), but it’s probably
-more important to get the app working at the moment.
-
 ## Standard Phoenix Stuff
 
 To start your Phoenix server:

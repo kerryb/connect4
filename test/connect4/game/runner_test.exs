@@ -3,68 +3,58 @@ defmodule Connect4.Game.RunnerTest do
 
   alias Connect4.Game.Runner
   alias Connect4.Game.Schema.Game
-  alias Connect4.GameRegistry
-  alias Connect4.Repo
+  alias Connect4.{GameRegistry, Repo}
   alias Ecto.Adapters.SQL.Sandbox
   alias Phoenix.PubSub
 
   setup do
-    {:ok, pid} = start_supervised({Runner, name: :test_runner})
+    {:ok, pid} = start_supervised(Runner)
     Sandbox.allow(Repo, self(), pid)
-
-    # Stops global Runner (as opposed to the test-specific one we created
-    # above) crashing when it receives a pubsub message
-    Sandbox.allow(Repo, self(), Runner)
-
     player_1 = insert(:player, code: "one")
     player_2 = insert(:player, code: "two")
-    %{pid: pid, player_1_id: player_1.id, player_2_id: player_2.id}
+    %{player_1_id: player_1.id, player_2_id: player_2.id}
   end
 
   describe "Connect4.Game.Runner" do
-    test "saves a new game to the database", %{
-      pid: pid,
-      player_1_id: player_1_id,
-      player_2_id: player_2_id
-    } do
-      Runner.start_game("one", "two", nil, pid)
+    test "saves a new game to the database", %{player_1_id: player_1_id, player_2_id: player_2_id} do
+      Runner.start_game("one", "two")
 
       assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner_id: nil}] =
                Repo.all(Game)
     end
 
-    test "creates a game server", %{pid: pid} do
-      {:ok, id} = Runner.start_game("one", "two", nil, pid)
+    test "creates a game server" do
+      {:ok, id} = Runner.start_game("one", "two")
       assert [{_pid, nil}] = Registry.lookup(GameRegistry, id)
     end
 
-    test "passes the timeout to the game", %{pid: pid} do
+    test "passes the timeout to the game" do
       PubSub.subscribe(Connect4.PubSub, "games")
-      {:ok, id} = Runner.start_game("one", "two", 100, pid)
+      {:ok, id} = Runner.start_game("one", "two", 100)
       Process.sleep(50)
       assert_receive {:completed, ^id, :X, %{}}
     end
 
-    test "returns the updated game board when a turn is played", %{pid: pid} do
-      {:ok, _id} = Runner.start_game("one", "two", nil, pid)
-      {:ok, board} = Runner.play("one", 3, pid)
+    test "returns the updated game board when a turn is played" do
+      {:ok, _id} = Runner.start_game("one", "two")
+      {:ok, board} = Runner.play("one", 3)
       assert board == %{3 => %{0 => :O}}
-      {:ok, board} = Runner.play("two", 3, pid)
+      {:ok, board} = Runner.play("two", 3)
       assert board == %{3 => %{0 => :O, 1 => :X}}
     end
 
-    test "allows an in-progress game to be queried", %{pid: pid} do
-      {:ok, _id} = Runner.start_game("one", "two", nil, pid)
-      {:ok, _board} = Runner.play("one", 3, pid)
-      assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one", pid)
+    test "allows an in-progress game to be queried" do
+      {:ok, _id} = Runner.start_game("one", "two")
+      {:ok, _board} = Runner.play("one", 3)
+      assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one")
     end
 
-    test "returns an error if querying a non-existent game", %{pid: pid} do
-      assert {:error, "Game not found"} = Runner.find_game("one", pid)
+    test "returns an error if querying a non-existent game" do
+      assert {:error, "Game not found"} = Runner.find_game("one")
     end
 
-    test "updates the database when a game finishes", %{pid: pid, player_1_id: player_1_id} do
-      {:ok, id} = Runner.start_game("one", "two", nil, pid)
+    test "updates the database when a game finishes", %{player_1_id: player_1_id} do
+      {:ok, id} = Runner.start_game("one", "two")
 
       PubSub.subscribe(Connect4.PubSub, "tournament")
 
