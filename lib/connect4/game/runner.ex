@@ -28,7 +28,7 @@ defmodule Connect4.Game.Runner do
     GenServer.call(__MODULE__, {:start_game, player_o_code, player_x_code, timeout})
   end
 
-  @spec play(String.t(), integer()) :: {:ok, Game.board()} | {:error, any()}
+  @spec play(String.t(), integer()) :: {:ok, Game.player(), Game.t()} | {:error, any()}
   def play(player_code, column) do
     GenServer.call(__MODULE__, {:play, player_code, column})
   end
@@ -58,7 +58,7 @@ defmodule Connect4.Game.Runner do
   def handle_call({:play, player_code, column}, _from, state) do
     with {id, player} <- state.games[player_code],
          {:ok, game} <- Game.play(id, player, column) do
-      {:reply, {:ok, game.board}, state}
+      {:reply, {:ok, player, game}, state}
     else
       nil -> {:reply, {:error, "Game not found"}}
       error -> {:reply, error}

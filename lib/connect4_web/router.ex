@@ -19,6 +19,7 @@ defmodule Connect4Web.Router do
 
     get "/", PageController, :home
     get "/games/:code", GameController, :show
+    post "/games/:code/:column", GameController, :play
   end
 
   # Other scopes may use custom stacks.

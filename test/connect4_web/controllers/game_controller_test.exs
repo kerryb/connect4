@@ -27,4 +27,14 @@ defmodule Connect4Web.GameControllerTest do
       assert %{"error" => "Game not found"} = json_response(conn, 404)
     end
   end
+
+  describe "POST /game/:code/:column" do
+    test "plays a turn", %{conn: conn} do
+      Runner.start_game("one", "two", nil)
+      conn = post(conn, ~p"/games/one/0")
+
+      assert %{"next_player" => "X", "board" => %{"0" => %{"0" => "O"}}} =
+               json_response(conn, 200)
+    end
+  end
 end

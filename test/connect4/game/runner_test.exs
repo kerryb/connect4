@@ -35,17 +35,17 @@ defmodule Connect4.Game.RunnerTest do
       assert_receive {:completed, ^id, :X, %{}}
     end
 
-    test "returns the updated game board when a turn is played" do
+    test "returns the player and the updated game when a turn is played" do
       {:ok, _id} = Runner.start_game("one", "two")
-      {:ok, board} = Runner.play("one", 3)
-      assert board == %{3 => %{0 => :O}}
-      {:ok, board} = Runner.play("two", 3)
-      assert board == %{3 => %{0 => :O, 1 => :X}}
+      assert {:ok, :O, %{next_player: :X, board: %{3 => %{0 => :O}}}} = Runner.play("one", 3)
+
+      assert {:ok, :X, %{next_player: :O, board: %{3 => %{0 => :O, 1 => :X}}}} =
+               Runner.play("two", 3)
     end
 
     test "allows an in-progress game to be queried" do
       {:ok, _id} = Runner.start_game("one", "two")
-      {:ok, _board} = Runner.play("one", 3)
+      {:ok, _, _} = Runner.play("one", 3)
       assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one")
     end
 
