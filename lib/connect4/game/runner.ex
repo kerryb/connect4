@@ -19,7 +19,7 @@ defmodule Connect4.Game.Runner do
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts)
+    GenServer.start_link(__MODULE__, opts, name: Keyword.get(opts, :name, __MODULE__))
   end
 
   @spec start_game(String.t(), String.t(), integer(), GenServer.server()) ::
@@ -31,6 +31,12 @@ defmodule Connect4.Game.Runner do
   @spec play(String.t(), integer(), GenServer.server()) :: {:ok, Game.board()} | {:error, any()}
   def play(player_code, column, pid \\ __MODULE__) do
     GenServer.call(pid, {:play, player_code, column})
+  end
+
+  @spec find_game(String.t(), GenServer.server()) ::
+          {:ok, Game.player(), Game.t()} | {:error, String.t()}
+  def find_game(player_code, pid \\ __MODULE__) do
+    GenServer.call(pid, {:find_game, player_code})
   end
 
   @impl GenServer
@@ -56,6 +62,15 @@ defmodule Connect4.Game.Runner do
     else
       nil -> {:reply, {:error, "Game not found"}}
       error -> {:reply, error}
+    end
+  end
+
+  def handle_call({:find_game, player_code}, _from, state) do
+    with {id, player} <- state.games[player_code],
+         game <- Game.get(id) do
+      {:reply, {:ok, player, game}, state}
+    else
+      nil -> {:reply, {:error, "Game not found"}}
     end
   end
 

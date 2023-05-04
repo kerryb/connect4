@@ -13,20 +13,26 @@ defmodule Connect4.Game.GameTest do
 
   describe "Connect4.Game.Game" do
     test "starts with O’s turn" do
-      assert Game.next_player(@game_id) == :O
+      assert Game.get(@game_id).next_player == :O
     end
 
     test "alternates players’ turns" do
       {:ok, _} = play_move(:O, 0)
-      assert Game.next_player(@game_id) == :X
+      assert Game.get(@game_id).next_player == :X
       {:ok, _} = play_move(:X, 0)
-      assert Game.next_player(@game_id) == :O
+      assert Game.get(@game_id).next_player == :O
     end
 
     test "keeps track of moves" do
       play_moves(O: 3, X: 2)
       {:ok, state} = play_move(:O, 2)
       assert state.board == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
+    end
+
+    test "allows a game to be queried" do
+      play_move(:O, 3)
+      game = Game.get(@game_id)
+      assert game.board == %{3 => %{0 => :O}}
     end
 
     test "detects four in a row horizontally as a win" do

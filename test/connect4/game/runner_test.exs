@@ -9,8 +9,13 @@ defmodule Connect4.Game.RunnerTest do
   alias Phoenix.PubSub
 
   setup do
-    {:ok, pid} = start_supervised(Runner, id: :test_runner)
+    {:ok, pid} = start_supervised({Runner, name: :test_runner})
     Sandbox.allow(Repo, self(), pid)
+
+    # Stops global Runner (as opposed to the test-specific one we created
+    # above) crashing when it receives a pubsub message
+    Sandbox.allow(Repo, self(), Runner)
+
     player_1 = insert(:player, code: "one")
     player_2 = insert(:player, code: "two")
     %{pid: pid, player_1_id: player_1.id, player_2_id: player_2.id}
@@ -46,6 +51,12 @@ defmodule Connect4.Game.RunnerTest do
       assert board == %{3 => %{0 => :O}}
       {:ok, board} = Runner.play("two", 3, pid)
       assert board == %{3 => %{0 => :O, 1 => :X}}
+    end
+
+    test "allows an in-progress game to be queried", %{pid: pid} do
+      {:ok, _id} = Runner.start_game("one", "two", nil, pid)
+      {:ok, _board} = Runner.play("one", 3, pid)
+      assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one", pid)
     end
 
     test "updates the database when a game finishes", %{pid: pid, player_1_id: player_1_id} do

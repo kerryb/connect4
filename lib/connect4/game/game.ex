@@ -41,8 +41,8 @@ defmodule Connect4.Game.Game do
     GenServer.start_link(__MODULE__, opts, name: via_tuple(opts[:id]))
   end
 
-  @spec next_player(any()) :: player()
-  def next_player(id), do: id |> via_tuple() |> GenServer.call(:next_player)
+  @spec get(any()) :: t()
+  def get(id), do: id |> via_tuple() |> GenServer.call(:get)
 
   @spec play(GenServer.server(), player(), column()) :: any()
   def play(id, player, column), do: id |> via_tuple() |> GenServer.call({:play, player, column})
@@ -64,7 +64,7 @@ defmodule Connect4.Game.Game do
   end
 
   @impl GenServer
-  def handle_call(:next_player, _from, game), do: {:reply, game.next_player, game}
+  def handle_call(:get, _from, game), do: {:reply, game, game}
 
   def handle_call({:play, player, column}, _from, game) do
     cond do

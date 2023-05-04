@@ -18,7 +18,8 @@ defmodule Connect4.Application do
       {Finch, name: Connect4.Finch},
       # Start the Endpoint (http/https)
       Connect4Web.Endpoint,
-      {Registry, keys: :unique, name: Connect4.GameRegistry}
+      {Registry, keys: :unique, name: Connect4.GameRegistry},
+      Connect4.Game.Runner
       # Start a worker by calling: Connect4.Worker.start_link(arg)
       # {Connect4.Worker, arg}
     ]
