@@ -90,23 +90,23 @@ defmodule Connect4.Game.GameTest do
     test "when a timeout is given, defaults if a player doesn’t make a move in that number of ms" do
       PubSub.subscribe(Connect4.PubSub, "games")
       stop_supervised!(Game)
-      start_supervised!({Game, id: "timeout-test", timeout: 100})
+      start_supervised!({Game, id: -1, timeout: 100})
       Process.sleep(110)
-      assert_received {:completed, "timeout-test", :X, _board}
+      assert_received {:completed, -1, :X, _board}
     end
 
     test "resets the timeout each time a move is played" do
       PubSub.subscribe(Connect4.PubSub, "games")
       stop_supervised!(Game)
-      start_supervised!({Game, id: "timeout-test", timeout: 100})
+      start_supervised!({Game, id: -1, timeout: 100})
       Process.sleep(60)
-      {:ok, _} = Game.play("timeout-test", :O, 0)
+      {:ok, _} = Game.play(-1, :O, 0)
       Process.sleep(60)
-      {:ok, _} = Game.play("timeout-test", :X, 0)
+      {:ok, _} = Game.play(-1, :X, 0)
       Process.sleep(60)
-      {:ok, _} = Game.play("timeout-test", :O, 0)
+      {:ok, _} = Game.play(-1, :O, 0)
       Process.sleep(110)
-      assert_received {:completed, "timeout-test", :O, _board}
+      assert_received {:completed, -1, :O, _board}
     end
 
     defp play_moves(moves) do
