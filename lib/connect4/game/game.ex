@@ -19,7 +19,7 @@ defmodule Connect4.Game.Game do
           board: board(),
           next_player: player(),
           winner: player() | :tie | nil,
-          timeout: integer() | nil,
+          timeout: integer(),
           timer_ref: reference() | nil
         }
 
@@ -52,15 +52,8 @@ defmodule Connect4.Game.Game do
   @impl GenServer
   def init(opts) do
     game = %__MODULE__{id: opts[:id], next_player: :O, board: %{}}
-
-    case opts[:timeout] do
-      nil ->
-        {:ok, game}
-
-      timeout ->
-        timer_ref = start_timer(timeout, nil)
-        {:ok, %{game | timeout: timeout, timer_ref: timer_ref}}
-    end
+    timer_ref = start_timer(opts[:timeout], nil)
+    {:ok, %{game | timeout: opts[:timeout], timer_ref: timer_ref}}
   end
 
   @impl GenServer
