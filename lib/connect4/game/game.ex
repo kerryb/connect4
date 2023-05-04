@@ -89,10 +89,12 @@ defmodule Connect4.Game.Game do
         {next_player, winner, timer_ref} =
           cond do
             tied?(board) ->
+              stop_timer(game.timer_ref)
               broadcast_completion(game.id, :tie, board)
               {nil, :tie, nil}
 
             won?(board, player, column) ->
+              stop_timer(game.timer_ref)
               broadcast_completion(game.id, player, board)
               {nil, player, nil}
 
@@ -122,9 +124,12 @@ defmodule Connect4.Game.Game do
   defp start_timer(nil, _old_timer_ref), do: nil
 
   defp start_timer(timeout, old_timer_ref) do
-    if old_timer_ref, do: Process.cancel_timer(old_timer_ref)
+    stop_timer(old_timer_ref)
     Process.send_after(self(), :timeout, timeout)
   end
+
+  defp stop_timer(nil), do: :ok
+  defp stop_timer(ref), do: Process.cancel_timer(ref)
 
   defp broadcast_completion(id, winner, board) do
     PubSub.broadcast!(Connect4.PubSub, "games", {:completed, id, winner, board})
