@@ -33,5 +33,25 @@ defmodule Connect4Web.GameJSONTest do
                [nil, nil, nil, nil, nil, nil]
              ]
     end
+
+    test "returns the winner", %{game: game} do
+      assert GameJSON.render(%{game | winner: :O}, :X).winner == :O
+    end
+
+    test "returns a status of 'playing' if the game is still in progress", %{game: game} do
+      assert GameJSON.render(game, :O).status == "playing"
+    end
+
+    test "returns a status of 'win' if the player won", %{game: game} do
+      assert GameJSON.render(%{game | winner: :O}, :O).status == "win"
+    end
+
+    test "returns a status of 'lose' if the player won", %{game: game} do
+      assert GameJSON.render(%{game | winner: :O}, :X).status == "lose"
+    end
+
+    test "returns a status of 'tie' if the game was tied", %{game: game} do
+      assert GameJSON.render(%{game | winner: :tie}, :X).status == "tie"
+    end
   end
 end

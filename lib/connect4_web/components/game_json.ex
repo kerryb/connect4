@@ -7,7 +7,9 @@ defmodule Connect4Web.GameJSON do
       playing_as: player,
       next_player: game.next_player,
       board: game.board,
-      board_as_array: as_array(game.board)
+      board_as_array: as_array(game.board),
+      winner: game.winner,
+      status: status(game, player)
     }
   end
 
@@ -20,4 +22,9 @@ defmodule Connect4Web.GameJSON do
       end
     end
   end
+
+  defp status(%{winner: winner}, winner), do: "win"
+  defp status(%{winner: :tie}, _), do: "tie"
+  defp status(%{winner: nil}, _), do: "playing"
+  defp status(_, _), do: "lose"
 end
