@@ -1,5 +1,5 @@
 defmodule Connect4.Game.RunnerTest do
-  use Connect4.DataCase, async: true
+  use Connect4.DataCase
 
   alias Connect4.Game.Runner
   alias Connect4.Game.Schema.Game

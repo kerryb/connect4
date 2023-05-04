@@ -1,5 +1,5 @@
 defmodule Connect4.Game.GameTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   alias Connect4.Game.Game
   alias Connect4.Repo

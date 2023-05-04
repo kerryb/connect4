@@ -1,5 +1,5 @@
 defmodule Connect4Web.GameControllerTest do
-  use Connect4Web.ConnCase, async: true
+  use Connect4Web.ConnCase
 
   import Connect4.Factory
 
