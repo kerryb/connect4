@@ -67,11 +67,7 @@ defmodule Connect4.Game.Game do
   def handle_call(:get, _from, game), do: {:reply, game, game}
 
   def handle_call({:play, player, column_str}, _from, game) do
-    column =
-      case Integer.parse(column_str) do
-        {col, ""} -> col
-        _ -> ""
-      end
+    column = parse_column(column_str)
 
     cond do
       player != game.next_player ->
@@ -84,34 +80,38 @@ defmodule Connect4.Game.Game do
         {:reply, {:error, "Column is full"}, game}
 
       true ->
-        board = place(game.board, player, column)
-
-        {next_player, winner, timer_ref} =
-          cond do
-            tied?(board) ->
-              stop_timer(game.timer_ref)
-              broadcast_completion(game.id, :tie, board)
-              {nil, :tie, nil}
-
-            won?(board, player, column) ->
-              stop_timer(game.timer_ref)
-              broadcast_completion(game.id, player, board)
-              {nil, player, nil}
-
-            true ->
-              {other_player(player), nil, start_timer(game.timeout, game.timer_ref)}
-          end
-
-        game = %{
-          game
-          | board: board,
-            next_player: next_player,
-            winner: winner,
-            timer_ref: timer_ref
-        }
-
+        game = play_move(game, player, column)
         {:reply, {:ok, game}, game}
     end
+  end
+
+  defp parse_column(column_str) do
+    case Integer.parse(column_str) do
+      {col, ""} -> col
+      _ -> ""
+    end
+  end
+
+  defp play_move(game, player, column) do
+    board = place(game.board, player, column)
+
+    {next_player, winner, timer_ref} =
+      cond do
+        tied?(board) ->
+          stop_timer(game.timer_ref)
+          broadcast_completion(game.id, :tie, board)
+          {nil, :tie, nil}
+
+        won?(board, player, column) ->
+          stop_timer(game.timer_ref)
+          broadcast_completion(game.id, player, board)
+          {nil, player, nil}
+
+        true ->
+          {other_player(player), nil, start_timer(game.timeout, game.timer_ref)}
+      end
+
+    %{game | board: board, next_player: next_player, winner: winner, timer_ref: timer_ref}
   end
 
   @impl GenServer
