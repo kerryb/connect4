@@ -22,19 +22,26 @@ defmodule Connect4.Game.RunnerTest do
       player_1_id: player_1_id,
       player_2_id: player_2_id
     } do
-      Runner.start_game("one", "two", pid)
+      Runner.start_game("one", "two", nil, pid)
 
       assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner_id: nil}] =
                Repo.all(Game)
     end
 
     test "creates a game server", %{pid: pid} do
-      {:ok, id} = Runner.start_game("one", "two", pid)
+      {:ok, id} = Runner.start_game("one", "two", nil, pid)
       assert [{_pid, nil}] = Registry.lookup(GameRegistry, id)
     end
 
+    test "passes the timeout to the game", %{pid: pid} do
+      PubSub.subscribe(Connect4.PubSub, "games")
+      {:ok, id} = Runner.start_game("one", "two", 100, pid)
+      Process.sleep(50)
+      assert_receive {:completed, ^id, :X, %{}}
+    end
+
     test "returns the updated game board when a turn is played", %{pid: pid} do
-      {:ok, _id} = Runner.start_game("one", "two", pid)
+      {:ok, _id} = Runner.start_game("one", "two", nil, pid)
       {:ok, board} = Runner.play("one", 3, pid)
       assert board == %{3 => %{0 => :O}}
       {:ok, board} = Runner.play("two", 3, pid)
@@ -42,7 +49,7 @@ defmodule Connect4.Game.RunnerTest do
     end
 
     test "updates the database when a game finishes", %{pid: pid, player_1_id: player_1_id} do
-      {:ok, id} = Runner.start_game("one", "two", pid)
+      {:ok, id} = Runner.start_game("one", "two", nil, pid)
 
       PubSub.subscribe(Connect4.PubSub, "tournament")
 
