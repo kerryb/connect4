@@ -5,7 +5,13 @@ defmodule Connect4Web.GameController do
   alias Connect4Web.GameJSON
 
   def show(conn, %{"code" => code}) do
-    {:ok, player, game} = Runner.find_game(code)
-    json(conn, GameJSON.render(game, player))
+    case Runner.find_game(code) do
+      {:ok, player, game} ->
+        Runner.find_game(code)
+        json(conn, GameJSON.render(game, player))
+
+      {:error, message} ->
+        conn |> put_status(:not_found) |> json(%{error: message})
+    end
   end
 end

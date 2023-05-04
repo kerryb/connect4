@@ -59,6 +59,10 @@ defmodule Connect4.Game.RunnerTest do
       assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one", pid)
     end
 
+    test "returns an error if querying a non-existent game", %{pid: pid} do
+      assert {:error, "Game not found"} = Runner.find_game("one", pid)
+    end
+
     test "updates the database when a game finishes", %{pid: pid, player_1_id: player_1_id} do
       {:ok, id} = Runner.start_game("one", "two", nil, pid)
 
