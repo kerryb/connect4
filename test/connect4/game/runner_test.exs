@@ -37,15 +37,21 @@ defmodule Connect4.Game.RunnerTest do
 
     test "returns the player and the updated game when a turn is played" do
       {:ok, _id} = Runner.start_game("one", "two")
-      assert {:ok, :O, %{next_player: :X, board: %{3 => %{0 => :O}}}} = Runner.play("one", 3)
+      assert {:ok, :O, %{next_player: :X, board: %{3 => %{0 => :O}}}} = Runner.play("one", "3")
+    end
 
-      assert {:ok, :X, %{next_player: :O, board: %{3 => %{0 => :O, 1 => :X}}}} =
-               Runner.play("two", 3)
+    test "returns an error if the game is not found" do
+      assert {:error, "Game not found"} = Runner.play("one", "3")
+    end
+
+    test "passes on any error from the game" do
+      {:ok, _id} = Runner.start_game("one", "two")
+      assert {:error, "Not your turn"} = Runner.play("two", "3")
     end
 
     test "allows an in-progress game to be queried" do
       {:ok, _id} = Runner.start_game("one", "two")
-      {:ok, _, _} = Runner.play("one", 3)
+      {:ok, _, _} = Runner.play("one", "3")
       assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one")
     end
 

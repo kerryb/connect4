@@ -75,7 +75,7 @@ defmodule Connect4.Game.GameTest do
     end
 
     test "does not allow play in an invalid column" do
-      assert {:error, "Column must be 0..6"} = play_move(:O, @game_id)
+      assert {:error, "Column must be 0..6"} = play_move(:O, -1)
       assert {:error, "Column must be 0..6"} = play_move(:O, 7)
       assert {:error, "Column must be 0..6"} = play_move(:O, "foo")
     end
@@ -100,11 +100,11 @@ defmodule Connect4.Game.GameTest do
     test "resets the timeout each time a move is played" do
       PubSub.subscribe(Connect4.PubSub, "games")
       Process.sleep(60)
-      {:ok, _} = Game.play(@game_id, :O, 0)
+      {:ok, _} = play_move(:O, 0)
       Process.sleep(60)
-      {:ok, _} = Game.play(@game_id, :X, 0)
+      {:ok, _} = play_move(:X, 0)
       Process.sleep(60)
-      {:ok, _} = Game.play(@game_id, :O, 0)
+      {:ok, _} = play_move(:O, 0)
       Process.sleep(110)
       assert_received {:completed, @game_id, :O, _board}
     end
@@ -116,7 +116,7 @@ defmodule Connect4.Game.GameTest do
       end)
     end
 
-    defp play_move(player, column), do: Game.play(@game_id, player, column)
+    defp play_move(player, column), do: Game.play(@game_id, player, to_string(column))
   end
 
   describe "Inspect implementation for Connect4.Game.Game" do

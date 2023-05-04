@@ -18,6 +18,11 @@ defmodule Connect4Web.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
+
+  scope "/", Connect4Web do
+    pipe_through :api
+
     get "/games/:code", GameController, :show
     post "/games/:code/:column", GameController, :play
   end

@@ -60,8 +60,8 @@ defmodule Connect4.Game.Runner do
          {:ok, game} <- Game.play(id, player, column) do
       {:reply, {:ok, player, game}, state}
     else
-      nil -> {:reply, {:error, "Game not found"}}
-      error -> {:reply, error}
+      nil -> {:reply, {:error, "Game not found"}, state}
+      error -> {:reply, error, state}
     end
   end
 

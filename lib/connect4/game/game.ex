@@ -66,7 +66,13 @@ defmodule Connect4.Game.Game do
   @impl GenServer
   def handle_call(:get, _from, game), do: {:reply, game, game}
 
-  def handle_call({:play, player, column}, _from, game) do
+  def handle_call({:play, player, column_str}, _from, game) do
+    column =
+      case Integer.parse(column_str) do
+        {col, ""} -> col
+        _ -> ""
+      end
+
     cond do
       player != game.next_player ->
         {:reply, {:error, "Not your turn"}, game}

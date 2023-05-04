@@ -15,8 +15,8 @@ defmodule Connect4Web.GameController do
     end
   end
 
-  def play(conn, %{"code" => code, "column" => column}) when column in ~w[0 1 2 3 4 5 6] do
-    case Runner.play(code, String.to_integer(column)) do
+  def play(conn, %{"code" => code, "column" => column}) do
+    case Runner.play(code, column) do
       {:ok, player, game} ->
         json(conn, GameJSON.render(game, player))
 
