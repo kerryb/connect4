@@ -12,7 +12,7 @@ deep-clean:
 format:
 	mix format --check-formatted
 credo:
-	mix credo
+	mix credo --all
 compile:
 	mix compile --warnings-as-errors
 dialyzer:
