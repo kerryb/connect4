@@ -5,7 +5,6 @@ defmodule Connect4.Factory do
 
   use ExMachina.Ecto, repo: Connect4.Repo
 
-  alias Connect4.Auth
   alias Connect4.Auth.Schema.Player
   alias Connect4.Game.Schema.Game
   alias Ecto.Changeset
