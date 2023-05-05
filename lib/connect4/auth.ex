@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4.Auth do
   @moduledoc """
   The Auth context.
@@ -140,10 +141,13 @@ defmodule Connect4.Auth do
 
     with {:ok, query} <- PlayerToken.verify_change_email_token_query(token, context),
          %PlayerToken{sent_to: email} <- Repo.one(query),
-         {:ok, _} <- Repo.transaction(player_email_multi(player, email, context)) do
+         {:ok, _player} <-
+           player
+           |> player_email_multi(email, context)
+           |> Repo.transaction() do
       :ok
     else
-      _ -> :error
+      _error -> :error
     end
   end
 
@@ -212,7 +216,7 @@ defmodule Connect4.Auth do
     |> Repo.transaction()
     |> case do
       {:ok, %{player: player}} -> {:ok, player}
-      {:error, :player, changeset, _} -> {:error, changeset}
+      {:error, :player, changeset, _changes} -> {:error, changeset}
     end
   end
 
@@ -239,7 +243,10 @@ defmodule Connect4.Auth do
   Deletes the signed token with the given context.
   """
   def delete_player_session_token(token) do
-    Repo.delete_all(PlayerToken.token_and_context_query(token, "session"))
+    token
+    |> PlayerToken.token_and_context_query("session")
+    |> Repo.delete_all()
+
     :ok
   end
 
@@ -281,10 +288,13 @@ defmodule Connect4.Auth do
   def confirm_player(token) do
     with {:ok, query} <- PlayerToken.verify_email_token_query(token, "confirm"),
          %Player{} = player <- Repo.one(query),
-         {:ok, %{player: player}} <- Repo.transaction(confirm_player_multi(player)) do
+         {:ok, %{player: player}} <-
+           player
+           |> confirm_player_multi()
+           |> Repo.transaction() do
       {:ok, player}
     else
-      _ -> :error
+      _error -> :error
     end
   end
 
@@ -333,7 +343,7 @@ defmodule Connect4.Auth do
          %Player{} = player <- Repo.one(query) do
       player
     else
-      _ -> nil
+      _error -> nil
     end
   end
 
@@ -356,7 +366,7 @@ defmodule Connect4.Auth do
     |> Repo.transaction()
     |> case do
       {:ok, %{player: player}} -> {:ok, player}
-      {:error, :player, changeset, _} -> {:error, changeset}
+      {:error, :player, changeset, _changes} -> {:error, changeset}
     end
   end
 end

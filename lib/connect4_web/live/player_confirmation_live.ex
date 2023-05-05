@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4Web.PlayerConfirmationLive do
   @moduledoc false
   use Connect4Web, :live_view
@@ -33,7 +34,7 @@ defmodule Connect4Web.PlayerConfirmationLive do
   # leaked token giving the player access to the account.
   def handle_event("confirm_account", %{"player" => %{"token" => token}}, socket) do
     case Auth.confirm_player(token) do
-      {:ok, _} ->
+      {:ok, _player} ->
         {:noreply,
          socket
          |> put_flash(:info, "Player confirmed successfully.")

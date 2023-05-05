@@ -70,7 +70,7 @@ defmodule Connect4.Game.Runner do
          game <- Game.get(id) do
       {:reply, {:ok, player, game}, state}
     else
-      _ -> {:reply, {:error, "Game not found"}, state}
+      _error -> {:reply, {:error, "Game not found"}, state}
     end
   end
 

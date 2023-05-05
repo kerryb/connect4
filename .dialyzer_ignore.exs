@@ -1,3 +1,3 @@
 [
-  {"lib/connect4/application.ex", :pattern_match, 18}
+  {"lib/connect4/application.ex", :pattern_match, 22}
 ]

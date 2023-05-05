@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4.AuthFixtures do
   @moduledoc """
   This module defines test helpers for creating
@@ -27,7 +28,7 @@ defmodule Connect4.AuthFixtures do
 
   def extract_player_token(fun) do
     {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
-    [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
+    [_pre, token | _post] = String.split(captured_email.text_body, "[TOKEN]")
     token
   end
 end

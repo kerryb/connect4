@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule Connect4.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
@@ -7,16 +8,19 @@ defmodule Connect4.Application do
 
   @env Application.compile_env(:connect4, :env)
 
-  @impl true
+  @impl Application
   def start(_type, _args) do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Connect4.Supervisor]
-    Supervisor.start_link(children(@env), opts)
+
+    @env
+    |> children()
+    |> Supervisor.start_link(opts)
   end
 
   defp children(:test), do: default_children()
-  defp children(_), do: default_children() ++ non_test_children()
+  defp children(_env), do: default_children() ++ non_test_children()
 
   defp default_children do
     [
@@ -35,7 +39,7 @@ defmodule Connect4.Application do
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
-  @impl true
+  @impl Application
   def config_change(changed, _new, removed) do
     Connect4Web.Endpoint.config_change(changed, removed)
     :ok

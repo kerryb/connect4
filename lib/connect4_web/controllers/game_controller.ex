@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4Web.GameController do
   use Connect4Web, :controller
 
@@ -11,7 +12,9 @@ defmodule Connect4Web.GameController do
         json(conn, GameJSON.render(game, player))
 
       {:error, message} ->
-        conn |> put_status(:not_found) |> json(%{error: message})
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: message})
     end
   end
 
@@ -21,7 +24,9 @@ defmodule Connect4Web.GameController do
         json(conn, GameJSON.render(game, player))
 
       {:error, message} ->
-        conn |> put_status(:bad_request) |> json(%{error: message})
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: message})
     end
   end
 end

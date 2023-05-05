@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4Web.PlayerRegistrationLive do
   @moduledoc false
   use Connect4Web, :live_view
@@ -59,17 +60,24 @@ defmodule Connect4Web.PlayerRegistrationLive do
   def handle_event("save", %{"player" => player_params}, socket) do
     case Auth.register_player(player_params) do
       {:ok, player} ->
-        {:ok, _} =
+        {:ok, _player} =
           Auth.deliver_player_confirmation_instructions(
             player,
             &url(~p"/players/confirm/#{&1}")
           )
 
         changeset = Auth.change_player_registration(player)
-        {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
+
+        {:noreply,
+         socket
+         |> assign(trigger_submit: true)
+         |> assign_form(changeset)}
 
       {:error, %Changeset{} = changeset} ->
-        {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
+        {:noreply,
+         socket
+         |> assign(check_errors: true)
+         |> assign_form(changeset)}
     end
   end
 

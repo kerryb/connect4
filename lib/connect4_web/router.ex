@@ -1,33 +1,35 @@
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
+
 defmodule Connect4Web.Router do
   use Connect4Web, :router
 
   import Connect4Web.PlayerAuth
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_live_flash
-    plug :put_root_layout, {Connect4Web.Layouts, :root}
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-    plug :fetch_current_player
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, {Connect4Web.Layouts, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+    plug(:fetch_current_player)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/", Connect4Web do
-    pipe_through :browser
+    pipe_through(:browser)
 
-    live "/", HomeLive
+    live("/", HomeLive)
   end
 
   scope "/", Connect4Web do
-    pipe_through :api
+    pipe_through(:api)
 
-    get "/games/:code", GameController, :show
-    post "/games/:code/:column", GameController, :play
+    get("/games/:code", GameController, :show)
+    post("/games/:code/:column", GameController, :play)
   end
 
   # Other scopes may use custom stacks.
@@ -45,48 +47,48 @@ defmodule Connect4Web.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through :browser
+      pipe_through(:browser)
 
-      live_dashboard "/dashboard", metrics: Connect4Web.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      live_dashboard("/dashboard", metrics: Connect4Web.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 
   ## Authentication routes
 
   scope "/", Connect4Web do
-    pipe_through [:browser, :redirect_if_player_is_authenticated]
+    pipe_through([:browser, :redirect_if_player_is_authenticated])
 
     live_session :redirect_if_player_is_authenticated,
       on_mount: [{Connect4Web.PlayerAuth, :redirect_if_player_is_authenticated}] do
-      live "/players/register", PlayerRegistrationLive, :new
-      live "/players/log_in", PlayerLoginLive, :new
-      live "/players/reset_password", PlayerForgotPasswordLive, :new
-      live "/players/reset_password/:token", PlayerResetPasswordLive, :edit
+      live("/players/register", PlayerRegistrationLive, :new)
+      live("/players/log_in", PlayerLoginLive, :new)
+      live("/players/reset_password", PlayerForgotPasswordLive, :new)
+      live("/players/reset_password/:token", PlayerResetPasswordLive, :edit)
     end
 
-    post "/players/log_in", PlayerSessionController, :create
+    post("/players/log_in", PlayerSessionController, :create)
   end
 
   scope "/", Connect4Web do
-    pipe_through [:browser, :require_authenticated_player]
+    pipe_through([:browser, :require_authenticated_player])
 
     live_session :require_authenticated_player,
       on_mount: [{Connect4Web.PlayerAuth, :ensure_authenticated}] do
-      live "/players/settings", PlayerSettingsLive, :edit
-      live "/players/settings/confirm_email/:token", PlayerSettingsLive, :confirm_email
+      live("/players/settings", PlayerSettingsLive, :edit)
+      live("/players/settings/confirm_email/:token", PlayerSettingsLive, :confirm_email)
     end
   end
 
   scope "/", Connect4Web do
-    pipe_through [:browser]
+    pipe_through([:browser])
 
-    delete "/players/log_out", PlayerSessionController, :delete
+    delete("/players/log_out", PlayerSessionController, :delete)
 
     live_session :current_player,
       on_mount: [{Connect4Web.PlayerAuth, :mount_current_player}] do
-      live "/players/confirm/:token", PlayerConfirmationLive, :edit
-      live "/players/confirm", PlayerConfirmationInstructionsLive, :new
+      live("/players/confirm/:token", PlayerConfirmationLive, :edit)
+      live("/players/confirm", PlayerConfirmationInstructionsLive, :new)
     end
   end
 end

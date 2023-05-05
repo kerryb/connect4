@@ -1,5 +1,5 @@
 defmodule Connect4.Game.GameTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Connect4.Game.Game
   alias Connect4.Repo
@@ -21,16 +21,16 @@ defmodule Connect4.Game.GameTest do
     end
 
     test "alternates players’ turns" do
-      {:ok, _} = play_move(:O, 0)
+      {:ok, _game} = play_move(:O, 0)
       assert Game.get(@game_id).next_player == :X
-      {:ok, _} = play_move(:X, 0)
+      {:ok, _game} = play_move(:X, 0)
       assert Game.get(@game_id).next_player == :O
     end
 
     test "keeps track of moves" do
       play_moves(O: 3, X: 2)
-      {:ok, state} = play_move(:O, 2)
-      assert state.board == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
+      {:ok, game} = play_move(:O, 2)
+      assert game.board == %{2 => %{0 => :X, 1 => :O}, 3 => %{0 => :O}}
     end
 
     test "allows a game to be queried" do
@@ -40,23 +40,23 @@ defmodule Connect4.Game.GameTest do
     end
 
     test "detects four in a row horizontally as a win" do
-      state = play_moves(O: 2, X: 2, O: 3, X: 3, O: 0, X: 0, O: 1)
-      assert state.winner == :O
+      game = play_moves(O: 2, X: 2, O: 3, X: 3, O: 0, X: 0, O: 1)
+      assert game.winner == :O
     end
 
     test "detects four in a row vertically as a win" do
-      state = play_moves(O: 2, X: 0, O: 2, X: 0, O: 2, X: 0, O: 2)
-      assert state.winner == :O
+      game = play_moves(O: 2, X: 0, O: 2, X: 0, O: 2, X: 0, O: 2)
+      assert game.winner == :O
     end
 
     test "detects four in a row diagonally to the left as a win" do
-      state = play_moves(O: 3, X: 2, O: 2, X: 1, O: 1, X: 0, O: 1, X: 0, O: 0, X: 4, O: 0)
-      assert state.winner == :O
+      game = play_moves(O: 3, X: 2, O: 2, X: 1, O: 1, X: 0, O: 1, X: 0, O: 0, X: 4, O: 0)
+      assert game.winner == :O
     end
 
     test "detects four in a row diagonally to the right as a win" do
-      state = play_moves(O: 0, X: 1, O: 1, X: 2, O: 2, X: 3, O: 2, X: 3, O: 3, X: 6, O: 3)
-      assert state.winner == :O
+      game = play_moves(O: 0, X: 1, O: 1, X: 2, O: 2, X: 3, O: 2, X: 3, O: 3, X: 6, O: 3)
+      assert game.winner == :O
     end
 
     test "is a tie if the board is filled with no lines being made" do
@@ -66,8 +66,8 @@ defmodule Connect4.Game.GameTest do
       play_moves(O: 4, X: 3, O: 3, X: 3, O: 3, X: 3, O: 3)
       play_moves(X: 4, O: 4, X: 4, O: 4, X: 4)
       play_moves(O: 5, X: 5, O: 5, X: 5, O: 5, X: 5)
-      state = play_moves(O: 6, X: 6, O: 6, X: 6, O: 6, X: 6)
-      assert state.winner == :tie
+      game = play_moves(O: 6, X: 6, O: 6, X: 6, O: 6, X: 6)
+      assert game.winner == :tie
     end
 
     test "does not allow play out of turn" do
@@ -100,19 +100,19 @@ defmodule Connect4.Game.GameTest do
     test "resets the timeout each time a move is played" do
       PubSub.subscribe(Connect4.PubSub, "games")
       Process.sleep(60)
-      {:ok, _} = play_move(:O, 0)
+      {:ok, _game} = play_move(:O, 0)
       Process.sleep(60)
-      {:ok, _} = play_move(:X, 0)
+      {:ok, _game} = play_move(:X, 0)
       Process.sleep(60)
-      {:ok, _} = play_move(:O, 0)
+      {:ok, _game} = play_move(:O, 0)
       Process.sleep(110)
       assert_received {:completed, @game_id, :O, _board}
     end
 
     defp play_moves(moves) do
-      Enum.reduce(moves, nil, fn {player, column}, _ ->
-        {:ok, state} = play_move(player, column)
-        state
+      Enum.reduce(moves, nil, fn {player, column}, _acc ->
+        {:ok, game} = play_move(player, column)
+        game
       end)
     end
 
@@ -120,7 +120,7 @@ defmodule Connect4.Game.GameTest do
   end
 
   describe "Inspect implementation for Connect4.Game.Game" do
-    test "renders the state of the board and the next player when in progress" do
+    test "renders the game of the board and the next player when in progress" do
       assert inspect(%Game{
                id: @game_id,
                next_player: :X,
@@ -137,7 +137,7 @@ defmodule Connect4.Game.GameTest do
                """)
     end
 
-    test "renders the state of the board and the winner when complete" do
+    test "renders the game of the board and the winner when complete" do
       assert inspect(%Game{
                id: @game_id,
                next_player: :X,

@@ -1,5 +1,5 @@
 defmodule Connect4.Game.RunnerTest do
-  use Connect4.DataCase
+  use Connect4.DataCase, async: false
 
   alias Connect4.Game.Runner
   alias Connect4.Game.Schema.Game
@@ -51,7 +51,7 @@ defmodule Connect4.Game.RunnerTest do
 
     test "allows an in-progress game to be queried" do
       {:ok, _id} = Runner.start_game("one", "two")
-      {:ok, _, _} = Runner.play("one", "3")
+      {:ok, _player, _game} = Runner.play("one", "3")
       assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one")
     end
 

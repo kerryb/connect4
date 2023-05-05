@@ -152,32 +152,10 @@
           {Credo.Check.Warning.UnusedRegexOperation, []},
           {Credo.Check.Warning.UnusedStringOperation, []},
           {Credo.Check.Warning.UnusedTupleOperation, []},
-          {Credo.Check.Warning.UnsafeExec, []}
-        ],
-        disabled: [
-          #
-          # Checks handled and fixed by Styler
-          #
-          {Credo.Check.Consistency.MultiAliasImportRequireUse, []},
-          {Credo.Check.Readability.AliasOrder, []},
-          {Credo.Check.Readability.BlockPipe, []},
-          {Credo.Check.Readability.LargeNumbers, []},
-          {Credo.Check.Readability.ModuleDoc, []},
-          {Credo.Check.Readability.MultiAlias, []},
-          {Credo.Check.Readability.SinglePipe, []},
-          {Credo.Check.Readability.StrictModuleLayout, []},
-          {Credo.Check.Readability.UnnecessaryAliasExpansion, []},
-          {Credo.Check.Refactor.PipeChainStart, []},
-          {Credo.Check.Refactor.FilterCount, []},
-          {Credo.Check.Refactor.MapJoin, []},
-          {Credo.Check.Refactor.MapInto, []},
+          {Credo.Check.Warning.UnsafeExec, []},
 
           #
-          # Checks scheduled for next check update (opt-in for now, just replace `false` with `[]`)
-
-          #
-          # Controversial and experimental checks (opt-in, just move the check to `:enabled`
-          #   and be sure to use `mix credo --strict` to see low priority checks)
+          # Checks that are disabled by default
           #
           {Credo.Check.Consistency.UnusedVariableNames, []},
           {Credo.Check.Design.DuplicatedCode, []},
@@ -202,11 +180,41 @@
           {Credo.Check.Refactor.PassAsyncInTestCases, []},
           {Credo.Check.Refactor.RejectFilter, []},
           {Credo.Check.Refactor.VariableRebinding, []},
-          {Credo.Check.Warning.LazyLogging, []},
           {Credo.Check.Warning.LeakyEnvironment, []},
           {Credo.Check.Warning.MapGetUnsafePass, []},
           {Credo.Check.Warning.MixEnv, []},
           {Credo.Check.Warning.UnsafeToAtom, []}
+        ],
+        disabled: [
+          #
+          # Checks handled and fixed by Styler
+          #
+          {Credo.Check.Consistency.MultiAliasImportRequireUse, []},
+          {Credo.Check.Readability.AliasOrder, []},
+          {Credo.Check.Readability.BlockPipe, []},
+          {Credo.Check.Readability.LargeNumbers, []},
+          {Credo.Check.Readability.ModuleDoc, []},
+          {Credo.Check.Readability.MultiAlias, []},
+          {Credo.Check.Readability.SinglePipe, []},
+          {Credo.Check.Readability.StrictModuleLayout, []},
+          {Credo.Check.Readability.UnnecessaryAliasExpansion, []},
+          {Credo.Check.Refactor.PipeChainStart, []},
+          {Credo.Check.Refactor.FilterCount, []},
+          {Credo.Check.Refactor.MapJoin, []},
+          {Credo.Check.Refactor.MapInto, []},
+
+          #
+          # Incompatible with Elixir 1.14
+          #
+          {Credo.Check.Warning.LazyLogging, []}
+
+          #
+          # Checks scheduled for next check update (opt-in for now, just replace `false` with `[]`)
+
+          #
+          # Controversial and experimental checks (opt-in, just move the check to `:enabled`
+          #   and be sure to use `mix credo --strict` to see low priority checks)
+          #
 
           #
           # Custom checks can be created using `mix credo.gen.check`.

@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4Web.ErrorHTML do
   use Connect4Web, :html
 

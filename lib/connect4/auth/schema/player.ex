@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4.Auth.Schema.Player do
   @moduledoc """
   Details of a player (or pair, team etc).
@@ -12,6 +13,17 @@ defmodule Connect4.Auth.Schema.Player do
 
   alias Connect4.Auth.Schema.Player
   alias Connect4.Repo
+
+  @type t :: %__MODULE__{
+          email: String.t(),
+          password: String.t(),
+          hashed_password: String.t(),
+          confirmed_at: DateTime.t(),
+          name: String.t(),
+          code: String.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
 
   schema "players" do
     field(:email, :string)
@@ -57,7 +69,7 @@ defmodule Connect4.Auth.Schema.Player do
   end
 
   defp create_random_code(changeset) do
-    change(changeset, %{code: for(_ <- 0..6, into: "", do: <<Enum.random(?A..?Z)>>)})
+    change(changeset, %{code: for(_n <- 0..6, into: "", do: <<Enum.random(?A..?Z)>>)})
   end
 
   defp validate_email(changeset, opts) do
@@ -133,7 +145,7 @@ defmodule Connect4.Auth.Schema.Player do
     |> cast(attrs, [:email])
     |> validate_email(opts)
     |> case do
-      %{changes: %{email: _}} = changeset -> changeset
+      %{changes: %{email: _email}} = changeset -> changeset
       %{} = changeset -> add_error(changeset, :email, "did not change")
     end
   end
@@ -176,7 +188,7 @@ defmodule Connect4.Auth.Schema.Player do
     Bcrypt.verify_pass(password, hashed_password)
   end
 
-  def valid_password?(_, _) do
+  def valid_password?(_player, _password) do
     Bcrypt.no_user_verify()
     false
   end

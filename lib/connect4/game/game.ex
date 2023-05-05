@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule Connect4.Game.Game do
   @moduledoc """
   A GenServer holding the state of a single game.
@@ -24,13 +25,22 @@ defmodule Connect4.Game.Game do
         }
 
   defimpl Inspect do
-    def inspect(game, _opts), do: rows(game.board) <> "\n(#{state(game)})"
+    @spec inspect(Connect4.Game.Game.t(), Inspect.Opts.t()) :: String.t()
+    def inspect(game, _opts) do
+      board = rows(game.board)
+      state = state(game)
+      "#{board}\n(#{state})"
+    end
 
     defp rows(board), do: Enum.map_join(5..0, "\n", &row(board, &1))
 
     defp row(board, row), do: Enum.map_join(0..6, " ", &cell(board, row, &1))
 
-    defp cell(board, row, column), do: board |> Map.get(column, %{}) |> Map.get(row, ".")
+    defp cell(board, row, column) do
+      board
+      |> Map.get(column, %{})
+      |> Map.get(row, ".")
+    end
 
     defp state(%{winner: nil} = game), do: "#{game.next_player} to play"
     defp state(%{winner: winner}), do: "#{winner} has won"
@@ -42,10 +52,18 @@ defmodule Connect4.Game.Game do
   end
 
   @spec get(any()) :: t()
-  def get(id), do: id |> via_tuple() |> GenServer.call(:get)
+  def get(id) do
+    id
+    |> via_tuple()
+    |> GenServer.call(:get)
+  end
 
   @spec play(GenServer.server(), player(), column()) :: any()
-  def play(id, player, column), do: id |> via_tuple() |> GenServer.call({:play, player, column})
+  def play(id, player, column) do
+    id
+    |> via_tuple()
+    |> GenServer.call({:play, player, column})
+  end
 
   defp via_tuple(id), do: {:via, Registry, {GameRegistry, id}}
 
@@ -69,7 +87,9 @@ defmodule Connect4.Game.Game do
       column not in 0..6 ->
         {:reply, {:error, "Column must be 0..6"}, game}
 
-      game.board |> Map.get(column, %{}) |> filled_row() == 5 ->
+      game.board
+      |> Map.get(column, %{})
+      |> filled_row() == 5 ->
         {:reply, {:error, "Column is full"}, game}
 
       true ->
@@ -81,7 +101,7 @@ defmodule Connect4.Game.Game do
   defp parse_column(column_str) do
     case Integer.parse(column_str) do
       {col, ""} -> col
-      _ -> ""
+      _error -> ""
     end
   end
 
@@ -138,7 +158,11 @@ defmodule Connect4.Game.Game do
 
   defp tied?(board), do: Enum.all?(0..6, &column_full?(board, &1))
 
-  defp column_full?(board, column_no), do: board |> Map.get(column_no, %{}) |> filled_row() == 5
+  defp column_full?(board, column_no) do
+    board
+    |> Map.get(column_no, %{})
+    |> filled_row() == 5
+  end
 
   defp won?(board, player, column) do
     completed_row?(board, player, column) or
@@ -152,7 +176,7 @@ defmodule Connect4.Game.Game do
 
     owned_cells =
       board
-      |> Enum.filter(fn {_, column} -> player == column[row_index] end)
+      |> Enum.filter(fn {_index, column} -> player == column[row_index] end)
       |> Enum.map(&elem(&1, 0))
 
     Enum.any?(0..3, fn start -> Enum.all?(start..(start + 3), &(&1 in owned_cells)) end)

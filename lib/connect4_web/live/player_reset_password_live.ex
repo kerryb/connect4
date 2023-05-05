@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4Web.PlayerResetPasswordLive do
   @moduledoc false
   use Connect4Web, :live_view
@@ -47,7 +48,7 @@ defmodule Connect4Web.PlayerResetPasswordLive do
         %{player: player} ->
           Auth.change_player_password(player)
 
-        _ ->
+        _assigns ->
           %{}
       end
 
@@ -58,7 +59,7 @@ defmodule Connect4Web.PlayerResetPasswordLive do
   # leaked token giving the player access to the account.
   def handle_event("reset_password", %{"player" => player_params}, socket) do
     case Auth.reset_player_password(socket.assigns.player, player_params) do
-      {:ok, _} ->
+      {:ok, _player} ->
         {:noreply,
          socket
          |> put_flash(:info, "Password reset successfully.")

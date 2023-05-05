@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4.Factory do
   @moduledoc """
   Factory definitions for tests.

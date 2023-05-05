@@ -1,3 +1,5 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule Connect4Web do
   @moduledoc """
   The entrypoint for defining your web interface, such

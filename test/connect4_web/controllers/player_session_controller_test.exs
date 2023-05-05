@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Refactor.VariableRebinding
 defmodule Connect4Web.PlayerSessionControllerTest do
   use Connect4Web.ConnCase, async: true
 
@@ -91,7 +92,11 @@ defmodule Connect4Web.PlayerSessionControllerTest do
 
   describe "DELETE /players/log_out" do
     test "logs the player out", %{conn: conn, player: player} do
-      conn = conn |> log_in_player(player) |> delete(~p"/players/log_out")
+      conn =
+        conn
+        |> log_in_player(player)
+        |> delete(~p"/players/log_out")
+
       assert redirected_to(conn) == ~p"/"
       refute get_session(conn, :player_token)
       assert Flash.get(conn.assigns.flash, :info) =~ "Logged out successfully"

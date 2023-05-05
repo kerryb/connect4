@@ -24,7 +24,7 @@ defmodule Connect4Web.GameJSON do
   end
 
   defp status(%{winner: winner}, winner), do: "win"
-  defp status(%{winner: :tie}, _), do: "tie"
-  defp status(%{winner: nil}, _), do: "playing"
-  defp status(_, _), do: "lose"
+  defp status(%{winner: :tie}, _player), do: "tie"
+  defp status(%{winner: nil}, _player), do: "playing"
+  defp status(_winner, _player), do: "lose"
 end

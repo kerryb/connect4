@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule Connect4Web.Gettext do
   @moduledoc """
   A module providing Internationalization with a gettext-based API.

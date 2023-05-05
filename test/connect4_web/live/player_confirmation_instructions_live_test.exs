@@ -1,5 +1,5 @@
 defmodule Connect4Web.PlayerConfirmationInstructionsLiveTest do
-  use Connect4Web.ConnCase
+  use Connect4Web.ConnCase, async: true
 
   import Connect4.AuthFixtures
   import Phoenix.LiveViewTest
@@ -35,7 +35,9 @@ defmodule Connect4Web.PlayerConfirmationInstructionsLiveTest do
     end
 
     test "does not send confirmation token if player is confirmed", %{conn: conn, player: player} do
-      Repo.update!(Player.confirm_changeset(player))
+      player
+      |> Player.confirm_changeset()
+      |> Repo.update!()
 
       {:ok, lv, _html} = live(conn, ~p"/players/confirm")
 

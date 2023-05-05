@@ -1,5 +1,6 @@
+# credo:disable-for-this-file Credo.Check.Refactor.VariableRebinding
 defmodule Connect4.AuthTest do
-  use Connect4.DataCase
+  use Connect4.DataCase, async: true
 
   import Connect4.AuthFixtures
 
@@ -86,7 +87,12 @@ defmodule Connect4.AuthTest do
 
     test "registers players with a hashed password" do
       email = unique_player_email()
-      {:ok, player} = Auth.register_player(valid_player_attributes(email: email))
+
+      {:ok, player} =
+        [email: email]
+        |> valid_player_attributes()
+        |> Auth.register_player()
+
       assert player.email == email
       assert is_binary(player.hashed_password)
       assert is_nil(player.confirmed_at)
@@ -298,9 +304,9 @@ defmodule Connect4.AuthTest do
     end
 
     test "deletes all tokens for the given player", %{player: player} do
-      _ = Auth.generate_player_session_token(player)
+      _token = Auth.generate_player_session_token(player)
 
-      {:ok, _} =
+      {:ok, _player} =
         Auth.update_player_password(player, valid_player_password(), %{
           password: "new valid password"
         })
@@ -494,8 +500,8 @@ defmodule Connect4.AuthTest do
     end
 
     test "deletes all tokens for the given player", %{player: player} do
-      _ = Auth.generate_player_session_token(player)
-      {:ok, _} = Auth.reset_player_password(player, %{password: "new valid password"})
+      _token = Auth.generate_player_session_token(player)
+      {:ok, _player} = Auth.reset_player_password(player, %{password: "new valid password"})
       refute Repo.get_by(PlayerToken, player_id: player.id)
     end
   end
