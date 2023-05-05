@@ -5,9 +5,10 @@ defmodule Connect4.Game.Queries.GameQueries do
 
   import Ecto.Query
 
-  alias Ecto.Changeset
-  alias Connect4.Game.Schema.{Game, Player}
+  alias Connect4.Auth.Schema.Player
+  alias Connect4.Game.Schema.Game
   alias Connect4.Repo
+  alias Ecto.Changeset
 
   def insert_from_codes(player_o_code, player_x_code) do
     player_o = Repo.one(from(p in Player, where: p.code == ^player_o_code))

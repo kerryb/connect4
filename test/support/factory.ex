@@ -5,15 +5,23 @@ defmodule Connect4.Factory do
 
   use ExMachina.Ecto, repo: Connect4.Repo
 
+  alias Connect4.Auth
+  alias Connect4.Auth.Schema.Player
+  alias Connect4.Game.Schema.Game
+  alias Ecto.Changeset
+
   def player_factory do
-    %Connect4.Game.Schema.Player{
+    %Player{}
+    |> Player.registration_changeset(%{
+      email: Faker.Internet.email(),
       name: Faker.Person.name(),
-      code: Faker.Lorem.sentence(4)
-    }
+      password: Faker.String.base64(12)
+    })
+    |> Changeset.apply_action!(:dummy)
   end
 
   def game_factory do
-    %Connect4.Game.Schema.Game{
+    %Game{
       player_o: build(:player),
       player_x: build(:player)
     }
