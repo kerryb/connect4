@@ -1,4 +1,5 @@
 defmodule Connect4Web.PlayerLoginLive do
+  @moduledoc false
   use Connect4Web, :live_view
 
   def render(assigns) do

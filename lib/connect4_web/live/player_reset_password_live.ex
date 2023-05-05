@@ -1,4 +1,5 @@
 defmodule Connect4Web.PlayerResetPasswordLive do
+  @moduledoc false
   use Connect4Web, :live_view
 
   alias Connect4.Auth

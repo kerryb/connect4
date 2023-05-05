@@ -1,10 +1,11 @@
 defmodule Connect4.AuthTest do
   use Connect4.DataCase
 
-  alias Connect4.Auth
-
-  alias Connect4.Auth.Schema.{Player, PlayerToken}
   import Connect4.AuthFixtures
+
+  alias Connect4.Auth
+  alias Connect4.Auth.Schema.Player
+  alias Connect4.Auth.Schema.PlayerToken
 
   describe "get_player_by_email/1" do
     test "does not return the player if the email does not exist" do
@@ -30,8 +31,7 @@ defmodule Connect4.AuthTest do
     test "returns the player if the email and password are valid" do
       %{id: id} = player = player_fixture()
 
-      assert %Player{id: ^id} =
-               Auth.get_player_by_email_and_password(player.email, valid_player_password())
+      assert %Player{id: ^id} = Auth.get_player_by_email_and_password(player.email, valid_player_password())
     end
   end
 
@@ -135,8 +135,7 @@ defmodule Connect4.AuthTest do
     end
 
     test "validates email", %{player: player} do
-      {:error, changeset} =
-        Auth.apply_player_email(player, valid_player_password(), %{email: "not valid"})
+      {:error, changeset} = Auth.apply_player_email(player, valid_player_password(), %{email: "not valid"})
 
       assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
     end
@@ -144,8 +143,7 @@ defmodule Connect4.AuthTest do
     test "validates maximum value for email for security", %{player: player} do
       too_long = String.duplicate("db", 100)
 
-      {:error, changeset} =
-        Auth.apply_player_email(player, valid_player_password(), %{email: too_long})
+      {:error, changeset} = Auth.apply_player_email(player, valid_player_password(), %{email: too_long})
 
       assert "should be at most 160 character(s)" in errors_on(changeset).email
     end
@@ -160,8 +158,7 @@ defmodule Connect4.AuthTest do
     end
 
     test "validates current password", %{player: player} do
-      {:error, changeset} =
-        Auth.apply_player_email(player, "invalid", %{email: unique_player_email()})
+      {:error, changeset} = Auth.apply_player_email(player, "invalid", %{email: unique_player_email()})
 
       assert %{current_password: ["is not valid"]} = errors_on(changeset)
     end
@@ -279,15 +276,13 @@ defmodule Connect4.AuthTest do
     test "validates maximum values for password for security", %{player: player} do
       too_long = String.duplicate("db", 100)
 
-      {:error, changeset} =
-        Auth.update_player_password(player, valid_player_password(), %{password: too_long})
+      {:error, changeset} = Auth.update_player_password(player, valid_player_password(), %{password: too_long})
 
       assert "should be at most 72 character(s)" in errors_on(changeset).password
     end
 
     test "validates current password", %{player: player} do
-      {:error, changeset} =
-        Auth.update_player_password(player, "invalid", %{password: valid_player_password()})
+      {:error, changeset} = Auth.update_player_password(player, "invalid", %{password: valid_player_password()})
 
       assert %{current_password: ["is not valid"]} = errors_on(changeset)
     end
@@ -492,8 +487,7 @@ defmodule Connect4.AuthTest do
     end
 
     test "updates the password", %{player: player} do
-      {:ok, updated_player} =
-        Auth.reset_player_password(player, %{password: "new valid password"})
+      {:ok, updated_player} = Auth.reset_player_password(player, %{password: "new valid password"})
 
       assert is_nil(updated_player.password)
       assert Auth.get_player_by_email_and_password(player.email, "new valid password")

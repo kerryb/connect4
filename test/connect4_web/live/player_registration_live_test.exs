@@ -1,8 +1,8 @@
 defmodule Connect4Web.PlayerRegistrationLiveTest do
   use Connect4Web.ConnCase
 
-  import Phoenix.LiveViewTest
   import Connect4.AuthFixtures
+  import Phoenix.LiveViewTest
 
   describe "Registration page" do
     test "renders registration page", %{conn: conn} do

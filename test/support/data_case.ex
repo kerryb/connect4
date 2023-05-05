@@ -22,13 +22,13 @@ defmodule Connect4.DataCase do
 
   using do
     quote do
-      alias Connect4.Repo
-
+      import Connect4.DataCase
+      import Connect4.Factory
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Connect4.DataCase
-      import Connect4.Factory
+
+      alias Connect4.Repo
     end
   end
 

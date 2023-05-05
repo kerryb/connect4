@@ -1,11 +1,12 @@
 defmodule Connect4Web.PlayerConfirmationInstructionsLiveTest do
   use Connect4Web.ConnCase
 
-  import Phoenix.LiveViewTest
   import Connect4.AuthFixtures
+  import Phoenix.LiveViewTest
 
+  alias Connect4.Auth.Schema.Player
+  alias Connect4.Auth.Schema.PlayerToken
   alias Connect4.Repo
-  alias Connect4.Auth.Schema.{Player, PlayerToken}
   alias Phoenix.Flash
 
   setup do

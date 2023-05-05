@@ -11,8 +11,7 @@ defmodule Connect4.Game.Queries.GameQueriesTest do
       %{id: player_2_id} = insert(:player, code: "two")
       {:ok, _} = GameQueries.insert_from_codes("one", "two")
 
-      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner_id: nil}] =
-               Repo.all(Game)
+      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner_id: nil}] = Repo.all(Game)
     end
   end
 

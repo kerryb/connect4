@@ -3,7 +3,8 @@ defmodule Connect4.Game.RunnerTest do
 
   alias Connect4.Game.Runner
   alias Connect4.Game.Schema.Game
-  alias Connect4.{GameRegistry, Repo}
+  alias Connect4.GameRegistry
+  alias Connect4.Repo
   alias Ecto.Adapters.SQL.Sandbox
   alias Phoenix.PubSub
 
@@ -19,8 +20,7 @@ defmodule Connect4.Game.RunnerTest do
     test "saves a new game to the database", %{player_1_id: player_1_id, player_2_id: player_2_id} do
       Runner.start_game("one", "two")
 
-      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner_id: nil}] =
-               Repo.all(Game)
+      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner_id: nil}] = Repo.all(Game)
     end
 
     test "creates a game server" do
@@ -67,8 +67,7 @@ defmodule Connect4.Game.RunnerTest do
       PubSub.broadcast!(
         Connect4.PubSub,
         "games",
-        {:completed, id, :O,
-         %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 2 => :X, 3 => :X}}}
+        {:completed, id, :O, %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 2 => :X, 3 => :X}}}
       )
 
       assert_receive :game_finished

@@ -1,8 +1,8 @@
 defmodule Connect4Web.PlayerLoginLiveTest do
   use Connect4Web.ConnCase
 
-  import Phoenix.LiveViewTest
   import Connect4.AuthFixtures
+  import Phoenix.LiveViewTest
 
   alias Phoenix.Flash
 
@@ -33,10 +33,7 @@ defmodule Connect4Web.PlayerLoginLiveTest do
 
       {:ok, lv, _html} = live(conn, ~p"/players/log_in")
 
-      form =
-        form(lv, "#login_form",
-          player: %{email: player.email, password: password, remember_me: true}
-        )
+      form = form(lv, "#login_form", player: %{email: player.email, password: password, remember_me: true})
 
       conn = submit_form(form, conn)
 
@@ -48,10 +45,7 @@ defmodule Connect4Web.PlayerLoginLiveTest do
     } do
       {:ok, lv, _html} = live(conn, ~p"/players/log_in")
 
-      form =
-        form(lv, "#login_form",
-          player: %{email: "test@email.com", password: "123456", remember_me: true}
-        )
+      form = form(lv, "#login_form", player: %{email: "test@email.com", password: "123456", remember_me: true})
 
       conn = submit_form(form, conn)
 

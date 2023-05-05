@@ -4,7 +4,8 @@ defmodule Connect4Web.PlayerAuthTest do
   import Connect4.AuthFixtures
 
   alias Connect4.Auth
-  alias Connect4Web.{Endpoint, PlayerAuth}
+  alias Connect4Web.Endpoint
+  alias Connect4Web.PlayerAuth
   alias Phoenix.LiveView
 
   @remember_me_cookie "_connect4_web_player_remember_me"
@@ -38,8 +39,7 @@ defmodule Connect4Web.PlayerAuthTest do
     end
 
     test "writes a cookie if remember_me is configured", %{conn: conn, player: player} do
-      conn =
-        conn |> fetch_cookies() |> PlayerAuth.log_in_player(player, %{"remember_me" => "true"})
+      conn = conn |> fetch_cookies() |> PlayerAuth.log_in_player(player, %{"remember_me" => "true"})
 
       assert get_session(conn, :player_token) == conn.cookies[@remember_me_cookie]
 
@@ -90,15 +90,13 @@ defmodule Connect4Web.PlayerAuthTest do
     test "authenticates player from session", %{conn: conn, player: player} do
       player_token = Auth.generate_player_session_token(player)
 
-      conn =
-        conn |> put_session(:player_token, player_token) |> PlayerAuth.fetch_current_player([])
+      conn = conn |> put_session(:player_token, player_token) |> PlayerAuth.fetch_current_player([])
 
       assert conn.assigns.current_player.id == player.id
     end
 
     test "authenticates player from cookies", %{conn: conn, player: player} do
-      logged_in_conn =
-        conn |> fetch_cookies() |> PlayerAuth.log_in_player(player, %{"remember_me" => "true"})
+      logged_in_conn = conn |> fetch_cookies() |> PlayerAuth.log_in_player(player, %{"remember_me" => "true"})
 
       player_token = logged_in_conn.cookies[@remember_me_cookie]
       %{value: signed_token} = logged_in_conn.resp_cookies[@remember_me_cookie]
@@ -128,8 +126,7 @@ defmodule Connect4Web.PlayerAuthTest do
       player_token = Auth.generate_player_session_token(player)
       session = conn |> put_session(:player_token, player_token) |> get_session()
 
-      {:cont, updated_socket} =
-        PlayerAuth.on_mount(:mount_current_player, %{}, session, %LiveView.Socket{})
+      {:cont, updated_socket} = PlayerAuth.on_mount(:mount_current_player, %{}, session, %LiveView.Socket{})
 
       assert updated_socket.assigns.current_player.id == player.id
     end
@@ -140,17 +137,15 @@ defmodule Connect4Web.PlayerAuthTest do
       player_token = "invalid_token"
       session = conn |> put_session(:player_token, player_token) |> get_session()
 
-      {:cont, updated_socket} =
-        PlayerAuth.on_mount(:mount_current_player, %{}, session, %LiveView.Socket{})
+      {:cont, updated_socket} = PlayerAuth.on_mount(:mount_current_player, %{}, session, %LiveView.Socket{})
 
       assert updated_socket.assigns.current_player == nil
     end
 
     test "assigns nil to current_player assign if there isn't a player_token", %{conn: conn} do
-      session = conn |> get_session()
+      session = get_session(conn)
 
-      {:cont, updated_socket} =
-        PlayerAuth.on_mount(:mount_current_player, %{}, session, %LiveView.Socket{})
+      {:cont, updated_socket} = PlayerAuth.on_mount(:mount_current_player, %{}, session, %LiveView.Socket{})
 
       assert updated_socket.assigns.current_player == nil
     end
@@ -164,8 +159,7 @@ defmodule Connect4Web.PlayerAuthTest do
       player_token = Auth.generate_player_session_token(player)
       session = conn |> put_session(:player_token, player_token) |> get_session()
 
-      {:cont, updated_socket} =
-        PlayerAuth.on_mount(:ensure_authenticated, %{}, session, %LiveView.Socket{})
+      {:cont, updated_socket} = PlayerAuth.on_mount(:ensure_authenticated, %{}, session, %LiveView.Socket{})
 
       assert updated_socket.assigns.current_player.id == player.id
     end
@@ -184,7 +178,7 @@ defmodule Connect4Web.PlayerAuthTest do
     end
 
     test "redirects to login page if there isn't a player_token ", %{conn: conn} do
-      session = conn |> get_session()
+      session = get_session(conn)
 
       socket = %LiveView.Socket{
         endpoint: Endpoint,
@@ -211,7 +205,7 @@ defmodule Connect4Web.PlayerAuthTest do
     end
 
     test "Don't redirect is there is no authenticated player", %{conn: conn} do
-      session = conn |> get_session()
+      session = get_session(conn)
 
       assert {:cont, _updated_socket} =
                PlayerAuth.on_mount(
@@ -279,8 +273,7 @@ defmodule Connect4Web.PlayerAuthTest do
     end
 
     test "does not redirect if player is authenticated", %{conn: conn, player: player} do
-      conn =
-        conn |> assign(:current_player, player) |> PlayerAuth.require_authenticated_player([])
+      conn = conn |> assign(:current_player, player) |> PlayerAuth.require_authenticated_player([])
 
       refute conn.halted
       refute conn.status

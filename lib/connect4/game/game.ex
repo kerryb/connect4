@@ -26,9 +26,9 @@ defmodule Connect4.Game.Game do
   defimpl Inspect do
     def inspect(game, _opts), do: rows(game.board) <> "\n(#{state(game)})"
 
-    defp rows(board), do: 5..0 |> Enum.map_join("\n", &row(board, &1))
+    defp rows(board), do: Enum.map_join(5..0, "\n", &row(board, &1))
 
-    defp row(board, row), do: 0..6 |> Enum.map_join(" ", &cell(board, row, &1))
+    defp row(board, row), do: Enum.map_join(0..6, " ", &cell(board, row, &1))
 
     defp cell(board, row, column), do: board |> Map.get(column, %{}) |> Map.get(row, ".")
 

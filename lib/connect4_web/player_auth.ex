@@ -5,12 +5,13 @@ defmodule Connect4Web.PlayerAuth do
 
   use Connect4Web, :verified_routes
 
-  import Plug.Conn
   import Phoenix.Controller
+  import Plug.Conn
 
   alias Connect4.Auth
   alias Connect4Web.Endpoint
-  alias Phoenix.{Component, LiveView}
+  alias Phoenix.Component
+  alias Phoenix.LiveView
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change

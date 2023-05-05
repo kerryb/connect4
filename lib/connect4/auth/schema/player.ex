@@ -7,6 +7,7 @@ defmodule Connect4.Auth.Schema.Player do
   """
 
   use Ecto.Schema
+
   import Ecto.Changeset
 
   alias Connect4.Auth.Schema.Player
@@ -160,7 +161,7 @@ defmodule Connect4.Auth.Schema.Player do
   Confirms the account by setting `confirmed_at`.
   """
   def confirm_changeset(player) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    now = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
     change(player, confirmed_at: now)
   end
 

@@ -4,7 +4,9 @@ defmodule Connect4.Auth.Schema.PlayerToken do
   """
 
   use Ecto.Schema
+
   import Ecto.Query
+
   alias Connect4.Auth.Schema.PlayerToken
 
   @hash_algorithm :sha256

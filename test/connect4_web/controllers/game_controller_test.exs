@@ -37,8 +37,7 @@ defmodule Connect4Web.GameControllerTest do
       Runner.start_game(code_1, code_2)
       conn = post(conn, ~p"/games/#{code_1}/0")
 
-      assert %{"next_player" => "X", "board" => %{"0" => %{"0" => "O"}}} =
-               json_response(conn, 200)
+      assert %{"next_player" => "X", "board" => %{"0" => %{"0" => "O"}}} = json_response(conn, 200)
     end
 
     test "returns any error from the game", %{conn: conn, code_1: code_1, code_2: code_2} do

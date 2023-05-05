@@ -1,11 +1,12 @@
 defmodule Connect4Web.PlayerConfirmationLiveTest do
   use Connect4Web.ConnCase
 
-  import Phoenix.LiveViewTest
   import Connect4.AuthFixtures
+  import Phoenix.LiveViewTest
 
-  alias Connect4.{Auth, Repo}
+  alias Connect4.Auth
   alias Connect4.Auth.Schema.PlayerToken
+  alias Connect4.Repo
 
   setup do
     %{player: player_fixture()}

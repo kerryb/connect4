@@ -1,8 +1,8 @@
 defmodule Connect4Web.PlayerSettingsLiveTest do
   use Connect4Web.ConnCase
 
-  import Phoenix.LiveViewTest
   import Connect4.AuthFixtures
+  import Phoenix.LiveViewTest
 
   alias Connect4.Auth
   alias Phoenix.Flash

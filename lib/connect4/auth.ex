@@ -6,7 +6,8 @@ defmodule Connect4.Auth do
   import Ecto.Query, warn: false
 
   alias Connect4.Auth.PlayerNotifier
-  alias Connect4.Auth.Schema.{Player, PlayerToken}
+  alias Connect4.Auth.Schema.Player
+  alias Connect4.Auth.Schema.PlayerToken
   alias Connect4.Repo
 
   ## Database getters
@@ -39,8 +40,7 @@ defmodule Connect4.Auth do
       nil
 
   """
-  def get_player_by_email_and_password(email, password)
-      when is_binary(email) and is_binary(password) do
+  def get_player_by_email_and_password(email, password) when is_binary(email) and is_binary(password) do
     player = Repo.get_by(Player, email: email)
     if Player.valid_password?(player, password), do: player
   end
@@ -167,14 +167,9 @@ defmodule Connect4.Auth do
       {:ok, %{to: ..., body: ...}}
 
   """
-  def deliver_player_update_email_instructions(
-        %Player{} = player,
-        current_email,
-        update_email_url_fun
-      )
+  def deliver_player_update_email_instructions(%Player{} = player, current_email, update_email_url_fun)
       when is_function(update_email_url_fun, 1) do
-    {encoded_token, player_token} =
-      PlayerToken.build_email_token(player, "change:#{current_email}")
+    {encoded_token, player_token} = PlayerToken.build_email_token(player, "change:#{current_email}")
 
     Repo.insert!(player_token)
     PlayerNotifier.deliver_update_email_instructions(player, update_email_url_fun.(encoded_token))

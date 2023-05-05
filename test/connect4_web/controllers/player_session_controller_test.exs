@@ -58,13 +58,9 @@ defmodule Connect4Web.PlayerSessionControllerTest do
 
     test "login following registration", %{conn: conn, player: player} do
       conn =
-        conn
-        |> post(~p"/players/log_in", %{
+        post(conn, ~p"/players/log_in", %{
           "_action" => "registered",
-          "player" => %{
-            "email" => player.email,
-            "password" => valid_player_password()
-          }
+          "player" => %{"email" => player.email, "password" => valid_player_password()}
         })
 
       assert redirected_to(conn) == ~p"/"
@@ -73,13 +69,9 @@ defmodule Connect4Web.PlayerSessionControllerTest do
 
     test "login following password update", %{conn: conn, player: player} do
       conn =
-        conn
-        |> post(~p"/players/log_in", %{
+        post(conn, ~p"/players/log_in", %{
           "_action" => "password_updated",
-          "player" => %{
-            "email" => player.email,
-            "password" => valid_player_password()
-          }
+          "player" => %{"email" => player.email, "password" => valid_player_password()}
         })
 
       assert redirected_to(conn) == ~p"/players/settings"
