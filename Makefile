@@ -1,5 +1,5 @@
 .PHONY: clean credo dialyzer format setup test update-deps
-all: clean credo compile format dialyzer test
+all: clean format credo compile dialyzer test
 setup:
 	mix deps.get
 	mix ecto.setup
@@ -9,10 +9,10 @@ clean:
 	rm -rf priv/static/assets/*
 deep-clean:
 	rm -rf _build deps priv/static/assets
-credo:
-	mix credo --strict
 format:
 	mix format --check-formatted
+credo:
+	mix credo --strict
 compile:
 	mix compile --warnings-as-errors
 dialyzer:
