@@ -17,7 +17,7 @@ defmodule Connect4Web.Router do
   scope "/", Connect4Web do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", HomeLive
   end
 
   scope "/", Connect4Web do
