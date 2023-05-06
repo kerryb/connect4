@@ -9,7 +9,7 @@ defmodule Connect4.Game.Game do
   alias Phoenix.PubSub
 
   @enforce_keys [:id, :board, :next_player]
-  defstruct [:id, :board, :next_player, :winner, :timeout, :timer_ref]
+  defstruct [:id, :board, :next_player, :winner, :timed_out?, :timeout, :timer_ref]
 
   @type column :: 0..6
   @type row :: 0..5
@@ -20,6 +20,7 @@ defmodule Connect4.Game.Game do
           board: board(),
           next_player: player(),
           winner: player() | :tie | nil,
+          timed_out?: boolean(),
           timeout: integer(),
           timer_ref: reference() | nil
         }
@@ -69,7 +70,7 @@ defmodule Connect4.Game.Game do
 
   @impl GenServer
   def init(opts) do
-    game = %__MODULE__{id: opts[:id], next_player: :O, board: %{}}
+    game = %__MODULE__{id: opts[:id], next_player: :O, board: %{}, timed_out?: false}
     timer_ref = start_timer(opts[:timeout], nil)
     {:ok, %{game | timeout: opts[:timeout], timer_ref: timer_ref}}
   end
@@ -124,14 +125,26 @@ defmodule Connect4.Game.Game do
           {other_player(player), nil, start_timer(game.timeout, game.timer_ref)}
       end
 
-    %{game | board: board, next_player: next_player, winner: winner, timer_ref: timer_ref}
+    %{
+      game
+      | board: board,
+        next_player: next_player,
+        winner: winner,
+        timed_out?: false,
+        timer_ref: timer_ref
+    }
   end
 
   @impl GenServer
+  def handle_info(:timeout, %{timed_out?: true} = game) do
+    broadcast_completion(game.id, :tie, game.board)
+    {:noreply, %{game | next_player: nil, winner: :tie}}
+  end
+
   def handle_info(:timeout, game) do
-    winner = other_player(game.next_player)
-    broadcast_completion(game.id, winner, game.board)
-    {:noreply, %{game | next_player: nil, winner: winner}}
+    next_player = other_player(game.next_player)
+    start_timer(game.timeout, game.timer_ref)
+    {:noreply, %{game | next_player: next_player, timed_out?: true}}
   end
 
   defp start_timer(nil, _old_timer_ref), do: nil

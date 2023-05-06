@@ -91,22 +91,42 @@ defmodule Connect4.Game.GameTest do
       assert_receive {:completed, @game_id, :O, ^board}
     end
 
-    test "counts as a loss if a player doesn’t make a move within <timeout> ms" do
-      PubSub.subscribe(Connect4.PubSub, "games")
+    test "switches to the other player if a player doesn’t make a move within <timeout> ms" do
       Process.sleep(110)
-      assert_received {:completed, @game_id, :X, _board}
+      assert Game.get(@game_id).next_player == :X
+    end
+
+    test "allows one player to keep making consecutive moves if their opponent times out" do
+      PubSub.subscribe(Connect4.PubSub, "games")
+      {:ok, _game} = play_move(:O, 0)
+      Process.sleep(110)
+      {:ok, _game} = play_move(:O, 0)
+      Process.sleep(110)
+      {:ok, _game} = play_move(:O, 0)
+      Process.sleep(110)
+      {:ok, _game} = play_move(:O, 0)
+      %{board: board} = game = Game.get(@game_id)
+      assert game.winner == :O
+      assert_receive {:completed, @game_id, :O, ^board}
+    end
+
+    test "considers the game a tie if both players time out consecutively" do
+      PubSub.subscribe(Connect4.PubSub, "games")
+      Process.sleep(210)
+      %{board: board} = game = Game.get(@game_id)
+      assert game.winner == :tie
+      assert_receive {:completed, @game_id, :tie, ^board}
     end
 
     test "resets the timeout each time a move is played" do
-      PubSub.subscribe(Connect4.PubSub, "games")
-      Process.sleep(60)
+      Process.sleep(90)
       {:ok, _game} = play_move(:O, 0)
-      Process.sleep(60)
+      Process.sleep(90)
       {:ok, _game} = play_move(:X, 0)
-      Process.sleep(60)
+      Process.sleep(90)
       {:ok, _game} = play_move(:O, 0)
       Process.sleep(110)
-      assert_received {:completed, @game_id, :O, _board}
+      assert Game.get(@game_id).next_player == :O
     end
 
     defp play_moves(moves) do
