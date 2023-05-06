@@ -11,6 +11,6 @@ defmodule Connect4.Auth.Queries.PlayerQueries do
 
   @spec confirmed :: [Player.t()]
   def confirmed do
-    Repo.all(from(p in Player, where: not is_nil(p.confirmed_at)))
+    Repo.all(from(p in Player, where: not is_nil(p.confirmed_at), where: not p.admin))
   end
 end
