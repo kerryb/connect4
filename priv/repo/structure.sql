@@ -79,7 +79,8 @@ CREATE TABLE public.players (
     updated_at timestamp(0) without time zone NOT NULL,
     email public.citext NOT NULL,
     hashed_password character varying(255) NOT NULL,
-    confirmed_at timestamp(0) without time zone
+    confirmed_at timestamp(0) without time zone,
+    admin boolean DEFAULT false NOT NULL
 );
 
 
@@ -272,3 +273,4 @@ ALTER TABLE ONLY public.players_tokens
 INSERT INTO public."schema_migrations" (version) VALUES (20230503142326);
 INSERT INTO public."schema_migrations" (version) VALUES (20230503143114);
 INSERT INTO public."schema_migrations" (version) VALUES (20230505153447);
+INSERT INTO public."schema_migrations" (version) VALUES (20230506201423);

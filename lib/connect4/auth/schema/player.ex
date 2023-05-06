@@ -21,6 +21,7 @@ defmodule Connect4.Auth.Schema.Player do
           confirmed_at: DateTime.t(),
           name: String.t(),
           code: String.t(),
+          admin: boolean(),
           inserted_at: DateTime.t(),
           updated_at: DateTime.t()
         }
@@ -32,6 +33,7 @@ defmodule Connect4.Auth.Schema.Player do
     field(:confirmed_at, :naive_datetime)
     field(:name, :string)
     field(:code, :string)
+    field(:admin, :boolean)
 
     timestamps()
   end
