@@ -6,9 +6,10 @@ defmodule Connect4Web.HomeLiveTest do
   import Phoenix.LiveViewTest
 
   describe "Connect4Web.HomeLive" do
-    test "Show a list of players", %{conn: conn} do
-      player_1 = insert(:player)
-      player_2 = insert(:player)
+    test "Shows a list of confirmed players", %{conn: conn} do
+      player_1 = insert(:player, confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, confirmed_at: nil)
+      player_3 = insert(:player, confirmed_at: DateTime.utc_now())
 
       {:ok, view, _html} =
         conn
@@ -16,7 +17,8 @@ defmodule Connect4Web.HomeLiveTest do
         |> live(~p"/")
 
       assert view |> element("td", player_1.name) |> has_element?()
-      assert view |> element("td", player_2.name) |> has_element?()
+      assert view |> element("td", player_3.name) |> has_element?()
+      refute view |> element("td", player_2.name) |> has_element?()
     end
   end
 end

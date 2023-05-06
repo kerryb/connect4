@@ -6,6 +6,6 @@ defmodule Connect4Web.HomeLive do
   alias Connect4.Auth.Queries.PlayerQueries
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, players: PlayerQueries.all())}
+    {:ok, assign(socket, players: PlayerQueries.confirmed())}
   end
 end

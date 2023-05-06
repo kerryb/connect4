@@ -4,11 +4,13 @@ defmodule Connect4.Auth.Queries.PlayerQueries do
   Queries for interacting with `Connect4.Auth.Schema.Player` records.
   """
 
+  import Ecto.Query
+
   alias Connect4.Auth.Schema.Player
   alias Connect4.Repo
 
-  @spec all :: [Player.t()]
-  def all do
-    Repo.all(Player)
+  @spec confirmed :: [Player.t()]
+  def confirmed do
+    Repo.all(from(p in Player, where: not is_nil(p.confirmed_at)))
   end
 end
