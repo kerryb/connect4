@@ -10,6 +10,7 @@ defmodule Connect4.Auth do
   alias Connect4.Auth.Schema.Player
   alias Connect4.Auth.Schema.PlayerToken
   alias Connect4.Repo
+  alias Phoenix.PubSub
 
   ## Database getters
 
@@ -292,6 +293,7 @@ defmodule Connect4.Auth do
            player
            |> confirm_player_multi()
            |> Repo.transaction() do
+      PubSub.broadcast!(Connect4.PubSub, "players", {:new_player, player})
       {:ok, player}
     else
       _error -> :error

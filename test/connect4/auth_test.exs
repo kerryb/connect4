@@ -7,6 +7,7 @@ defmodule Connect4.AuthTest do
   alias Connect4.Auth
   alias Connect4.Auth.Schema.Player
   alias Connect4.Auth.Schema.PlayerToken
+  alias Phoenix.PubSub
 
   describe "get_player_by_email/1" do
     test "does not return the player if the email does not exist" do
@@ -404,6 +405,12 @@ defmodule Connect4.AuthTest do
       assert confirmed_player.confirmed_at != player.confirmed_at
       assert Repo.get!(Player, player.id).confirmed_at
       refute Repo.get_by(PlayerToken, player_id: player.id)
+    end
+
+    test "broadcasts a message that a new user has been confirmed", %{token: token} do
+      PubSub.subscribe(Connect4.PubSub, "players")
+      {:ok, confirmed_player} = Auth.confirm_player(token)
+      assert_receive {:new_player, ^confirmed_player}
     end
 
     test "does not confirm with invalid token", %{player: player} do
