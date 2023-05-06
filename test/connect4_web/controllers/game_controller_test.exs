@@ -1,8 +1,6 @@
 defmodule Connect4Web.GameControllerTest do
   use Connect4Web.ConnCase, async: true
 
-  import Connect4.Factory
-
   alias Connect4.Game.Runner
   alias Connect4.Repo
   alias Ecto.Adapters.SQL.Sandbox

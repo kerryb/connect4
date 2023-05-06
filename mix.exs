@@ -39,6 +39,7 @@ defmodule Connect4.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:assertions, "~> 0.19", only: :test},
       {:bcrypt_elixir, "~> 3.0"},
       {:excoveralls, "~> 0.16", only: :test, runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},

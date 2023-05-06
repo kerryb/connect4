@@ -24,6 +24,7 @@ defmodule Connect4Web.ConnCase do
       use Connect4Web, :verified_routes
 
       # Import conveniences for testing with connections
+      import Connect4.Factory
       import Connect4Web.ConnCase
       import Phoenix.ConnTest
       import Plug.Conn
