@@ -130,11 +130,11 @@ defmodule Connect4.Game.GameTest do
     end
 
     test "resets the timeout each time a move is played" do
-      Process.sleep(90)
+      Process.sleep(60)
       {:ok, _game} = play_move(:O, 0)
-      Process.sleep(90)
+      Process.sleep(60)
       {:ok, _game} = play_move(:X, 0)
-      Process.sleep(90)
+      Process.sleep(60)
       {:ok, _game} = play_move(:O, 0)
       Process.sleep(110)
       assert Game.get(@game_id).next_player == :O
