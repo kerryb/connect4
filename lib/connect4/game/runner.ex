@@ -75,8 +75,8 @@ defmodule Connect4.Game.Runner do
   end
 
   @impl GenServer
-  def handle_info({:completed, id, winner, _board}, state) do
-    GameQueries.update_winner(id, winner)
+  def handle_info({:completed, id, winner, board}, state) do
+    GameQueries.update_winner(id, winner, board)
     PubSub.broadcast(Connect4.PubSub, "tournament", :game_finished)
     {:noreply, state}
   end

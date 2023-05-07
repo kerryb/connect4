@@ -61,17 +61,11 @@ defmodule Connect4.Game.RunnerTest do
 
     test "updates the database when a game finishes", %{player_1_id: player_1_id} do
       {:ok, id} = Runner.start_game("one", "two")
-
       PubSub.subscribe(Connect4.PubSub, "tournament")
-
-      PubSub.broadcast!(
-        Connect4.PubSub,
-        "games",
-        {:completed, id, :O, %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 2 => :X, 3 => :X}}}
-      )
-
+      board = %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 2 => :X, 3 => :X}}
+      PubSub.broadcast!(Connect4.PubSub, "games", {:completed, id, :O, board})
       assert_receive :game_finished
-      assert [%{winner_id: ^player_1_id}] = Repo.all(Game)
+      assert [%{winner_id: ^player_1_id, board: ^board}] = Repo.all(Game)
     end
   end
 end

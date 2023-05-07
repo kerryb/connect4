@@ -20,9 +20,9 @@ defmodule Connect4.Game.Queries.GameQueries do
     Repo.insert(%Game{player_o: player_o, player_x: player_x})
   end
 
-  @spec update_winner(integer(), atom()) ::
+  @spec update_winner(integer(), Connect4.Game.Game.player(), Connect4.Game.Game.board()) ::
           {:ok, Schema.t()} | {:error, Changeset.t()} | {:error, String.t()}
-  def update_winner(id, winner) do
+  def update_winner(id, winner, board) do
     case Repo.get(Game, id) do
       nil ->
         {:error, "Game not found"}
@@ -31,7 +31,7 @@ defmodule Connect4.Game.Queries.GameQueries do
         winner_id = if winner == :O, do: game.player_o_id, else: game.player_x_id
 
         game
-        |> Changeset.change(%{winner_id: winner_id})
+        |> Changeset.change(%{winner_id: winner_id, board: board})
         |> Repo.update()
     end
   end

@@ -44,7 +44,8 @@ CREATE TABLE public.games (
     player_x_id bigint,
     winner_id bigint,
     inserted_at timestamp(0) without time zone NOT NULL,
-    updated_at timestamp(0) without time zone NOT NULL
+    updated_at timestamp(0) without time zone NOT NULL,
+    board jsonb
 );
 
 
@@ -274,3 +275,4 @@ INSERT INTO public."schema_migrations" (version) VALUES (20230503142326);
 INSERT INTO public."schema_migrations" (version) VALUES (20230503143114);
 INSERT INTO public."schema_migrations" (version) VALUES (20230505153447);
 INSERT INTO public."schema_migrations" (version) VALUES (20230506201423);
+INSERT INTO public."schema_migrations" (version) VALUES (20230507135102);

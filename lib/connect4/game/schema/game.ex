@@ -5,8 +5,10 @@ defmodule Connect4.Game.Schema.Game do
   use Ecto.Schema
 
   alias Connect4.Auth.Schema.Player
+  alias Connect4.Game.Schema.Board
 
   schema "games" do
+    field(:board, Board)
     belongs_to(:player_o, Player)
     belongs_to(:player_x, Player)
     belongs_to(:winner, Player)

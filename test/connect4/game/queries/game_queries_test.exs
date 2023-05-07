@@ -16,15 +16,16 @@ defmodule Connect4.Game.Queries.GameQueriesTest do
   end
 
   describe "Connect4.Game.Queries.GameQueries.update_winner/2" do
-    test "updates the winner to the player with the supplied code" do
+    test "saves the board, and sets the winner to the player with the supplied code" do
       %{id: player_id} = player_1 = insert(:player, code: "one")
       %{id: game_id} = insert(:game, player_o: player_1)
-      GameQueries.update_winner(game_id, :O)
-      assert [%{winner_id: ^player_id}] = Repo.all(Game)
+      board = %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 2 => :X, 3 => :X}}
+      GameQueries.update_winner(game_id, :O, board)
+      assert [%{winner_id: ^player_id, board: ^board}] = Repo.all(Game)
     end
 
     test "returns an error if the game is not found" do
-      assert {:error, "Game not found"} = GameQueries.update_winner(123, :O)
+      assert {:error, "Game not found"} = GameQueries.update_winner(123, :O, %{})
     end
   end
 end
