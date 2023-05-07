@@ -20,12 +20,6 @@ defmodule Connect4Web.Router do
   end
 
   scope "/", Connect4Web do
-    pipe_through(:browser)
-
-    live("/", HomeLive)
-  end
-
-  scope "/", Connect4Web do
     pipe_through(:api)
 
     get("/games/:code", GameController, :show)
@@ -89,6 +83,7 @@ defmodule Connect4Web.Router do
       on_mount: [{Connect4Web.PlayerAuth, :mount_current_player}] do
       live("/players/confirm/:token", PlayerConfirmationLive, :edit)
       live("/players/confirm", PlayerConfirmationInstructionsLive, :new)
+      live("/", HomeLive)
     end
   end
 end

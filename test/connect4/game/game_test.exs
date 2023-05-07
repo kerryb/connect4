@@ -2,6 +2,7 @@ defmodule Connect4.Game.GameTest do
   use ExUnit.Case, async: true
 
   alias Connect4.Game.Game
+  alias Connect4.GameRegistry
   alias Connect4.Repo
   alias Ecto.Adapters.SQL.Sandbox
   alias Phoenix.PubSub
@@ -85,10 +86,21 @@ defmodule Connect4.Game.GameTest do
       assert {:error, "Column is full"} = play_move(:O, 0)
     end
 
-    test "broadcasts a message on completion" do
+    test "broadcasts a message and terminates on completion" do
       PubSub.subscribe(Connect4.PubSub, "games")
+      [{game_pid, _name}] = Registry.lookup(GameRegistry, @game_id)
+      Process.monitor(game_pid)
       %{board: board} = play_moves(O: 2, X: 2, O: 3, X: 3, O: 0, X: 0, O: 1)
       assert_receive {:completed, @game_id, :O, ^board}
+      assert_receive {:DOWN, _ref, :process, ^game_pid, :normal}
+    end
+
+    defp check_game_process_terminates(retries \\ 10)
+    defp check_game_process_terminates(0), do: false
+
+    defp check_game_process_terminates(retries) do
+      Process.sleep(100)
+      check_game_process_terminates(retries - 1)
     end
 
     test "switches to the other player if a player doesn’t make a move within <timeout> ms" do
@@ -104,8 +116,7 @@ defmodule Connect4.Game.GameTest do
       Process.sleep(110)
       {:ok, _game} = play_move(:O, 0)
       Process.sleep(110)
-      {:ok, _game} = play_move(:O, 0)
-      %{board: board} = game = Game.get(@game_id)
+      {:ok, %{board: board} = game} = play_move(:O, 0)
       assert game.winner == :O
       assert_receive {:completed, @game_id, :O, ^board}
     end

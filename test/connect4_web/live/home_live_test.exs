@@ -10,16 +10,16 @@ defmodule Connect4Web.HomeLiveTest do
   alias Connect4.Repo
 
   describe "Connect4Web.HomeLive" do
-    test "Shows a list of confirmed players", %{conn: conn} do
+    test "Shows a list of confirmed players, highlighting the logged-in player", %{conn: conn} do
       player_1 = insert(:player, confirmed_at: DateTime.utc_now())
       player_2 = insert(:player, confirmed_at: nil)
       player_3 = insert(:player, confirmed_at: DateTime.utc_now())
 
       {:ok, view, _html} = conn |> log_in_player(player_1) |> live(~p"/")
 
-      assert view |> element("td", player_1.name) |> has_element?()
-      assert view |> element("td", player_3.name) |> has_element?()
-      refute view |> element("td", player_2.name) |> has_element?()
+      assert view |> element("tr:has(.bg-purple-100) td", player_1.name) |> has_element?()
+      assert view |> element("tr:not(has(.bg-purple-100)) td", player_3.name) |> has_element?()
+      refute view |> element("tr:not(has(.bg-purple-100)) td", player_2.name) |> has_element?()
     end
 
     test "Adds newly-confirmed players to the list", %{conn: conn} do

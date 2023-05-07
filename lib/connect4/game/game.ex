@@ -94,8 +94,7 @@ defmodule Connect4.Game.Game do
         {:reply, {:error, "Column is full"}, game}
 
       true ->
-        game = play_move(game, player, column)
-        {:reply, {:ok, game}, game}
+        play_move(game, player, column)
     end
   end
 
@@ -107,32 +106,31 @@ defmodule Connect4.Game.Game do
   end
 
   defp play_move(game, player, column) do
-    board = place(game.board, player, column)
+    game = Map.update!(game, :board, &place(&1, player, column))
 
-    {next_player, winner, timer_ref} =
-      cond do
-        tied?(board) ->
-          stop_timer(game.timer_ref)
-          broadcast_completion(game.id, :tie, board)
-          {nil, :tie, nil}
+    cond do
+      tied?(game.board) -> complete_game(game, :tie)
+      won?(game.board, player, column) -> complete_game(game, player)
+      true -> complete_move(game)
+    end
+  end
 
-        won?(board, player, column) ->
-          stop_timer(game.timer_ref)
-          broadcast_completion(game.id, player, board)
-          {nil, player, nil}
+  defp complete_game(game, winner) do
+    stop_timer(game.timer_ref)
+    broadcast_completion(game.id, winner, game.board)
+    game = %{game | next_player: nil, winner: winner, timed_out?: false, timer_ref: nil}
+    {:stop, :normal, {:ok, game}, game}
+  end
 
-        true ->
-          {other_player(player), nil, start_timer(game.timeout, game.timer_ref)}
-      end
-
-    %{
+  defp complete_move(game) do
+    game = %{
       game
-      | board: board,
-        next_player: next_player,
-        winner: winner,
+      | next_player: other_player(game.next_player),
         timed_out?: false,
-        timer_ref: timer_ref
+        timer_ref: start_timer(game.timeout, game.timer_ref)
     }
+
+    {:reply, {:ok, game}, game}
   end
 
   @impl GenServer
