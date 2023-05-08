@@ -1,12 +1,16 @@
 <.table
   id="c4-players"
   rows={@players}
+  row_id={&"player-#{&1.id}"}
   row_class={
-    fn player ->
-      if @current_player && @current_player.id == player.id,
-        do: "bg-purple-100 hover:!bg-purple-200 text-bold"
+    &if @current_player && @current_player.id == &1.id do
+      "bg-purple-100 hover:!bg-purple-200 text-bold"
     end
   }
 >
-  <:col :let={player} label="Player"><%= player.name %></:col>
+  <:col :let={player} class="c4-player" label="Name"><%= player.name %></:col>
+  <:col :let={player} class="c4-played" label="Played"><%= player.played %></:col>
+  <:col :let={player} class="c4-won" label="Won"><%= player.won %></:col>
+  <:col :let={player} class="c4-tied" label="Tied"><%= player.tied %></:col>
+  <:col :let={player} class="c4-lost" label="Lost"><%= player.lost %></:col>
 </.table>

@@ -20,7 +20,7 @@ defmodule Connect4.Game.RunnerTest do
     test "saves a new game to the database", %{player_1_id: player_1_id, player_2_id: player_2_id} do
       Runner.start_game("one", "two")
 
-      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner_id: nil}] = Repo.all(Game)
+      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner: nil}] = Repo.all(Game)
     end
 
     test "creates a game server" do
@@ -30,9 +30,9 @@ defmodule Connect4.Game.RunnerTest do
 
     test "passes the timeout to the game" do
       PubSub.subscribe(Connect4.PubSub, "games")
-      {:ok, id} = Runner.start_game("one", "two", 50)
+      {:ok, game_id} = Runner.start_game("one", "two", 50)
       Process.sleep(110)
-      assert_receive {:completed, ^id, :tie, %{}}
+      assert_receive {:completed, %{id: ^game_id}}
     end
 
     test "returns the player and the updated game when a turn is played" do
@@ -59,13 +59,18 @@ defmodule Connect4.Game.RunnerTest do
       assert {:error, "Game not found"} = Runner.find_game("one")
     end
 
-    test "updates the database when a game finishes", %{player_1_id: player_1_id} do
-      {:ok, id} = Runner.start_game("one", "two")
+    test "updates the database when a game finishes" do
+      {:ok, game_id} = Runner.start_game("one", "two")
       PubSub.subscribe(Connect4.PubSub, "tournament")
-      board = %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 2 => :X, 3 => :X}}
-      PubSub.broadcast!(Connect4.PubSub, "games", {:completed, id, :O, board})
+
+      game =
+        Game
+        |> Repo.get(game_id)
+        |> Map.merge(%{board: %{0 => %{0 => :O}}, winner: "tie"})
+
+      PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game})
       assert_receive :game_finished
-      assert [%{winner_id: ^player_1_id, board: ^board}] = Repo.all(Game)
+      assert [%{winner: "tie", board: %{0 => %{0 => :O}}}] = Repo.all(Game)
     end
   end
 end

@@ -90,17 +90,9 @@ defmodule Connect4.Game.GameTest do
       PubSub.subscribe(Connect4.PubSub, "games")
       [{game_pid, _name}] = Registry.lookup(GameRegistry, @game_id)
       Process.monitor(game_pid)
-      %{board: board} = play_moves(O: 2, X: 2, O: 3, X: 3, O: 0, X: 0, O: 1)
-      assert_receive {:completed, @game_id, :O, ^board}
+      game = play_moves(O: 2, X: 2, O: 3, X: 3, O: 0, X: 0, O: 1)
+      assert_receive {:completed, ^game}
       assert_receive {:DOWN, _ref, :process, ^game_pid, :normal}
-    end
-
-    defp check_game_process_terminates(retries \\ 10)
-    defp check_game_process_terminates(0), do: false
-
-    defp check_game_process_terminates(retries) do
-      Process.sleep(100)
-      check_game_process_terminates(retries - 1)
     end
 
     test "switches to the other player if a player doesn’t make a move within <timeout> ms" do
@@ -116,17 +108,17 @@ defmodule Connect4.Game.GameTest do
       Process.sleep(110)
       {:ok, _game} = play_move(:O, 0)
       Process.sleep(110)
-      {:ok, %{board: board} = game} = play_move(:O, 0)
+      {:ok, game} = play_move(:O, 0)
       assert game.winner == :O
-      assert_receive {:completed, @game_id, :O, ^board}
+      assert_receive {:completed, ^game}
     end
 
     test "considers the game a tie if both players time out consecutively" do
       PubSub.subscribe(Connect4.PubSub, "games")
       Process.sleep(210)
-      %{board: board} = game = Game.get(@game_id)
+      %{id: game_id} = game = Game.get(@game_id)
       assert game.winner == :tie
-      assert_receive {:completed, @game_id, :tie, ^board}
+      assert_receive {:completed, %{id: ^game_id}}
     end
 
     test "resets the timeout each time a move is played" do

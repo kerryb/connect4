@@ -117,8 +117,8 @@ defmodule Connect4.Game.Game do
 
   defp complete_game(game, winner) do
     stop_timer(game.timer_ref)
-    broadcast_completion(game.id, winner, game.board)
     game = %{game | next_player: nil, winner: winner, timed_out?: false, timer_ref: nil}
+    broadcast_completion(game)
     {:stop, :normal, {:ok, game}, game}
   end
 
@@ -135,8 +135,9 @@ defmodule Connect4.Game.Game do
 
   @impl GenServer
   def handle_info(:timeout, %{timed_out?: true} = game) do
-    broadcast_completion(game.id, :tie, game.board)
-    {:noreply, %{game | next_player: nil, winner: :tie}}
+    game = %{game | next_player: nil, winner: :tie}
+    broadcast_completion(game)
+    {:noreply, game}
   end
 
   def handle_info(:timeout, game) do
@@ -155,8 +156,8 @@ defmodule Connect4.Game.Game do
   defp stop_timer(nil), do: :ok
   defp stop_timer(ref), do: Process.cancel_timer(ref)
 
-  defp broadcast_completion(id, winner, board) do
-    PubSub.broadcast!(Connect4.PubSub, "games", {:completed, id, winner, board})
+  defp broadcast_completion(game) do
+    PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game})
   end
 
   defp place(board, player, column) do

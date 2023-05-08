@@ -12,19 +12,10 @@ defmodule Connect4.Auth.Schema.Player do
   import Ecto.Changeset
 
   alias Connect4.Auth.Schema.Player
+  alias Connect4.Game.Schema.Game
   alias Connect4.Repo
 
-  @type t :: %__MODULE__{
-          email: String.t(),
-          password: String.t(),
-          hashed_password: String.t(),
-          confirmed_at: DateTime.t(),
-          name: String.t(),
-          code: String.t(),
-          admin: boolean(),
-          inserted_at: DateTime.t(),
-          updated_at: DateTime.t()
-        }
+  @type t :: %__MODULE__{}
 
   schema "players" do
     field(:email, :string)
@@ -34,6 +25,13 @@ defmodule Connect4.Auth.Schema.Player do
     field(:name, :string)
     field(:code, :string)
     field(:admin, :boolean)
+    field(:played, :integer, virtual: true)
+    field(:won, :integer, virtual: true)
+    field(:tied, :integer, virtual: true)
+    field(:lost, :integer, virtual: true)
+
+    has_many(:games_as_o, Game, foreign_key: :player_o_id)
+    has_many(:games_as_x, Game, foreign_key: :player_x_id)
 
     timestamps()
   end
@@ -204,5 +202,30 @@ defmodule Connect4.Auth.Schema.Player do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  @doc """
+  Given a player with :games_as_o and :games_as_x preloaded, calculates
+  played/won/tied/lost stats and populates the virtual fields.
+  """
+  def calculate_stats(player) do
+    %{player | played: played(player), won: won(player), tied: tied(player), lost: lost(player)}
+  end
+
+  defp played(player), do: length(player.games_as_o) + length(player.games_as_x)
+
+  defp won(player) do
+    Enum.count(player.games_as_o, &(&1.winner == "O")) +
+      Enum.count(player.games_as_x, &(&1.winner == "X"))
+  end
+
+  defp tied(player) do
+    Enum.count(player.games_as_o, &(&1.winner == "tie")) +
+      Enum.count(player.games_as_x, &(&1.winner == "tie"))
+  end
+
+  defp lost(player) do
+    Enum.count(player.games_as_o, &(&1.winner == "X")) +
+      Enum.count(player.games_as_x, &(&1.winner == "O"))
   end
 end

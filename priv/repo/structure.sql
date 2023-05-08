@@ -42,10 +42,10 @@ CREATE TABLE public.games (
     id bigint NOT NULL,
     player_o_id bigint,
     player_x_id bigint,
-    winner_id bigint,
     inserted_at timestamp(0) without time zone NOT NULL,
     updated_at timestamp(0) without time zone NOT NULL,
-    board jsonb
+    board jsonb,
+    winner character varying(255)
 );
 
 
@@ -252,14 +252,6 @@ ALTER TABLE ONLY public.games
 
 
 --
--- Name: games games_winner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.games
-    ADD CONSTRAINT games_winner_id_fkey FOREIGN KEY (winner_id) REFERENCES public.players(id);
-
-
---
 -- Name: players_tokens players_tokens_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -276,3 +268,4 @@ INSERT INTO public."schema_migrations" (version) VALUES (20230503143114);
 INSERT INTO public."schema_migrations" (version) VALUES (20230505153447);
 INSERT INTO public."schema_migrations" (version) VALUES (20230506201423);
 INSERT INTO public."schema_migrations" (version) VALUES (20230507135102);
+INSERT INTO public."schema_migrations" (version) VALUES (20230508104403);

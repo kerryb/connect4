@@ -28,10 +28,8 @@ defmodule Connect4.Game.Queries.GameQueries do
         {:error, "Game not found"}
 
       game ->
-        winner_id = if winner == :O, do: game.player_o_id, else: game.player_x_id
-
         game
-        |> Changeset.change(%{winner_id: winner_id, board: board})
+        |> Changeset.change(%{winner: to_string(winner), board: board})
         |> Repo.update()
     end
   end
