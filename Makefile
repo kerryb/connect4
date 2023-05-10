@@ -8,7 +8,7 @@ clean:
 	MIX_ENV=test mix clean
 	rm -rf priv/static/assets/*
 deep-clean:
-	rm -rf _build deps priv/static/assets
+	rm -rf _build deps priv/static/assets/*
 format:
 	mix format --check-formatted
 credo:
