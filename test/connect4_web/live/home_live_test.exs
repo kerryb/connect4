@@ -57,5 +57,10 @@ defmodule Connect4Web.HomeLiveTest do
       assert view |> element("tr#player-#{player_1.id} td.c4-tied", "1") |> has_element?()
       assert view |> element("tr#player-#{player_2.id} td.c4-lost", "1") |> has_element?()
     end
+
+    test "says if the tournament is currently inactive", %{conn: conn} do
+      {:ok, _view, html} = live(conn, ~p"/")
+      assert html =~ "not currently active"
+    end
   end
 end
