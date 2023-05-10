@@ -8,7 +8,6 @@ defmodule Connect4Web.GameController do
   def show(conn, %{"code" => code}) do
     case Runner.find_game(code) do
       {:ok, player, game} ->
-        Runner.find_game(code)
         json(conn, GameJSON.render(game, player))
 
       {:error, message} ->
@@ -31,6 +30,18 @@ defmodule Connect4Web.GameController do
         conn
         |> put_status(:bad_request)
         |> json(%{error: message})
+    end
+  end
+
+  def show_test(conn, %{"code" => code}) do
+    case Runner.find_game(code) do
+      {:ok, _player, game} ->
+        json(conn, GameJSON.render_test(game))
+
+      {:error, _message} ->
+        Runner.start_game(code, code)
+        {:ok, _player, game} = Runner.find_game(code)
+        json(conn, GameJSON.render_test(game))
     end
   end
 end

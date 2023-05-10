@@ -20,8 +20,7 @@ defmodule Connect4.Game.RunnerTest do
     test "inserts a game in the database", %{player_1_id: player_1_id, player_2_id: player_2_id} do
       Runner.start_game("one", "two")
 
-      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner: nil}] =
-               Repo.all(Game)
+      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner: nil}] = Repo.all(Game)
     end
 
     test "creates a game server" do

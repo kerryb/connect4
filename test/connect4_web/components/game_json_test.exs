@@ -4,12 +4,12 @@ defmodule Connect4Web.GameJSONTest do
   alias Connect4.Game.Game
   alias Connect4Web.GameJSON
 
-  describe "Connect4Web.GameJSON.render/2" do
-    setup do
-      game = %Game{id: 123, next_player: :O, board: %{0 => %{0 => :O, 1 => :X}, 3 => %{0 => :O}}}
-      %{game: game}
-    end
+  setup do
+    game = %Game{id: 123, next_player: :O, board: %{0 => %{0 => :O, 1 => :X}, 3 => %{0 => :O}}}
+    %{game: game}
+  end
 
+  describe "Connect4Web.GameJSON.render/2" do
     test "returns who you’re playing as (O or X)", %{game: game} do
       assert GameJSON.render(game, :X).playing_as == :X
     end
@@ -52,6 +52,12 @@ defmodule Connect4Web.GameJSONTest do
 
     test "returns a status of 'tie' if the game was tied", %{game: game} do
       assert GameJSON.render(%{game | winner: :tie}, :X).status == "tie"
+    end
+  end
+
+  describe "Connect4Web.GameJSON.render_test/1" do
+    test "always sets playing_as to next_player", %{game: game} do
+      assert GameJSON.render_test(game).playing_as == :O
     end
   end
 end
