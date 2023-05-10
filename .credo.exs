@@ -163,7 +163,6 @@
           {Credo.Check.Readability.AliasAs, []},
           {Credo.Check.Readability.ImplTrue, []},
           {Credo.Check.Readability.NestedFunctionCalls, []},
-          {Credo.Check.Readability.OneArityFunctionInPipe, []},
           {Credo.Check.Readability.SeparateAliasRequire, []},
           {Credo.Check.Readability.SingleFunctionToBlockPipe, []},
           {Credo.Check.Readability.Specs, []},
@@ -202,6 +201,7 @@
           {Credo.Check.Refactor.FilterCount, []},
           {Credo.Check.Refactor.MapJoin, []},
           {Credo.Check.Refactor.MapInto, []},
+          {Credo.Check.Readability.OneArityFunctionInPipe, []},
 
           #
           # Incompatible with Elixir 1.14
