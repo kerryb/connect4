@@ -24,23 +24,22 @@ defmodule Connect4Web.HomeLiveTest do
     end
 
     test "Adds newly-confirmed players to the list", %{conn: conn} do
-      player_1 = insert(:player, confirmed_at: DateTime.utc_now())
-      player_2 = insert(:player, confirmed_at: nil)
-      {encoded_token, player_token} = PlayerToken.build_email_token(player_2, "confirm")
+      player = insert(:player, confirmed_at: nil)
+      {encoded_token, player_token} = PlayerToken.build_email_token(player, "confirm")
       Repo.insert!(player_token)
 
-      {:ok, view, _html} = conn |> log_in_player(player_1) |> live(~p"/")
-      refute view |> element("td", player_2.name) |> has_element?()
+      {:ok, view, _html} = live(conn, ~p"/")
+      refute view |> element("td", player.name) |> has_element?()
 
       {:ok, _player} = Auth.confirm_player(encoded_token)
-      assert view |> element("td", player_2.name) |> has_element?()
+      assert view |> element("td", player.name) |> has_element?()
     end
 
     test "Updates scores as games complete", %{conn: conn} do
       player_1 = insert(:player, confirmed_at: DateTime.utc_now())
       player_2 = insert(:player, confirmed_at: DateTime.utc_now())
 
-      {:ok, view, _html} = conn |> log_in_player(player_1) |> live(~p"/")
+      {:ok, view, _html} = live(conn, ~p"/")
 
       assert view |> element("tr#player-#{player_1.id} td.c4-played", "0") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-won", "0") |> has_element?()
