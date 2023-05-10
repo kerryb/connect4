@@ -16,11 +16,12 @@ defmodule Connect4.Game.RunnerTest do
     %{player_1_id: player_1.id, player_2_id: player_2.id}
   end
 
-  describe "Connect4.Game.Runner" do
-    test "saves a new game to the database", %{player_1_id: player_1_id, player_2_id: player_2_id} do
+  describe "Connect4.Game.Runner.start_game/3" do
+    test "inserts a game in the database", %{player_1_id: player_1_id, player_2_id: player_2_id} do
       Runner.start_game("one", "two")
 
-      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner: nil}] = Repo.all(Game)
+      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner: nil}] =
+               Repo.all(Game)
     end
 
     test "creates a game server" do
@@ -35,30 +36,6 @@ defmodule Connect4.Game.RunnerTest do
       assert_receive {:completed, %{id: ^game_id}}
     end
 
-    test "returns the player and the updated game when a turn is played" do
-      {:ok, _id} = Runner.start_game("one", "two")
-      assert {:ok, :O, %{next_player: :X, board: %{3 => %{0 => :O}}}} = Runner.play("one", "3")
-    end
-
-    test "returns an error if the game is not found" do
-      assert {:error, "Game not found"} = Runner.play("one", "3")
-    end
-
-    test "passes on any error from the game" do
-      {:ok, _id} = Runner.start_game("one", "two")
-      assert {:error, "Not your turn"} = Runner.play("two", "3")
-    end
-
-    test "allows an in-progress game to be queried" do
-      {:ok, _id} = Runner.start_game("one", "two")
-      {:ok, _player, _game} = Runner.play("one", "3")
-      assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one")
-    end
-
-    test "returns an error if querying a non-existent game" do
-      assert {:error, "Game not found"} = Runner.find_game("one")
-    end
-
     test "updates the database when a game finishes" do
       {:ok, game_id} = Runner.start_game("one", "two")
       PubSub.subscribe(Connect4.PubSub, "tournament")
@@ -71,6 +48,34 @@ defmodule Connect4.Game.RunnerTest do
       PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game})
       assert_receive :game_finished
       assert [%{winner: "tie", board: %{0 => %{0 => :O}}}] = Repo.all(Game)
+    end
+  end
+
+  describe "Connect4.Game.Runner.play/2" do
+    test "returns the player and the updated game" do
+      {:ok, _id} = Runner.start_game("one", "two")
+      assert {:ok, :O, %{next_player: :X, board: %{3 => %{0 => :O}}}} = Runner.play("one", "3")
+    end
+
+    test "returns an error if the game is not found" do
+      assert {:error, "Game not found"} = Runner.play("one", "3")
+    end
+
+    test "passes on any error from the game" do
+      {:ok, _id} = Runner.start_game("one", "two")
+      assert {:error, "Not your turn"} = Runner.play("two", "3")
+    end
+  end
+
+  describe "Connect4.Game.Runner.find_game/1" do
+    test "returns an in-progress game if found" do
+      {:ok, _id} = Runner.start_game("one", "two")
+      {:ok, _player, _game} = Runner.play("one", "3")
+      assert {:ok, :O, %{board: %{3 => %{0 => :O}}}} = Runner.find_game("one")
+    end
+
+    test "returns an error if the game is not found" do
+      assert {:error, "Game not found"} = Runner.find_game("one")
     end
   end
 end
