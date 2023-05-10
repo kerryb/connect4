@@ -24,4 +24,15 @@ defmodule Connect4.Game.SchedulerTest do
       refute Scheduler.active?()
     end
   end
+
+  describe "Connect4.Game.Scheduler.seconds_to_go/1" do
+    test "returns nil when inactive" do
+      assert is_nil(Scheduler.seconds_to_go())
+    end
+
+    test "returns the number of seconds to the next scheduled game when active" do
+      Scheduler.activate()
+      assert Scheduler.seconds_to_go(~N[2023-05-10 22:28:30]) == 90
+    end
+  end
 end

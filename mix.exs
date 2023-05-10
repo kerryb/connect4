@@ -43,6 +43,7 @@ defmodule Connect4.MixProject do
       {:bcrypt_elixir, "~> 3.0"},
       {:excoveralls, "~> 0.16", only: :test, runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:crontab, "~> 1.1"},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:ecto_sql, "~> 3.6"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
