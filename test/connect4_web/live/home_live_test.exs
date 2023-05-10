@@ -7,8 +7,14 @@ defmodule Connect4Web.HomeLiveTest do
 
   alias Connect4.Auth
   alias Connect4.Auth.Schema.PlayerToken
+  alias Connect4.Game.Scheduler
   alias Connect4.Repo
   alias Phoenix.PubSub
+
+  setup do
+    {:ok, _pid} = start_supervised(Scheduler)
+    :ok
+  end
 
   describe "Connect4Web.HomeLive" do
     test "Shows a list of confirmed players, highlighting the logged-in player", %{conn: conn} do
@@ -57,9 +63,15 @@ defmodule Connect4Web.HomeLiveTest do
       assert view |> element("tr#player-#{player_2.id} td.c4-lost", "1") |> has_element?()
     end
 
-    test "says if the tournament is currently inactive", %{conn: conn} do
-      {:ok, _view, html} = live(conn, ~p"/")
-      assert html =~ "not currently active"
+    test "displays a message if the tournament is inactive", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/")
+      assert view |> element("#tournament-status", "not currently active") |> has_element?()
+    end
+
+    test "displays seconds until next game if the tournament is active", %{conn: conn} do
+      Scheduler.activate()
+      {:ok, view, _html} = live(conn, ~p"/")
+      assert view |> element("#tournament-status", ~r/\d+:\d\d/) |> has_element?()
     end
   end
 end

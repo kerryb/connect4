@@ -5,6 +5,7 @@ defmodule Connect4Web.HomeLive do
 
   alias Connect4.Auth.Queries.PlayerQueries
   alias Connect4.Auth.Schema.Player
+  alias Connect4.Game.Scheduler
   alias Phoenix.LiveView
   alias Phoenix.PubSub
 
@@ -16,7 +17,15 @@ defmodule Connect4Web.HomeLive do
     end
 
     players = Enum.map(PlayerQueries.active_with_games(), &Player.calculate_stats(&1))
-    {:ok, assign(socket, players: players)}
+    active? = Scheduler.active?()
+    time_until_next_game = time_until_next_game(active?)
+
+    {:ok,
+     assign(socket,
+       players: players,
+       tournament_active?: active?,
+       time_until_next_game: time_until_next_game
+     )}
   end
 
   @impl LiveView
@@ -36,5 +45,20 @@ defmodule Connect4Web.HomeLive do
     else
       player
     end
+  end
+
+  defp time_until_next_game(false), do: nil
+
+  defp time_until_next_game(true) do
+    time = Scheduler.seconds_to_go()
+    minutes = div(time, 60)
+
+    seconds =
+      time
+      |> Integer.mod(60)
+      |> to_string()
+      |> String.pad_leading(2, "0")
+
+    "#{minutes}:#{seconds}"
   end
 end
