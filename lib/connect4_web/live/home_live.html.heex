@@ -1,6 +1,6 @@
 <div id="tournament-status" class="flex px-8 py-4 rounded-full bg-slate-200">
   <%= if @active? do %>
-    <div>Next game in <%= @time_until_next_game %></div>
+    <div>Next game in <span class="font-bold"><%= @time_until_next_game %></span></div>
     <%= if @current_player && @current_player.admin do %>
       <div class="ml-auto">
         <a
