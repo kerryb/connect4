@@ -93,5 +93,11 @@ defmodule Connect4Web.HomeLiveTest do
       assert view |> element("#tournament-status", "not currently active") |> eventually_has_element?()
       refute Scheduler.active?()
     end
+
+    test "ignores unexpected messages", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/")
+      send(view.pid, :wibble)
+      render(view)
+    end
   end
 end

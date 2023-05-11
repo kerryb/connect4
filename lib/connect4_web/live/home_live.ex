@@ -61,6 +61,8 @@ defmodule Connect4Web.HomeLive do
     {:noreply, assign(socket, active?: false)}
   end
 
+  def handle_info(_message, socket), do: {:noreply, socket}
+
   defp update_players(players, game), do: Enum.map(players, &update_player(&1, game))
 
   defp update_player(player, game) do
