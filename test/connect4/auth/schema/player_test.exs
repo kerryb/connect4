@@ -15,7 +15,7 @@ defmodule Connect4.Auth.Schema.PlayerTest do
       insert(:game, player_o: player_2, player_x: player_1, winner: "tie")
       insert(:game, player_o: player_1, player_x: player_2, winner: nil)
 
-      assert %{played: 3, won: 1, tied: 1, lost: 1} =
+      assert %{played: 3, won: 1, tied: 1, lost: 1, points: 4} =
                player_1
                |> Repo.preload([:games_as_o, :games_as_x])
                |> Player.calculate_stats()

@@ -29,6 +29,7 @@ defmodule Connect4.Auth.Schema.Player do
     field(:won, :integer, virtual: true)
     field(:tied, :integer, virtual: true)
     field(:lost, :integer, virtual: true)
+    field(:points, :integer, virtual: true)
 
     has_many(:games_as_o, Game, foreign_key: :player_o_id)
     has_many(:games_as_x, Game, foreign_key: :player_x_id)
@@ -209,7 +210,12 @@ defmodule Connect4.Auth.Schema.Player do
   played/won/tied/lost stats and populates the virtual fields.
   """
   def calculate_stats(player) do
-    %{player | played: played(player), won: won(player), tied: tied(player), lost: lost(player)}
+    played = played(player)
+    won = won(player)
+    tied = tied(player)
+    lost = lost(player)
+    points = 3 * won + tied
+    %{player | played: played, won: won, tied: tied, lost: lost, points: points}
   end
 
   defp played(player) do

@@ -46,6 +46,7 @@ defmodule Connect4Web.HomeLiveTest do
       assert view |> element("tr#player-#{player_1.id} td.c4-won", "0") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-tied", "0") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-lost", "0") |> has_element?()
+      assert view |> element("tr#player-#{player_1.id} td.c4-points", "0") |> has_element?()
 
       game_1 = insert(:game, player_o: player_1, player_x: player_2, winner: "O", board: %{})
       PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game_1})
@@ -55,7 +56,7 @@ defmodule Connect4Web.HomeLiveTest do
       assert view |> element("tr#player-#{player_1.id} td.c4-played", "2") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-won", "1") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-tied", "1") |> has_element?()
-      assert view |> element("tr#player-#{player_2.id} td.c4-lost", "1") |> has_element?()
+      assert view |> element("tr#player-#{player_2.id} td.c4-points", "4") |> has_element?()
     end
 
     test "displays a message if the tournament is inactive", %{conn: conn} do
