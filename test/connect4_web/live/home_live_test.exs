@@ -87,8 +87,11 @@ defmodule Connect4Web.HomeLiveTest do
       {:ok, view, _html} = conn |> log_in_player(admin) |> live(~p"/")
       view |> element("a", "Activate") |> render_click()
       assert view |> element("#tournament-status", ~r/\d+:\d\d/) |> eventually_has_element?()
+      assert Scheduler.active?()
+
       view |> element("a", "Deactivate") |> render_click()
       assert view |> element("#tournament-status", "not currently active") |> eventually_has_element?()
+      refute Scheduler.active?()
     end
   end
 end

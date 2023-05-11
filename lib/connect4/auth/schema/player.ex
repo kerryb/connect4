@@ -212,7 +212,10 @@ defmodule Connect4.Auth.Schema.Player do
     %{player | played: played(player), won: won(player), tied: tied(player), lost: lost(player)}
   end
 
-  defp played(player), do: length(player.games_as_o) + length(player.games_as_x)
+  defp played(player) do
+    Enum.count(player.games_as_o, &(not is_nil(&1.winner))) +
+      Enum.count(player.games_as_x, &(not is_nil(&1.winner)))
+  end
 
   defp won(player) do
     Enum.count(player.games_as_o, &(&1.winner == "O")) +

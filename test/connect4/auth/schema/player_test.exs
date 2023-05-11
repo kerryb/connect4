@@ -13,6 +13,7 @@ defmodule Connect4.Auth.Schema.PlayerTest do
       insert(:game, player_o: player_1, player_x: player_2, winner: "O")
       insert(:game, player_o: player_2, player_x: player_1, winner: "O")
       insert(:game, player_o: player_2, player_x: player_1, winner: "tie")
+      insert(:game, player_o: player_1, player_x: player_2, winner: nil)
 
       assert %{played: 3, won: 1, tied: 1, lost: 1} =
                player_1
