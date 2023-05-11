@@ -12,7 +12,7 @@ defmodule Connect4Web.HomeLive do
   @impl LiveView
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      PubSub.subscribe(Connect4.PubSub, "games")
+      PubSub.subscribe(Connect4.PubSub, "runner")
       PubSub.subscribe(Connect4.PubSub, "players")
       PubSub.subscribe(Connect4.PubSub, "scheduler")
     end
@@ -54,7 +54,7 @@ defmodule Connect4Web.HomeLive do
     {:noreply, update(socket, :players, &[player | &1])}
   end
 
-  def handle_info({:completed, game}, socket) do
+  def handle_info({:game_finished, game}, socket) do
     {:noreply, update(socket, :players, &update_players(&1, game))}
   end
 

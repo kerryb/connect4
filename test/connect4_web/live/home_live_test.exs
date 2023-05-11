@@ -50,9 +50,9 @@ defmodule Connect4Web.HomeLiveTest do
       assert html =~ ~r/Alice.*Bob/ms
 
       game_1 = insert(:game, player_o: player_1, player_x: player_2, winner: "X", board: %{})
-      PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game_1})
+      PubSub.broadcast!(Connect4.PubSub, "runner", {:game_finished, game_1})
       game_2 = insert(:game, player_o: player_2, player_x: player_1, winner: "tie", board: %{})
-      PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game_2})
+      PubSub.broadcast!(Connect4.PubSub, "runner", {:game_finished, game_2})
 
       assert view |> element("tr#player-#{player_2.id} td.c4-played", "2") |> has_element?()
       assert view |> element("tr#player-#{player_2.id} td.c4-won", "1") |> has_element?()
