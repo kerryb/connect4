@@ -11,7 +11,7 @@ defmodule Connect4.Game.GameTest do
 
   setup do
     Application.ensure_all_started(:connect4)
-    {:ok, pid} = start_supervised({Game, timeout: 100, id: @game_id})
+    {:ok, pid} = start_supervised({Game, timeout: 100, first_move_timeout: 300, id: @game_id})
     Sandbox.allow(Repo, self(), pid)
     :ok
   end
@@ -119,12 +119,15 @@ defmodule Connect4.Game.GameTest do
       assert Game.get(@game_id).next_player == :O
     end
 
-    test "does not apply the timeout to either player’s first move" do
+    test "applies a longer timeout to each player’s first move" do
       Process.sleep(110)
       assert Game.get(@game_id).next_player == :O
-      play_move(:O, 0)
+      Process.sleep(200)
+      assert Game.get(@game_id).next_player == :X
       Process.sleep(110)
       assert Game.get(@game_id).next_player == :X
+      Process.sleep(200)
+      assert Game.get(@game_id).winner == :tie
     end
 
     test "allows one player to keep making consecutive moves if their opponent times out" do

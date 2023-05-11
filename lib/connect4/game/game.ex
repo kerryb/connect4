@@ -15,6 +15,7 @@ defmodule Connect4.Game.Game do
             winner: nil,
             timed_out?: false,
             timeout: nil,
+            first_move_timeout: nil,
             timer_ref: nil,
             played: MapSet.new()
 
@@ -30,6 +31,7 @@ defmodule Connect4.Game.Game do
           winner: player() | :tie | nil,
           timed_out?: boolean(),
           timeout: integer(),
+          first_move_timeout: integer(),
           timer_ref: reference() | nil
         }
 
@@ -79,7 +81,8 @@ defmodule Connect4.Game.Game do
   @impl GenServer
   def init(opts) do
     game = %__MODULE__{id: opts[:id]}
-    {:ok, %{game | timeout: opts[:timeout]}}
+    timer_ref = start_timer(opts[:first_move_timeout], game.timer_ref)
+    {:ok, %{game | timeout: opts[:timeout], first_move_timeout: opts[:first_move_timeout], timer_ref: timer_ref}}
   end
 
   @impl GenServer
@@ -132,11 +135,8 @@ defmodule Connect4.Game.Game do
 
   defp complete_move(game, player) do
     next_player = other_player(game.next_player)
-
-    timer_ref =
-      if MapSet.member?(game.played, next_player) do
-        start_timer(game.timeout, game.timer_ref)
-      end
+    timeout = timeout_for_move(game, next_player)
+    timer_ref = start_timer(timeout, game.timer_ref)
 
     game =
       mark_played(
@@ -156,13 +156,18 @@ defmodule Connect4.Game.Game do
 
   def handle_info(:timeout, game) do
     next_player = other_player(game.next_player)
-
-    timer_ref =
-      if MapSet.member?(game.played, next_player) do
-        start_timer(game.timeout, game.timer_ref)
-      end
+    timeout = timeout_for_move(game, next_player)
+    timer_ref = start_timer(timeout, game.timer_ref)
 
     {:noreply, %{game | next_player: next_player, timed_out?: true, timer_ref: timer_ref}}
+  end
+
+  defp timeout_for_move(game, next_player) do
+    if MapSet.member?(game.played, next_player) do
+      game.timeout
+    else
+      game.first_move_timeout
+    end
   end
 
   defp start_timer(nil, _old_timer_ref), do: nil

@@ -22,10 +22,10 @@ defmodule Connect4.Game.Runner do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  @spec start_game(String.t(), String.t(), integer()) ::
+  @spec start_game(String.t(), String.t(), integer(), integer()) ::
           {:ok, integer()} | {:error, any()}
-  def start_game(player_o_code, player_x_code, timeout \\ :timer.minutes(1)) do
-    GenServer.call(__MODULE__, {:start_game, player_o_code, player_x_code, timeout})
+  def start_game(player_o_code, player_x_code, timeout, first_move_timeout) do
+    GenServer.call(__MODULE__, {:start_game, player_o_code, player_x_code, timeout, first_move_timeout})
   end
 
   @spec play(String.t(), integer()) :: {:ok, Game.player(), Game.t()} | {:error, any()}
@@ -46,9 +46,9 @@ defmodule Connect4.Game.Runner do
   end
 
   @impl GenServer
-  def handle_call({:start_game, player_o_code, player_x_code, timeout}, _from, state) do
+  def handle_call({:start_game, player_o_code, player_x_code, timeout, first_move_timeout}, _from, state) do
     with {:ok, game} <- GameQueries.insert_from_codes(player_o_code, player_x_code),
-         {:ok, _pid} <- Game.start_link(id: game.id, timeout: timeout) do
+         {:ok, _pid} <- Game.start_link(id: game.id, timeout: timeout, first_move_timeout: first_move_timeout) do
       {:reply, {:ok, game.id}, register_game(state, player_o_code, player_x_code, game.id)}
     else
       error -> {:reply, error, state}

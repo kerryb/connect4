@@ -19,7 +19,7 @@ defmodule Connect4Web.GameControllerTest do
       code_1: code_1,
       code_2: code_2
     } do
-      Runner.start_game(code_1, code_2)
+      Runner.start_game(code_1, code_2, 50, 100)
       conn = get(conn, ~p"/games/#{code_1}")
       assert %{"playing_as" => "O"} = json_response(conn, 200)
     end
@@ -35,7 +35,7 @@ defmodule Connect4Web.GameControllerTest do
 
   describe "POST /game/:code/:column" do
     test "plays a turn", %{conn: conn, code_1: code_1, code_2: code_2} do
-      Runner.start_game(code_1, code_2)
+      Runner.start_game(code_1, code_2, 50, 100)
       conn = post(conn, ~p"/games/#{code_1}/0")
 
       assert %{"next_player" => "X", "board" => %{"0" => %{"0" => "O"}}} = json_response(conn, 200)
@@ -50,7 +50,7 @@ defmodule Connect4Web.GameControllerTest do
     end
 
     test "returns any other error from the game", %{conn: conn, code_1: code_1, code_2: code_2} do
-      Runner.start_game(code_1, code_2)
+      Runner.start_game(code_1, code_2, 50, 100)
       conn = post(conn, ~p"/games/#{code_2}/0")
       assert %{"error" => "Not your turn"} = json_response(conn, 400)
     end
