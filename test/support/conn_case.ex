@@ -64,4 +64,42 @@ defmodule Connect4Web.ConnCase do
     |> Phoenix.ConnTest.init_test_session(%{})
     |> Plug.Conn.put_session(:player_token, token)
   end
+
+  @doc """
+  Look for an element for up to a second, giving the view a chance to re-render
+  after asynchronous operations.
+
+  Usage is the same as `Phoenix.LiveViewTest.has_element?/1`.
+  """
+  @spec eventually_has_element?(Phoenix.LiveViewTest.Element.t()) :: boolean()
+  def eventually_has_element?(element, retries \\ 0)
+  def eventually_has_element?(_element, 20), do: false
+
+  def eventually_has_element?(element, retries) do
+    if Phoenix.LiveViewTest.has_element?(element) do
+      true
+    else
+      Process.sleep(100)
+      eventually_has_element?(element, retries + 1)
+    end
+  end
+
+  @doc """
+  Look for the absence of an element for up to a second, giving the view a
+  chance to re-render after asynchronous operations.
+
+  Usage is the same as `Phoenix.LiveViewTest.has_element?/1`.
+  """
+  @spec eventually_has_no_element?(Phoenix.LiveViewTest.Element.t()) :: boolean()
+  def eventually_has_no_element?(element, retries \\ 0)
+  def eventually_has_no_element?(_element, 20), do: false
+
+  def eventually_has_no_element?(element, retries) do
+    if Phoenix.LiveViewTest.has_element?(element) do
+      Process.sleep(100)
+      eventually_has_no_element?(element, retries + 1)
+    else
+      true
+    end
+  end
 end

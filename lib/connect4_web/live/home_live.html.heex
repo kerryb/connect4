@@ -1,8 +1,30 @@
-<div id="tournament-status" class="px-8 py-4 rounded-full bg-slate-200">
+<div id="tournament-status" class="flex px-8 py-4 rounded-full bg-slate-200">
   <%= if @active? do %>
-    Next game in <%= @time_until_next_game %>
+    <div>Next game in <%= @time_until_next_game %></div>
+    <%= if @current_player && @current_player.admin do %>
+      <div class="ml-auto">
+        <a
+          href="#"
+          phx-click="deactivate"
+          class="rounded-full bg-white hover:bg-slate-300 border border-black px-2 py-1"
+        >
+          Deactivate
+        </a>
+      </div>
+    <% end %>
   <% else %>
-    The tournament is not currently active
+    <div>The tournament is not currently active</div>
+    <%= if @current_player && @current_player.admin do %>
+      <div class="ml-auto">
+        <a
+          href="#"
+          phx-click="activate"
+          class="rounded-full bg-white hover:bg-slate-300 border border-black px-2 py-1"
+        >
+          Activate
+        </a>
+      </div>
+    <% end %>
   <% end %>
 </div>
 

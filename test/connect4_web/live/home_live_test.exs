@@ -81,5 +81,14 @@ defmodule Connect4Web.HomeLiveTest do
       PubSub.broadcast!(Connect4.PubSub, "scheduler", :deactivated)
       assert view |> element("#tournament-status", "not currently active") |> has_element?()
     end
+
+    test "allows admins to enable and disable the tournament", %{conn: conn} do
+      admin = insert(:player, confirmed_at: DateTime.utc_now(), admin: true)
+      {:ok, view, _html} = conn |> log_in_player(admin) |> live(~p"/")
+      view |> element("a", "Activate") |> render_click()
+      assert view |> element("#tournament-status", ~r/\d+:\d\d/) |> eventually_has_element?()
+      view |> element("a", "Deactivate") |> render_click()
+      assert view |> element("#tournament-status", "not currently active") |> eventually_has_element?()
+    end
   end
 end

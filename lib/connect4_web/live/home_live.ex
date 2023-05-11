@@ -34,6 +34,17 @@ defmodule Connect4Web.HomeLive do
   end
 
   @impl LiveView
+  def handle_event("activate", _params, socket) do
+    Scheduler.activate()
+    {:noreply, assign(socket, active?: true)}
+  end
+
+  def handle_event("deactivate", _params, socket) do
+    Scheduler.deactivate()
+    {:noreply, assign(socket, active?: false)}
+  end
+
+  @impl LiveView
   def handle_info({:new_player, player}, socket) do
     {:noreply, update(socket, :players, &[player | &1])}
   end
