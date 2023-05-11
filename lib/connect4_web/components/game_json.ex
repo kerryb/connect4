@@ -13,9 +13,6 @@ defmodule Connect4Web.GameJSON do
     }
   end
 
-  @spec render_test(Game.t()) :: map()
-  def render_test(game), do: render(game, game.next_player)
-
   defp as_array(board) do
     for column_index <- 0..6 do
       column = Map.get(board, column_index, %{})

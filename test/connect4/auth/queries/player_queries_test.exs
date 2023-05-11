@@ -43,6 +43,17 @@ defmodule Connect4.Auth.Queries.PlayerQueriesTest do
     end
   end
 
+  describe "Connect4.Game.Queries.GameQueries.from_code/1" do
+    test "returns the player with the code" do
+      %{id: id} = insert(:player, code: "ABCDE")
+      assert %{id: ^id} = PlayerQueries.from_code("ABCDE")
+    end
+
+    test "returns nil if the code is not found" do
+      assert is_nil(PlayerQueries.from_code("ABCDE"))
+    end
+  end
+
   describe "Connect4.Game.Queries.GameQueries.reload_player_with_game_and_stats/1" do
     test "reloads the player, with games and stats" do
       player_1 = insert(:player, confirmed_at: DateTime.utc_now())

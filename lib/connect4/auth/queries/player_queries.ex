@@ -25,6 +25,11 @@ defmodule Connect4.Auth.Queries.PlayerQueries do
     )
   end
 
+  @spec from_code(String.t()) :: Player.t() | nil
+  def from_code(code) do
+    Repo.one(from p in Player, where: p.code == ^code)
+  end
+
   @spec reload_player_with_game_and_stats(integer()) :: Player.t()
   def reload_player_with_game_and_stats(id) do
     from(p in Player, where: p.id == ^id, preload: [:games_as_o, :games_as_x])

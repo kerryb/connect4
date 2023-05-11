@@ -33,17 +33,6 @@ defmodule Connect4Web.GameControllerTest do
     end
   end
 
-  describe "GET /test/:code" do
-    test "returns the current test game for the player with the code, if found", %{
-      conn: conn,
-      code_1: code_1
-    } do
-      Runner.start_game(code_1, code_1)
-      conn = get(conn, ~p"/test/#{code_1}")
-      assert %{"playing_as" => "O"} = json_response(conn, 200)
-    end
-  end
-
   describe "POST /game/:code/:column" do
     test "plays a turn", %{conn: conn, code_1: code_1, code_2: code_2} do
       Runner.start_game(code_1, code_2)

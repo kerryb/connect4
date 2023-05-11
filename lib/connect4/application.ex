@@ -34,7 +34,7 @@ defmodule Connect4.Application do
   end
 
   defp non_test_children do
-    [Connect4.Game.Runner, Connect4.Game.Scheduler]
+    [Connect4.Game.Runner, Connect4.Game.TestRunner, Connect4.Game.Scheduler]
   end
 
   # Tell Phoenix to update the endpoint configuration

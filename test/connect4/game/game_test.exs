@@ -28,6 +28,13 @@ defmodule Connect4.Game.GameTest do
       assert Game.get(@game_id).next_player == :O
     end
 
+    test "allows playing as both players in test mode" do
+      {:ok, _game} = play_move(:test, 0)
+      assert Game.get(@game_id).next_player == :X
+      {:ok, _game} = play_move(:test, 0)
+      assert Game.get(@game_id).next_player == :O
+    end
+
     test "keeps track of moves" do
       play_moves(O: 3, X: 2)
       {:ok, game} = play_move(:O, 2)

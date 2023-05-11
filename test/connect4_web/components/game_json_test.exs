@@ -54,10 +54,4 @@ defmodule Connect4Web.GameJSONTest do
       assert GameJSON.render(%{game | winner: :tie}, :X).status == "tie"
     end
   end
-
-  describe "Connect4Web.GameJSON.render_test/1" do
-    test "always sets playing_as to next_player", %{game: game} do
-      assert GameJSON.render_test(game).playing_as == :O
-    end
-  end
 end

@@ -67,7 +67,7 @@ defmodule Connect4.Game.Game do
     |> GenServer.call(:get)
   end
 
-  @spec play(GenServer.server(), player(), column()) :: any()
+  @spec play(GenServer.server(), player() | :test, column()) :: any()
   def play(id, player, column) do
     id
     |> via_tuple()
@@ -86,22 +86,23 @@ defmodule Connect4.Game.Game do
   def handle_call(:get, _from, game), do: {:reply, game, game}
 
   def handle_call({:play, player, column_str}, _from, game) do
+    play_as = if player == :test, do: game.next_player, else: player
     column = parse_column(column_str)
 
     cond do
-      player != game.next_player ->
-        {:reply, {:error, "Not your turn"}, mark_played(game, player)}
+      play_as != game.next_player ->
+        {:reply, {:error, "Not your turn"}, mark_played(game, play_as)}
 
       column not in 0..6 ->
-        {:reply, {:error, "Column must be 0..6"}, mark_played(game, player)}
+        {:reply, {:error, "Column must be 0..6"}, mark_played(game, play_as)}
 
       game.board
       |> Map.get(column, %{})
       |> filled_row() == 5 ->
-        {:reply, {:error, "Column is full"}, mark_played(game, player)}
+        {:reply, {:error, "Column is full"}, mark_played(game, play_as)}
 
       true ->
-        play_move(game, player, column)
+        play_move(game, play_as, column)
     end
   end
 
