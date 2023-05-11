@@ -94,11 +94,11 @@ defmodule Connect4.Game.GameTest do
     end
 
     test "returns an error if attempting to query a game that is not running" do
-      assert {:error, "Game not found"} = Game.get("456")
+      assert {:error, :not_found} = Game.get("456")
     end
 
     test "returns an error if attempting to play in a game that is not running" do
-      assert {:error, "Game not found"} = Game.play("456", :O, "0")
+      assert {:error, :not_found} = Game.play("456", :O, "0")
     end
 
     test "broadcasts a message and terminates on completion" do

@@ -59,7 +59,7 @@ defmodule Connect4.Game.RunnerTest do
     end
 
     test "returns an error if the game is not found" do
-      assert {:error, "Game not found"} = Runner.play("one", "3")
+      assert {:error, :not_found} = Runner.play("one", "3")
     end
 
     test "passes on any error from the game" do
@@ -76,7 +76,7 @@ defmodule Connect4.Game.RunnerTest do
     end
 
     test "returns an error if the game is not found" do
-      assert {:error, "Game not found"} = Runner.find_game("one")
+      assert {:error, :not_found} = Runner.find_game("one")
     end
   end
 end

@@ -64,7 +64,7 @@ defmodule Connect4.Game.Game do
   def get(id) do
     case Registry.lookup(GameRegistry, id) do
       [{pid, _name}] -> GenServer.call(pid, :get)
-      _missing -> {:error, "Game not found"}
+      _missing -> {:error, :not_found}
     end
   end
 
@@ -72,7 +72,7 @@ defmodule Connect4.Game.Game do
   def play(id, player, column) do
     case Registry.lookup(GameRegistry, id) do
       [{pid, _name}] -> GenServer.call(pid, {:play, player, column})
-      _missing -> {:error, "Game not found"}
+      _missing -> {:error, :not_found}
     end
   end
 
