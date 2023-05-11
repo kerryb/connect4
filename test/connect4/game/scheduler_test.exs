@@ -1,12 +1,13 @@
 defmodule Connect4.Game.SchedulerTest do
-  use ExUnit.Case, async: false
+  use Connect4.DataCase, async: false
 
+  alias Connect4.Game.Runner
   alias Connect4.Game.Scheduler
   alias Phoenix.PubSub
 
   setup do
-    {:ok, _pid} = start_supervised(Scheduler)
-    :ok
+    {:ok, pid} = start_supervised(Scheduler)
+    %{pid: pid}
   end
 
   describe "Connect4.Game.Scheduler" do
@@ -39,6 +40,17 @@ defmodule Connect4.Game.SchedulerTest do
       PubSub.subscribe(Connect4.PubSub, "scheduler")
       Scheduler.deactivate()
       assert_receive :deactivated
+    end
+
+    test "starts games when the scheduled time is reached", %{pid: pid} do
+      start_supervised!(Runner)
+      PubSub.subscribe(Connect4.PubSub, "scheduler")
+      insert(:player, code: "one", confirmed_at: DateTime.utc_now())
+      insert(:player, code: "two", confirmed_at: DateTime.utc_now())
+      send(pid, :start_round)
+      assert_receive :round_started
+      assert {:ok, _player, _game} = Runner.find_game("one")
+      assert {:ok, _player, _game} = Runner.find_game("two")
     end
   end
 

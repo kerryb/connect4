@@ -9,6 +9,11 @@ defmodule Connect4.Auth.Queries.PlayerQueries do
   alias Connect4.Auth.Schema.Player
   alias Connect4.Repo
 
+  @spec active :: [Player.t()]
+  def active do
+    Repo.all(from(p in Player, where: not is_nil(p.confirmed_at), where: not p.admin))
+  end
+
   @spec active_with_games :: [Player.t()]
   def active_with_games do
     Repo.all(

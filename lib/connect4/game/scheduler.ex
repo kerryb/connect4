@@ -4,10 +4,11 @@ defmodule Connect4.Game.Scheduler do
   """
   use GenServer
 
+  alias Connect4.Auth.Queries.PlayerQueries
+  alias Connect4.Game.Runner
   alias Phoenix.PubSub
 
-  @enforce_keys [:active?, :interval_minutes]
-  defstruct [:active?, :interval_minutes, :timer_ref]
+  defstruct active?: false, interval_minutes: 10, tick_timer_ref: nil, round_timer_ref: nil
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
@@ -30,9 +31,7 @@ defmodule Connect4.Game.Scheduler do
   def seconds_to_go(now \\ NaiveDateTime.utc_now()), do: GenServer.call(__MODULE__, {:seconds_to_go, now})
 
   @impl GenServer
-  def init(_opts) do
-    {:ok, %__MODULE__{active?: false, interval_minutes: 10}}
-  end
+  def init(_opts), do: {:ok, %__MODULE__{}}
 
   @impl GenServer
   def handle_call(:active?, _from, state), do: {:reply, state.active?, state}
@@ -46,19 +45,22 @@ defmodule Connect4.Game.Scheduler do
 
   @impl GenServer
   def handle_cast(:activate, state) do
-    timer_ref = Process.send_after(self(), :broadcast_seconds_remaining, 1000)
-    {:noreply, %{state | active?: true, timer_ref: timer_ref}}
+    tick_timer_ref = Process.send_after(self(), :tick, 1000)
+    seconds_to_go = calculate_seconds_to_go(state.interval_minutes)
+    round_timer_ref = Process.send_after(self(), :start_round, :timer.seconds(seconds_to_go))
+    {:noreply, %{state | active?: true, tick_timer_ref: tick_timer_ref, round_timer_ref: round_timer_ref}}
   end
 
   def handle_cast(:deactivate, state) do
-    if state.timer_ref, do: Process.cancel_timer(state.timer_ref)
+    if state.tick_timer_ref, do: Process.cancel_timer(state.tick_timer_ref)
+    if state.round_timer_ref, do: Process.cancel_timer(state.round_timer_ref)
     PubSub.broadcast!(Connect4.PubSub, "scheduler", :deactivated)
-    {:noreply, %{state | active?: false, timer_ref: nil}}
+    {:noreply, %{state | active?: false, tick_timer_ref: nil}}
   end
 
   @impl GenServer
-  def handle_info(:broadcast_seconds_remaining, state) do
-    timer_ref = Process.send_after(self(), :broadcast_seconds_remaining, 1000)
+  def handle_info(:tick, state) do
+    tick_timer_ref = Process.send_after(self(), :tick, 1000)
 
     PubSub.broadcast!(
       Connect4.PubSub,
@@ -66,7 +68,17 @@ defmodule Connect4.Game.Scheduler do
       {:seconds_to_go, calculate_seconds_to_go(state.interval_minutes)}
     )
 
-    {:noreply, %{state | timer_ref: timer_ref}}
+    {:noreply, %{state | tick_timer_ref: tick_timer_ref}}
+  end
+
+  def handle_info(:start_round, state) do
+    PlayerQueries.active()
+    |> Enum.shuffle()
+    |> Enum.chunk_every(2, 2, :discard)
+    |> Enum.each(fn [player_1, player_2] -> Runner.start_game(player_1.code, player_2.code, 1000) end)
+
+    PubSub.broadcast!(Connect4.PubSub, "scheduler", :round_started)
+    {:noreply, state}
   end
 
   defp calculate_seconds_to_go(interval_minutes, now \\ NaiveDateTime.utc_now()) do
