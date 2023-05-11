@@ -8,6 +8,7 @@ defmodule Connect4.Game.TestRunner do
   use GenServer
 
   alias Connect4.Game.Game
+  alias Connect4.GameRegistry
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
@@ -32,7 +33,7 @@ defmodule Connect4.Game.TestRunner do
   @impl GenServer
   def handle_call({:play, player_code, column}, _from, state) do
     {id, state} =
-      case state.games[player_code] do
+      case game_id_if_registered_and_running(state.games, player_code) do
         nil ->
           id = start_game(player_code)
           {id, register_game(state, player_code, id)}
@@ -49,7 +50,7 @@ defmodule Connect4.Game.TestRunner do
 
   def handle_call({:find_or_start_game, player_code}, _from, state) do
     id =
-      case state.games[player_code] do
+      case game_id_if_registered_and_running(state.games, player_code) do
         nil ->
           id = start_game(player_code)
           register_game(state, player_code, id)
@@ -60,6 +61,15 @@ defmodule Connect4.Game.TestRunner do
       end
 
     {:reply, {:ok, Game.get(id)}, state}
+  end
+
+  defp game_id_if_registered_and_running(games, player_code) do
+    with id when not is_nil(id) <- games[player_code],
+         [{_pid, _name}] <- Registry.lookup(GameRegistry, id) do
+      id
+    else
+      _failed -> nil
+    end
   end
 
   defp start_game(player_code) do
