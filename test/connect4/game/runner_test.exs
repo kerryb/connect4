@@ -31,6 +31,8 @@ defmodule Connect4.Game.RunnerTest do
     test "passes the timeout to the game" do
       PubSub.subscribe(Connect4.PubSub, "games")
       {:ok, game_id} = Runner.start_game("one", "two", 50)
+      {:ok, _player, _game} = Runner.play("one", "3")
+      {:ok, _player, _game} = Runner.play("two", "3")
       Process.sleep(110)
       assert_receive {:completed, %{id: ^game_id}}
     end

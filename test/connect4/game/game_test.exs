@@ -96,15 +96,25 @@ defmodule Connect4.Game.GameTest do
     end
 
     test "switches to the other player if a player doesn’t make a move within <timeout> ms" do
+      play_moves(O: 2, X: 2)
+      Process.sleep(110)
+      assert Game.get(@game_id).next_player == :X
+      play_moves(X: 4, O: 4)
+      Process.sleep(110)
+      assert Game.get(@game_id).next_player == :O
+    end
+
+    test "does not apply the timeout to either player’s first move" do
+      Process.sleep(110)
+      assert Game.get(@game_id).next_player == :O
+      play_move(:O, 0)
       Process.sleep(110)
       assert Game.get(@game_id).next_player == :X
     end
 
     test "allows one player to keep making consecutive moves if their opponent times out" do
       PubSub.subscribe(Connect4.PubSub, "games")
-      {:ok, _game} = play_move(:O, 0)
-      Process.sleep(110)
-      {:ok, _game} = play_move(:O, 0)
+      play_moves(O: 0, X: 1, O: 0)
       Process.sleep(110)
       {:ok, _game} = play_move(:O, 0)
       Process.sleep(110)
@@ -115,6 +125,7 @@ defmodule Connect4.Game.GameTest do
 
     test "considers the game a tie if both players time out consecutively" do
       PubSub.subscribe(Connect4.PubSub, "games")
+      play_moves(O: 0, X: 0)
       Process.sleep(210)
       %{id: game_id} = game = Game.get(@game_id)
       assert game.winner == :tie

@@ -1,5 +1,5 @@
 defmodule Connect4Web.ErrorHTMLTest do
-  use Connect4Web.ConnCase, async: true
+  use Connect4Web.ConnCase, async: false
 
   # Bring render_to_string/4 for testing custom views
   import Phoenix.Template

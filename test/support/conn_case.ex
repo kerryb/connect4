@@ -35,6 +35,7 @@ defmodule Connect4Web.ConnCase do
 
   setup tags do
     Connect4.DataCase.setup_sandbox(tags)
+    {:ok, _pid} = start_supervised(Connect4.Game.Scheduler)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 

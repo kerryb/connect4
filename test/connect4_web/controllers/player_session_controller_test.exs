@@ -1,6 +1,6 @@
 # credo:disable-for-this-file Credo.Check.Refactor.VariableRebinding
 defmodule Connect4Web.PlayerSessionControllerTest do
-  use Connect4Web.ConnCase, async: true
+  use Connect4Web.ConnCase, async: false
 
   import Connect4.AuthFixtures
 

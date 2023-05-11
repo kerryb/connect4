@@ -1,5 +1,5 @@
 defmodule Connect4Web.ErrorJSONTest do
-  use Connect4Web.ConnCase, async: true
+  use Connect4Web.ConnCase, async: false
 
   test "renders 404" do
     assert Connect4Web.ErrorJSON.render("404.json", %{}) == %{errors: %{detail: "Not Found"}}

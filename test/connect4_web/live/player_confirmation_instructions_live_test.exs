@@ -1,5 +1,5 @@
 defmodule Connect4Web.PlayerConfirmationInstructionsLiveTest do
-  use Connect4Web.ConnCase, async: true
+  use Connect4Web.ConnCase, async: false
 
   import Connect4.AuthFixtures
   import Phoenix.LiveViewTest

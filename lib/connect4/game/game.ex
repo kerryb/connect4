@@ -8,8 +8,15 @@ defmodule Connect4.Game.Game do
   alias Connect4.GameRegistry
   alias Phoenix.PubSub
 
-  @enforce_keys [:id, :board, :next_player]
-  defstruct [:id, :board, :next_player, :winner, :timed_out?, :timeout, :timer_ref]
+  @enforce_keys [:id]
+  defstruct id: nil,
+            board: %{},
+            next_player: :O,
+            winner: nil,
+            timed_out?: false,
+            timeout: nil,
+            timer_ref: nil,
+            played: MapSet.new()
 
   @type column :: 0..6
   @type row :: 0..5
@@ -19,6 +26,7 @@ defmodule Connect4.Game.Game do
           id: GenServer.server(),
           board: board(),
           next_player: player(),
+          played: MapSet.t(player()),
           winner: player() | :tie | nil,
           timed_out?: boolean(),
           timeout: integer(),
@@ -70,9 +78,8 @@ defmodule Connect4.Game.Game do
 
   @impl GenServer
   def init(opts) do
-    game = %__MODULE__{id: opts[:id], next_player: :O, board: %{}, timed_out?: false}
-    timer_ref = start_timer(opts[:timeout], nil)
-    {:ok, %{game | timeout: opts[:timeout], timer_ref: timer_ref}}
+    game = %__MODULE__{id: opts[:id]}
+    {:ok, %{game | timeout: opts[:timeout]}}
   end
 
   @impl GenServer
@@ -83,15 +90,15 @@ defmodule Connect4.Game.Game do
 
     cond do
       player != game.next_player ->
-        {:reply, {:error, "Not your turn"}, game}
+        {:reply, {:error, "Not your turn"}, mark_played(game, player)}
 
       column not in 0..6 ->
-        {:reply, {:error, "Column must be 0..6"}, game}
+        {:reply, {:error, "Column must be 0..6"}, mark_played(game, player)}
 
       game.board
       |> Map.get(column, %{})
       |> filled_row() == 5 ->
-        {:reply, {:error, "Column is full"}, game}
+        {:reply, {:error, "Column is full"}, mark_played(game, player)}
 
       true ->
         play_move(game, player, column)
@@ -111,7 +118,7 @@ defmodule Connect4.Game.Game do
     cond do
       tied?(game.board) -> complete_game(game, :tie)
       won?(game.board, player, column) -> complete_game(game, player)
-      true -> complete_move(game)
+      true -> complete_move(game, player)
     end
   end
 
@@ -122,13 +129,19 @@ defmodule Connect4.Game.Game do
     {:stop, :normal, {:ok, game}, game}
   end
 
-  defp complete_move(game) do
-    game = %{
-      game
-      | next_player: other_player(game.next_player),
-        timed_out?: false,
-        timer_ref: start_timer(game.timeout, game.timer_ref)
-    }
+  defp complete_move(game, player) do
+    next_player = other_player(game.next_player)
+
+    timer_ref =
+      if MapSet.member?(game.played, next_player) do
+        start_timer(game.timeout, game.timer_ref)
+      end
+
+    game =
+      mark_played(
+        %{game | next_player: next_player, timed_out?: false, timer_ref: timer_ref},
+        player
+      )
 
     {:reply, {:ok, game}, game}
   end
@@ -142,8 +155,13 @@ defmodule Connect4.Game.Game do
 
   def handle_info(:timeout, game) do
     next_player = other_player(game.next_player)
-    start_timer(game.timeout, game.timer_ref)
-    {:noreply, %{game | next_player: next_player, timed_out?: true}}
+
+    timer_ref =
+      if MapSet.member?(game.played, next_player) do
+        start_timer(game.timeout, game.timer_ref)
+      end
+
+    {:noreply, %{game | next_player: next_player, timed_out?: true, timer_ref: timer_ref}}
   end
 
   defp start_timer(nil, _old_timer_ref), do: nil
@@ -214,4 +232,8 @@ defmodule Connect4.Game.Game do
 
   defp other_player(:O), do: :X
   defp other_player(:X), do: :O
+
+  defp mark_played(game, player) do
+    Map.update!(game, :played, &MapSet.put(&1, player))
+  end
 end

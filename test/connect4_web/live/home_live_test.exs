@@ -1,7 +1,7 @@
 # credo:disable-for-this-file Credo.Check.Readability.OnePipePerLine
 # credo:disable-for-this-file Credo.Check.Refactor.VariableRebinding
 defmodule Connect4Web.HomeLiveTest do
-  use Connect4Web.ConnCase, async: true
+  use Connect4Web.ConnCase, async: false
 
   import Phoenix.LiveViewTest
 
@@ -10,11 +10,6 @@ defmodule Connect4Web.HomeLiveTest do
   alias Connect4.Game.Scheduler
   alias Connect4.Repo
   alias Phoenix.PubSub
-
-  setup do
-    {:ok, _pid} = start_supervised(Scheduler)
-    :ok
-  end
 
   describe "Connect4Web.HomeLive" do
     test "Shows a list of confirmed players, highlighting the logged-in player", %{conn: conn} do

@@ -1,5 +1,5 @@
 defmodule Connect4Web.GameControllerTest do
-  use Connect4Web.ConnCase, async: true
+  use Connect4Web.ConnCase, async: false
 
   alias Connect4.Game.Runner
   alias Connect4.Repo
