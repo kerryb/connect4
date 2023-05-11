@@ -93,6 +93,14 @@ defmodule Connect4.Game.GameTest do
       assert {:error, "Column is full"} = play_move(:O, 0)
     end
 
+    test "returns an error if attempting to query a game that is not running" do
+      assert {:error, "Game not found"} = Game.get("456")
+    end
+
+    test "returns an error if attempting to play in a game that is not running" do
+      assert {:error, "Game not found"} = Game.play("456", :O, "0")
+    end
+
     test "broadcasts a message and terminates on completion" do
       PubSub.subscribe(Connect4.PubSub, "games")
       [{game_pid, _name}] = Registry.lookup(GameRegistry, @game_id)

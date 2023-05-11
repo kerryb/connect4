@@ -57,24 +57,24 @@ defmodule Connect4.Game.Game do
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: via_tuple(opts[:id]))
+    GenServer.start_link(__MODULE__, opts, name: {:via, Registry, {GameRegistry, opts[:id]}})
   end
 
   @spec get(any()) :: t()
   def get(id) do
-    id
-    |> via_tuple()
-    |> GenServer.call(:get)
+    case Registry.lookup(GameRegistry, id) do
+      [{pid, _name}] -> GenServer.call(pid, :get)
+      _missing -> {:error, "Game not found"}
+    end
   end
 
   @spec play(GenServer.server(), player() | :test, column()) :: any()
   def play(id, player, column) do
-    id
-    |> via_tuple()
-    |> GenServer.call({:play, player, column})
+    case Registry.lookup(GameRegistry, id) do
+      [{pid, _name}] -> GenServer.call(pid, {:play, player, column})
+      _missing -> {:error, "Game not found"}
+    end
   end
-
-  defp via_tuple(id), do: {:via, Registry, {GameRegistry, id}}
 
   @impl GenServer
   def init(opts) do
