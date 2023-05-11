@@ -36,27 +36,29 @@ defmodule Connect4Web.HomeLiveTest do
       assert view |> element("td", player.name) |> has_element?()
     end
 
-    test "Updates scores as games complete", %{conn: conn} do
-      player_1 = insert(:player, confirmed_at: DateTime.utc_now())
-      player_2 = insert(:player, confirmed_at: DateTime.utc_now())
+    test "Updates scores and re-sorts table as games complete", %{conn: conn} do
+      player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
 
-      {:ok, view, _html} = live(conn, ~p"/")
+      {:ok, view, html} = live(conn, ~p"/")
 
       assert view |> element("tr#player-#{player_1.id} td.c4-played", "0") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-won", "0") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-tied", "0") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-lost", "0") |> has_element?()
       assert view |> element("tr#player-#{player_1.id} td.c4-points", "0") |> has_element?()
+      assert html =~ ~r/Alice.*Bob/ms
 
-      game_1 = insert(:game, player_o: player_1, player_x: player_2, winner: "O", board: %{})
+      game_1 = insert(:game, player_o: player_1, player_x: player_2, winner: "X", board: %{})
       PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game_1})
       game_2 = insert(:game, player_o: player_2, player_x: player_1, winner: "tie", board: %{})
       PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game_2})
 
-      assert view |> element("tr#player-#{player_1.id} td.c4-played", "2") |> has_element?()
-      assert view |> element("tr#player-#{player_1.id} td.c4-won", "1") |> has_element?()
-      assert view |> element("tr#player-#{player_1.id} td.c4-tied", "1") |> has_element?()
+      assert view |> element("tr#player-#{player_2.id} td.c4-played", "2") |> has_element?()
+      assert view |> element("tr#player-#{player_2.id} td.c4-won", "1") |> has_element?()
+      assert view |> element("tr#player-#{player_2.id} td.c4-tied", "1") |> has_element?()
       assert view |> element("tr#player-#{player_2.id} td.c4-points", "4") |> has_element?()
+      assert render(view) =~ ~r/Bob.*Alice/ms
     end
 
     test "displays a message if the tournament is inactive", %{conn: conn} do

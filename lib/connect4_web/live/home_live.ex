@@ -63,7 +63,11 @@ defmodule Connect4Web.HomeLive do
 
   def handle_info(_message, socket), do: {:noreply, socket}
 
-  defp update_players(players, game), do: Enum.map(players, &update_player(&1, game))
+  defp update_players(players, game) do
+    players
+    |> Enum.map(&update_player(&1, game))
+    |> Enum.sort_by(&{-&1.points, -&1.won, &1.name})
+  end
 
   defp update_player(player, game) do
     if player.id in [game.player_o_id, game.player_x_id] do
