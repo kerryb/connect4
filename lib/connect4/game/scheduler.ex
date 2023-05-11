@@ -80,13 +80,16 @@ defmodule Connect4.Game.Scheduler do
   end
 
   def handle_info(:start_round, state) do
+    seconds_to_go = calculate_seconds_to_go(state.interval_minutes)
+    round_timer_ref = Process.send_after(self(), :start_round, :timer.seconds(seconds_to_go))
+
     PlayerQueries.active()
     |> Enum.shuffle()
     |> Enum.chunk_every(2, 2, :discard)
     |> Enum.each(fn [player_1, player_2] -> Runner.start_game(player_1.code, player_2.code, 1000) end)
 
     PubSub.broadcast!(Connect4.PubSub, "scheduler", :round_started)
-    {:noreply, state}
+    {:noreply, %{state | round_timer_ref: round_timer_ref}}
   end
 
   defp calculate_seconds_to_go(interval_minutes, now \\ NaiveDateTime.utc_now()) do
