@@ -19,6 +19,7 @@ defmodule Connect4Web.HomeLive do
 
     players = Enum.map(PlayerQueries.active_with_games(), &Player.calculate_stats(&1))
     active? = Scheduler.active?()
+    interval_minutes = Scheduler.interval_minutes()
 
     time_until_next_game =
       if active? do
@@ -29,13 +30,17 @@ defmodule Connect4Web.HomeLive do
      assign(socket,
        players: players,
        active?: active?,
+       interval_minutes: interval_minutes,
        time_until_next_game: time_until_next_game
      )}
   end
 
   @impl LiveView
-  def handle_event("activate", _params, socket) do
-    Scheduler.activate()
+  def handle_event("activate", params, socket) do
+    params["interval"]
+    |> String.to_integer()
+    |> Scheduler.activate()
+
     {:noreply, assign(socket, active?: true)}
   end
 

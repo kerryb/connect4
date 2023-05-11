@@ -1,6 +1,8 @@
-<div id="tournament-status" class="flex px-8 py-4 rounded-full bg-slate-200">
+<div id="tournament-status" class="flex gap-0 px-8 py-4 rounded-full bg-slate-200">
   <%= if @active? do %>
-    <div>Next game in <span class="font-bold"><%= @time_until_next_game %></span></div>
+    <div class="my-auto">
+      Next game in <span class="font-bold"><%= @time_until_next_game %></span>
+    </div>
     <%= if @current_player && @current_player.admin do %>
       <div class="ml-auto">
         <a
@@ -13,17 +15,24 @@
       </div>
     <% end %>
   <% else %>
-    <div>The tournament is not currently active</div>
+    <div class="my-auto">The tournament is not currently active</div>
     <%= if @current_player && @current_player.admin do %>
-      <div class="ml-auto">
-        <a
-          href="#"
-          phx-click="activate"
-          class="rounded-full bg-white hover:bg-slate-300 border border-black px-2 py-1"
+      <form id="runner" class="ml-auto p-0" phx-submit="activate">
+        <label for="interval">Interval:</label>
+        <input
+          name="interval"
+          id="interval"
+          type="number"
+          value={@interval_minutes}
+          class="w-20 py-1 mx-0"
+        />
+        <button
+          type="submit"
+          class="rounded-r-full bg-white hover:bg-slate-300 border border-black mx-0 px-2 py-1"
         >
           Activate
-        </a>
-      </div>
+        </button>
+      </form>
     <% end %>
   <% end %>
 </div>

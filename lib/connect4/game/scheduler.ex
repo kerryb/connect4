@@ -18,8 +18,8 @@ defmodule Connect4.Game.Scheduler do
   @spec active? :: boolean()
   def active?, do: GenServer.call(__MODULE__, :active?)
 
-  @spec activate :: :ok
-  def activate, do: GenServer.cast(__MODULE__, :activate)
+  @spec activate(integer()) :: :ok
+  def activate(interval_minutes), do: GenServer.cast(__MODULE__, {:activate, interval_minutes})
 
   @spec deactivate :: :ok
   def deactivate, do: GenServer.cast(__MODULE__, :deactivate)
@@ -44,11 +44,19 @@ defmodule Connect4.Game.Scheduler do
   end
 
   @impl GenServer
-  def handle_cast(:activate, state) do
+  def handle_cast({:activate, interval_minutes}, state) do
     tick_timer_ref = Process.send_after(self(), :tick, 1000)
-    seconds_to_go = calculate_seconds_to_go(state.interval_minutes)
+    seconds_to_go = calculate_seconds_to_go(interval_minutes)
     round_timer_ref = Process.send_after(self(), :start_round, :timer.seconds(seconds_to_go))
-    {:noreply, %{state | active?: true, tick_timer_ref: tick_timer_ref, round_timer_ref: round_timer_ref}}
+
+    {:noreply,
+     %{
+       state
+       | active?: true,
+         interval_minutes: interval_minutes,
+         tick_timer_ref: tick_timer_ref,
+         round_timer_ref: round_timer_ref
+     }}
   end
 
   def handle_cast(:deactivate, state) do

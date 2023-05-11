@@ -67,7 +67,7 @@ defmodule Connect4Web.HomeLiveTest do
     end
 
     test "displays seconds until next game if the tournament is active", %{conn: conn} do
-      Scheduler.activate()
+      Scheduler.activate(10)
       {:ok, view, _html} = live(conn, ~p"/")
       assert view |> element("#tournament-status", ~r/\d+:\d\d/) |> has_element?()
     end
@@ -79,7 +79,7 @@ defmodule Connect4Web.HomeLiveTest do
     end
 
     test "updates to inactive when it receives a broadcast message", %{conn: conn} do
-      Scheduler.activate()
+      Scheduler.activate(10)
       {:ok, view, _html} = live(conn, ~p"/")
       PubSub.broadcast!(Connect4.PubSub, "scheduler", :deactivated)
       assert view |> element("#tournament-status", "not currently active") |> has_element?()
@@ -88,12 +88,17 @@ defmodule Connect4Web.HomeLiveTest do
     test "allows admins to enable and disable the tournament", %{conn: conn} do
       admin = insert(:player, confirmed_at: DateTime.utc_now(), admin: true)
       {:ok, view, _html} = conn |> log_in_player(admin) |> live(~p"/")
-      view |> element("a", "Activate") |> render_click()
+      view |> element("form#runner") |> render_submit(%{"interval" => "5"})
       assert view |> element("#tournament-status", ~r/\d+:\d\d/) |> eventually_has_element?()
       assert Scheduler.active?()
+      assert Scheduler.interval_minutes() == 5
 
       view |> element("a", "Deactivate") |> render_click()
-      assert view |> element("#tournament-status", "not currently active") |> eventually_has_element?()
+
+      assert view
+             |> element("#tournament-status", "not currently active")
+             |> eventually_has_element?()
+
       refute Scheduler.active?()
     end
 

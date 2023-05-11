@@ -20,15 +20,16 @@ defmodule Connect4.Game.SchedulerTest do
     end
 
     test "can be activated and deactivated" do
-      Scheduler.activate()
+      Scheduler.activate(5)
       assert Scheduler.active?()
+      assert Scheduler.interval_minutes() == 5
       Scheduler.deactivate()
       refute Scheduler.active?()
     end
 
     test "broadcasts the time remaining every second while active" do
       PubSub.subscribe(Connect4.PubSub, "scheduler")
-      Scheduler.activate()
+      Scheduler.activate(10)
       assert_receive {:seconds_to_go, seconds_1}, 1500
       assert_receive {:seconds_to_go, seconds_2}, 1500
       assert seconds_1 - seconds_2 == 1
@@ -60,7 +61,7 @@ defmodule Connect4.Game.SchedulerTest do
     end
 
     test "returns the number of seconds to the next scheduled game when active" do
-      Scheduler.activate()
+      Scheduler.activate(10)
       assert Scheduler.seconds_to_go(~N[2023-05-10 22:28:30]) == 90
     end
   end
