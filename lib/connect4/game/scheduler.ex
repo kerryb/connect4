@@ -4,8 +4,10 @@ defmodule Connect4.Game.Scheduler do
   """
   use GenServer
 
+  alias Phoenix.PubSub
+
   @enforce_keys [:active?, :interval_minutes]
-  defstruct [:active?, :interval_minutes]
+  defstruct [:active?, :interval_minutes, :timer_ref]
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
@@ -39,14 +41,38 @@ defmodule Connect4.Game.Scheduler do
   def handle_call({:seconds_to_go, _now}, _from, %{active?: false} = state), do: {:reply, nil, state}
 
   def handle_call({:seconds_to_go, now}, _from, state) do
-    with {:ok, crontab} <- Crontab.CronExpression.Parser.parse("*/#{state.interval_minutes}"),
-         {:ok, next_game_at} <- Crontab.Scheduler.get_next_run_date(crontab, now),
-         seconds_to_go <- NaiveDateTime.diff(next_game_at, now) do
-      {:reply, seconds_to_go, state}
-    end
+    {:reply, calculate_seconds_to_go(state.interval_minutes, now), state}
   end
 
   @impl GenServer
-  def handle_cast(:activate, state), do: {:noreply, %{state | active?: true}}
-  def handle_cast(:deactivate, state), do: {:noreply, %{state | active?: false}}
+  def handle_cast(:activate, state) do
+    timer_ref = Process.send_after(self(), :broadcast_seconds_remaining, 1000)
+    {:noreply, %{state | active?: true, timer_ref: timer_ref}}
+  end
+
+  def handle_cast(:deactivate, state) do
+    if state.timer_ref, do: Process.cancel_timer(state.timer_ref)
+    PubSub.broadcast!(Connect4.PubSub, "scheduler", :deactivated)
+    {:noreply, %{state | active?: false, timer_ref: nil}}
+  end
+
+  @impl GenServer
+  def handle_info(:broadcast_seconds_remaining, state) do
+    timer_ref = Process.send_after(self(), :broadcast_seconds_remaining, 1000)
+
+    PubSub.broadcast!(
+      Connect4.PubSub,
+      "scheduler",
+      {:seconds_to_go, calculate_seconds_to_go(state.interval_minutes)}
+    )
+
+    {:noreply, %{state | timer_ref: timer_ref}}
+  end
+
+  defp calculate_seconds_to_go(interval_minutes, now \\ NaiveDateTime.utc_now()) do
+    with {:ok, crontab} <- Crontab.CronExpression.Parser.parse("*/#{interval_minutes}"),
+         {:ok, next_game_at} <- Crontab.Scheduler.get_next_run_date(crontab, now) do
+      NaiveDateTime.diff(next_game_at, now)
+    end
+  end
 end

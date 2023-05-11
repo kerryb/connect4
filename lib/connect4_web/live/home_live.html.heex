@@ -1,5 +1,5 @@
 <div id="tournament-status" class="px-8 py-4 rounded-full bg-slate-200">
-  <%= if @tournament_active? do %>
+  <%= if @active? do %>
     Next game in <%= @time_until_next_game %>
   <% else %>
     The tournament is not currently active

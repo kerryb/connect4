@@ -73,5 +73,18 @@ defmodule Connect4Web.HomeLiveTest do
       {:ok, view, _html} = live(conn, ~p"/")
       assert view |> element("#tournament-status", ~r/\d+:\d\d/) |> has_element?()
     end
+
+    test "updates the time when it receives a broadcast message", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/")
+      PubSub.broadcast!(Connect4.PubSub, "scheduler", {:seconds_to_go, 123})
+      assert view |> element("#tournament-status", "2:03") |> has_element?()
+    end
+
+    test "updates to inactive when it receives a broadcast message", %{conn: conn} do
+      Scheduler.activate()
+      {:ok, view, _html} = live(conn, ~p"/")
+      PubSub.broadcast!(Connect4.PubSub, "scheduler", :deactivated)
+      assert view |> element("#tournament-status", "not currently active") |> has_element?()
+    end
   end
 end

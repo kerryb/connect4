@@ -11,9 +11,7 @@ defmodule Connect4Web.GameController do
         json(conn, GameJSON.render(game, player))
 
       {:error, message} ->
-        1
-        |> :timer.seconds()
-        |> Process.sleep()
+        Process.sleep(1000)
 
         conn
         |> put_status(:not_found)

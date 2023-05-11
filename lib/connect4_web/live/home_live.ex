@@ -14,16 +14,21 @@ defmodule Connect4Web.HomeLive do
     if connected?(socket) do
       PubSub.subscribe(Connect4.PubSub, "games")
       PubSub.subscribe(Connect4.PubSub, "players")
+      PubSub.subscribe(Connect4.PubSub, "scheduler")
     end
 
     players = Enum.map(PlayerQueries.active_with_games(), &Player.calculate_stats(&1))
     active? = Scheduler.active?()
-    time_until_next_game = time_until_next_game(active?)
+
+    time_until_next_game =
+      if active? do
+        format_time(Scheduler.seconds_to_go())
+      end
 
     {:ok,
      assign(socket,
        players: players,
-       tournament_active?: active?,
+       active?: active?,
        time_until_next_game: time_until_next_game
      )}
   end
@@ -37,6 +42,14 @@ defmodule Connect4Web.HomeLive do
     {:noreply, update(socket, :players, &update_players(&1, game))}
   end
 
+  def handle_info({:seconds_to_go, seconds_to_go}, socket) do
+    {:noreply, assign(socket, active?: true, time_until_next_game: format_time(seconds_to_go))}
+  end
+
+  def handle_info(:deactivated, socket) do
+    {:noreply, assign(socket, active?: false)}
+  end
+
   defp update_players(players, game), do: Enum.map(players, &update_player(&1, game))
 
   defp update_player(player, game) do
@@ -47,14 +60,11 @@ defmodule Connect4Web.HomeLive do
     end
   end
 
-  defp time_until_next_game(false), do: nil
-
-  defp time_until_next_game(true) do
-    time = Scheduler.seconds_to_go()
-    minutes = div(time, 60)
+  defp format_time(seconds_to_go) do
+    minutes = div(seconds_to_go, 60)
 
     seconds =
-      time
+      seconds_to_go
       |> Integer.mod(60)
       |> to_string()
       |> String.pad_leading(2, "0")

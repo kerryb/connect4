@@ -2,6 +2,7 @@ defmodule Connect4.Game.SchedulerTest do
   use ExUnit.Case, async: false
 
   alias Connect4.Game.Scheduler
+  alias Phoenix.PubSub
 
   setup do
     {:ok, _pid} = start_supervised(Scheduler)
@@ -22,6 +23,22 @@ defmodule Connect4.Game.SchedulerTest do
       assert Scheduler.active?()
       Scheduler.deactivate()
       refute Scheduler.active?()
+    end
+
+    test "broadcasts the time remaining every second while active" do
+      PubSub.subscribe(Connect4.PubSub, "scheduler")
+      Scheduler.activate()
+      assert_receive {:seconds_to_go, seconds_1}, 1500
+      assert_receive {:seconds_to_go, seconds_2}, 1500
+      assert seconds_1 - seconds_2 == 1
+      Scheduler.deactivate()
+      refute_receive {:seconds_to_go, _seconds}, 1500
+    end
+
+    test "broadcasts a message when deactivated" do
+      PubSub.subscribe(Connect4.PubSub, "scheduler")
+      Scheduler.deactivate()
+      assert_receive :deactivated
     end
   end
 

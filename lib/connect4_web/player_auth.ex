@@ -83,7 +83,7 @@ defmodule Connect4Web.PlayerAuth do
     player_token && Auth.delete_player_session_token(player_token)
 
     if live_socket_id = get_session(conn, :live_socket_id) do
-      Endpoint.broadcast(live_socket_id, "disconnect", %{})
+      Endpoint.broadcast!(live_socket_id, "disconnect", %{})
     end
 
     conn
