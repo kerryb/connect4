@@ -30,6 +30,7 @@ defmodule Connect4Web.HomeLive do
      assign(socket,
        players: players,
        active?: active?,
+       show_code?: false,
        interval_minutes: interval_minutes,
        time_until_next_game: time_until_next_game
      )}
@@ -47,6 +48,14 @@ defmodule Connect4Web.HomeLive do
   def handle_event("deactivate", _params, socket) do
     Scheduler.deactivate()
     {:noreply, assign(socket, active?: false)}
+  end
+
+  def handle_event("show-code", _params, socket) do
+    {:noreply, assign(socket, show_code?: true)}
+  end
+
+  def handle_event("hide-code", _params, socket) do
+    {:noreply, assign(socket, show_code?: false)}
   end
 
   @impl LiveView

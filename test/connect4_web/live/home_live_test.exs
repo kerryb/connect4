@@ -62,6 +62,18 @@ defmodule Connect4Web.HomeLiveTest do
       assert render(view) =~ ~r/Bob.*Alice/ms
     end
 
+    test "allows players to view their codes", %{conn: conn} do
+      player = insert(:player, confirmed_at: DateTime.utc_now(), admin: false)
+      {:ok, view, _html} = conn |> log_in_player(player) |> live(~p"/")
+      refute view |> element("#player-code", player.code) |> has_element?()
+
+      view |> element("a#show-code") |> render_click()
+      assert view |> element("#player-code", player.code) |> has_element?()
+
+      view |> element("a#hide-code") |> render_click()
+      refute view |> element("#player-code", player.code) |> has_element?()
+    end
+
     test "displays a message if the tournament is inactive", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/")
       assert view |> element("#tournament-status", "not currently active") |> has_element?()

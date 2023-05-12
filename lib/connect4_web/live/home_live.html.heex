@@ -35,6 +35,23 @@
       </form>
     <% end %>
   <% end %>
+  <%= if @current_player && not(@current_player.admin) do %>
+    <div class="ml-auto">
+      Player code:
+      <div :if={@show_code?} class="inline-block" id="player-code">
+        <div class="inline-block w-24 text-center"><%= @current_player.code %></div>
+        <.link id="hide-code" phx-click="hide-code">
+          <.icon name="hero-eye-slash-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
+        </.link>
+      </div>
+      <div :if={not @show_code?} class="inline-block" id="player-code" class="w-32 px-2">
+        <div class="inline-block w-24 text-center">•••••••</div>
+        <.link id="show-code" phx-click="show-code">
+          <.icon name="hero-eye-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
+        </.link>
+      </div>
+    </div>
+  <% end %>
 </div>
 
 <.table
