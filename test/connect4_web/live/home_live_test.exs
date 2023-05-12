@@ -74,6 +74,28 @@ defmodule Connect4Web.HomeLiveTest do
       refute view |> element("#player-code", player.code) |> has_element?()
     end
 
+    test "Allows a player’s game history to be shown", %{conn: conn} do
+      player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
+
+      insert(:game,
+        player_o: player_1,
+        player_x: player_2,
+        winner: "X",
+        board: %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 1 => :X, 2 => :X}}
+      )
+
+      insert(:game, player_o: player_2, player_x: player_1, winner: "tie", board: %{})
+
+      {:ok, view, _html} = live(conn, ~p"/")
+      html = view |> element("td.c4-player", "Alice") |> render_click()
+      assert html =~ "Bob (X) beat Alice (O)"
+      assert html =~ "Bob (O) tied with Alice (X)"
+
+      view |> element("#close-games") |> render_click()
+      assert view |> element("h1", "Help") |> has_element?()
+    end
+
     test "displays a message if the tournament is inactive", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/")
       assert view |> element("#tournament-status", "not currently active") |> has_element?()

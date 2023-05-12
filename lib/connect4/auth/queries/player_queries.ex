@@ -20,7 +20,7 @@ defmodule Connect4.Auth.Queries.PlayerQueries do
       from(p in Player,
         where: not is_nil(p.confirmed_at),
         where: not p.admin,
-        preload: [:games_as_o, :games_as_x]
+        preload: [games_as_o: [:player_o, :player_x], games_as_x: [:player_o, :player_x]]
       )
     )
   end

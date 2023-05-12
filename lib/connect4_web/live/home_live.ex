@@ -33,6 +33,8 @@ defmodule Connect4Web.HomeLive do
        players: players,
        active?: active?,
        show_code?: false,
+       player: nil,
+       games: nil,
        interval_minutes: interval_minutes,
        time_until_next_game: time_until_next_game
      )}
@@ -58,6 +60,17 @@ defmodule Connect4Web.HomeLive do
 
   def handle_event("hide-code", _params, socket) do
     {:noreply, assign(socket, show_code?: false)}
+  end
+
+  def handle_event("show-games-" <> id_str, _params, socket) do
+    id = String.to_integer(id_str)
+    player = Enum.find(socket.assigns.players, &(&1.id == id))
+    games = Enum.sort_by(player.games_as_o ++ player.games_as_x, & &1.inserted_at, :desc)
+    {:noreply, assign(socket, player: player, games: games)}
+  end
+
+  def handle_event("close-games", _params, socket) do
+    {:noreply, assign(socket, player: nil, games: nil)}
   end
 
   @impl LiveView

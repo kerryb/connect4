@@ -4,6 +4,7 @@ defmodule Connect4.Auth.Queries.PlayerQueriesTest do
   import Assertions, only: [assert_lists_equal: 3]
 
   alias Connect4.Auth.Queries.PlayerQueries
+  alias Connect4.Auth.Schema.Player
 
   describe "Connect4.Game.Queries.GameQueries.active/0" do
     test "returns all confirmed non-admin players" do
@@ -34,12 +35,14 @@ defmodule Connect4.Auth.Queries.PlayerQueriesTest do
       )
     end
 
-    test "preloads games" do
+    test "preloads games and each game’s O and X players" do
       player_1 = insert(:player, confirmed_at: DateTime.utc_now())
       player_2 = insert(:player, confirmed_at: DateTime.utc_now())
       insert(:game, player_o: player_1, player_x: player_2, winner: "O")
       players = PlayerQueries.active_with_games()
-      assert %{games_as_o: [_game], games_as_x: []} = Enum.find(players, &(&1.id == player_1.id))
+
+      assert %{games_as_o: [%{player_o: %Player{}, player_x: %Player{}}], games_as_x: []} =
+               Enum.find(players, &(&1.id == player_1.id))
     end
   end
 
