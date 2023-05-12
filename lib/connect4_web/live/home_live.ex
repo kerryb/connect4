@@ -51,7 +51,7 @@ defmodule Connect4Web.HomeLive do
 
   @impl LiveView
   def handle_info({:new_player, player}, socket) do
-    {:noreply, update(socket, :players, &[player | &1])}
+    {:noreply, update(socket, :players, &[Player.calculate_stats(player) | &1])}
   end
 
   def handle_info({:game_finished, game}, socket) do

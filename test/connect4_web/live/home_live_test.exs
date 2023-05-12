@@ -33,7 +33,8 @@ defmodule Connect4Web.HomeLiveTest do
       refute view |> element("td", player.name) |> has_element?()
 
       {:ok, _player} = Auth.confirm_player(encoded_token)
-      assert view |> element("td", player.name) |> has_element?()
+      assert view |> element("td.c4-player", player.name) |> has_element?()
+      assert view |> element("td.c4-points", "0") |> has_element?()
     end
 
     test "Updates scores and re-sorts table as games complete", %{conn: conn} do
