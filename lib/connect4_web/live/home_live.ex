@@ -9,6 +9,8 @@ defmodule Connect4Web.HomeLive do
   alias Phoenix.LiveView
   alias Phoenix.PubSub
 
+  embed_templates "home/*"
+
   @impl LiveView
   def mount(_params, _session, socket) do
     if connected?(socket) do
