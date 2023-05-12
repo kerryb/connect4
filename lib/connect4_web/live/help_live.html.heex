@@ -1,0 +1,166 @@
+<h1 class="font-bold text-2xl">Help</h1>
+
+<h2 class="font-bold text-lg mt-4">Registering a player or team</h2>
+<p class="mt-4">
+  Use the links on the top right to register and log in. You’ll need to provide
+  a valid email address to confirm your account, and once you’ve done this you
+  will appear on the leaderboard.
+</p>
+<p class="mt-4">
+  If you’re playing as a team, just register with one person’s email, and set
+  your name to the team name you want to be shown on the board.
+</p>
+
+<h2 class="font-bold text-lg mt-4">The tournament</h2>
+
+<p class="mt-4">
+  Once the tournament starts, a new round will automatically begin every five
+  minutes. This interval may change, but the home page will always show a
+  countdown to the next round.
+</p>
+
+<p class="mt-4">
+  In each round, each player will play one game, with pairings chosen randomly
+  each time. Games are between “O” and “X” (rather than teh traditional red and
+  yellow), and these are also allocated randomly for each game.
+</p>
+
+<p class="mt-4">
+  Games will continue until they are won or tied, both players time out (see
+  below), or the next round starts. Incomplete games are counted as ties.
+</p>
+
+<h2 class="font-bold text-lg mt-4">Retrieving current game status</h2>
+
+<p class="mt-4">
+  Make a GET request to <span class="font-bold text-blue-500"><%= url(~p"/games/CODE") %></span>, replacing
+  <em>CODE</em>
+  with your secret player
+  code. You can get your code using the button on the home page.
+</p>
+
+<p class="mt-4">
+  The response will be a json document containing details of the game. Here’s
+  an example, which has been prettified for readability (the real response will
+  be a single line):
+</p>
+
+<pre class="mt-4 bg-slate-100 p-4">
+  {
+  "board": {
+    "0": { "0": "O", "1": "X" },
+    "1": { "0": "O" }
+  },
+  "board_as_array": [
+    [ "O", "X", null, null, null, null ],
+    [ "O", null, null, null, null, null ],
+    [ null, null, null, null, null, null ],
+    [ null, null, null, null, null, null ],
+    [ null, null, null, null, null, null ],
+    [ null, null, null, null, null, null ],
+    [ null, null, null, null, null, null ]
+  ],
+  "next_player": "O",
+  "playing_as": "X",
+  "status": "playing",
+  "winner": null
+}
+</pre>
+
+<p class="mt-4">
+  Note that the board is provided in two formats. These both contain the same
+  information, so use whichever you find easiest to work with. The above
+  example represents a board where “O” occupies the bottom spaces in columns 0
+  and 1, and “X” occupies the second space in column 1 (columns are numbered
+  0–6, and rows 0–5).
+</p>
+
+<p class="mt-4">
+  The first, <em>board</em>, is a map of column indexes to rows, where each row
+  is a map of row indexes to the player occupying that space. Only non-empty
+  columns and rows are included.
+</p>
+
+<p class="mt-4">
+  The second, <em>board_as_array</em>, is a two-dimensional array, with rows
+  nested in columns. Empty spaces are returned as null.
+</p>
+
+<p class="mt-4">
+  The other columns should be largely self-explanatory, but here’s an explanation anyway:
+</p>
+
+<dl class="divide-y divide-gray-100">
+  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+    <dt class="font-bold">next_player</dt>
+    <dd class="sm:col-span-2 sm:mt-0">The player (“O” or “X”) whose turn it is to play</dd>
+  </div>
+  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+    <dt class="font-bold">playing_as</dt>
+    <dd class="sm:col-span-2 sm:mt-0">
+      The player (“O” or “X”) that you are playing this game as
+    </dd>
+  </div>
+  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+    <dt class="font-bold">status</dt>
+    <dd class="sm:col-span-2 sm:mt-0">
+      The status of the game, from your point of view (“playing”, “win”, “lose”, or “tie”)
+    </dd>
+  </div>
+  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+    <dt class="font-bold">winner</dt>
+    <dd class="sm:col-span-2 sm:mt-0">
+      The winner (“O”, “X”, or "tie") if the game is over, or null
+    </dd>
+  </div>
+</dl>
+
+<h2 class="font-bold text-lg mt-4">Playing a move</h2>
+
+<p class="mt-4">
+  Make a POST request to <span class="font-bold text-blue-500"><%= url(~p"/games/CODE/COLUMN") %></span>, replacing
+  <em>CODE</em>
+  with your player code and <em>COLUMN</em>
+  with the number of the column you want to play in (0–6).
+</p>
+
+<p class="mt-4">
+  The response will be JSON in the same format as for the GET request above.
+</p>
+
+<h2 class="font-bold text-lg mt-4">Errors</h2>
+
+<p class="mt-4">If something goes wrong (eg no game is in progress, or it’s not
+  your turn, you’ll get a response with 4xx status code and a JSON body
+  containing the error, eg:</p>
+
+<pre class="mt-4 bg-slate-100 p-4">
+  {"error":"Game not found"}
+</pre>
+
+<h2 class="font-bold text-lg mt-4">Timeouts</h2>
+
+<p class="mt-4">
+  Once a round starts, each player has 30 seconds to make their first move. For
+  subsequent moves, the timeout is reduced to one second. If you don’t play
+  your move in time, you skip your turn and your opponent can play again. If
+  both players time out consecutively, the game finishes as a tie.
+</p>
+
+<h2 class="font-bold text-lg mt-4">Test mode</h2>
+
+<p class="mt-4">
+  To help with testing, alternative URLs are available, which can be used at
+  any time regardless of tournament progress and do not affect the scoring. If
+  you use these URLs, a game will be automatically created as required, with
+  you playing both “O” and “X” (you will always appear to be playing as
+  whoever’s turn it is next). The test URLs replace <em>games</em>
+  with <em>test</em>, ie GET
+  <span class="font-bold text-blue-500"><%= url(~p"/test/CODE") %></span>
+  and POST <span class="font-bold
+  text-blue-500"><%= url(~p"/test/CODE/COLUMN") %></span>.
+</p>
+
+<h2 class="font-bold text-lg mt-4">Scoring</h2>
+
+<p class="mt-4">Three points for a win, and one for a tie. But it’s only a bit of fun!</p>

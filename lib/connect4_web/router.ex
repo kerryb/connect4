@@ -87,6 +87,7 @@ defmodule Connect4Web.Router do
       live("/players/confirm/:token", PlayerConfirmationLive, :edit)
       live("/players/confirm", PlayerConfirmationInstructionsLive, :new)
       live("/", HomeLive)
+      live("/help", HelpLive)
     end
   end
 end
