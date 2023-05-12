@@ -51,6 +51,28 @@ defmodule Connect4.Game.RunnerTest do
       assert_receive {:game_finished, %{id: ^game_id}}
       assert [%{winner: "tie", board: %{0 => %{0 => :O}}}] = Repo.all(Game)
     end
+
+    test "completes any games the players still have in progress" do
+      insert(:player, code: "three")
+      insert(:player, code: "four")
+      PubSub.subscribe(Connect4.PubSub, "runner")
+      {:ok, game_1_id} = Runner.start_game("one", "two", 50, 100)
+      {:ok, game_2_id} = Runner.start_game("three", "four", 50, 100)
+
+      {:ok, _new_game_id} = Runner.start_game("one", "three", 50, 100)
+      assert_receive {:game_finished, %{id: ^game_1_id}}
+      assert_receive {:game_finished, %{id: ^game_2_id}}
+      assert %{winner: "tie"} = Repo.get(Game, game_1_id)
+      assert %{winner: "tie"} = Repo.get(Game, game_2_id)
+    end
+
+    test "does not attempt to complete the same game twice" do
+      PubSub.subscribe(Connect4.PubSub, "runner")
+      {:ok, game_id} = Runner.start_game("one", "two", 50, 100)
+
+      {:ok, _new_game_id} = Runner.start_game("one", "two", 50, 100)
+      assert_receive {:game_finished, %{id: ^game_id}}
+    end
   end
 
   describe "Connect4.Game.Runner.play/2" do

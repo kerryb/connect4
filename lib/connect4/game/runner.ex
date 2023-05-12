@@ -25,7 +25,10 @@ defmodule Connect4.Game.Runner do
   @spec start_game(String.t(), String.t(), integer(), integer()) ::
           {:ok, integer()} | {:error, any()}
   def start_game(player_o_code, player_x_code, timeout, first_move_timeout) do
-    GenServer.call(__MODULE__, {:start_game, player_o_code, player_x_code, timeout, first_move_timeout})
+    GenServer.call(
+      __MODULE__,
+      {:start_game, player_o_code, player_x_code, timeout, first_move_timeout}
+    )
   end
 
   @spec play(String.t(), integer()) :: {:ok, Game.player(), Game.t()} | {:error, any()}
@@ -48,7 +51,8 @@ defmodule Connect4.Game.Runner do
   @impl GenServer
   def handle_call({:start_game, player_o_code, player_x_code, timeout, first_move_timeout}, _from, state) do
     with {:ok, game} <- GameQueries.insert_from_codes(player_o_code, player_x_code),
-         {:ok, _pid} <- Game.start_link(id: game.id, timeout: timeout, first_move_timeout: first_move_timeout) do
+         {:ok, _pid} <-
+           Game.start_link(id: game.id, timeout: timeout, first_move_timeout: first_move_timeout) do
       {:reply, {:ok, game.id}, register_game(state, player_o_code, player_x_code, game.id)}
     else
       error -> {:reply, error, state}
@@ -85,10 +89,16 @@ defmodule Connect4.Game.Runner do
   end
 
   defp register_game(state, player_o_code, player_x_code, game_id) do
+    complete_existing_game(state.games[player_o_code])
+    complete_existing_game(state.games[player_x_code])
+
     Map.update!(state, :games, fn games ->
       games
       |> Map.put(player_o_code, {game_id, :O})
       |> Map.put(player_x_code, {game_id, :X})
     end)
   end
+
+  defp complete_existing_game(nil), do: :ok
+  defp complete_existing_game({id, _player}), do: Game.terminate(id)
 end

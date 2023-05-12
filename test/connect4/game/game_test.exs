@@ -3,16 +3,13 @@ defmodule Connect4.Game.GameTest do
 
   alias Connect4.Game.Game
   alias Connect4.GameRegistry
-  alias Connect4.Repo
-  alias Ecto.Adapters.SQL.Sandbox
   alias Phoenix.PubSub
 
   @game_id 123
 
   setup do
     Application.ensure_all_started(:connect4)
-    {:ok, pid} = start_supervised({Game, timeout: 100, first_move_timeout: 300, id: @game_id})
-    Sandbox.allow(Repo, self(), pid)
+    {:ok, _pid} = start_supervised({Game, timeout: 100, first_move_timeout: 300, id: @game_id})
     :ok
   end
 
@@ -148,6 +145,22 @@ defmodule Connect4.Game.GameTest do
       %{id: game_id} = game = Game.get(@game_id)
       assert game.winner == :tie
       assert_receive {:completed, %{id: ^game_id}}
+    end
+
+    test "allows a game to be terminated, resulting in a tie" do
+      PubSub.subscribe(Connect4.PubSub, "games")
+      Game.terminate(@game_id)
+      game_id = @game_id
+      assert_receive {:completed, %{id: ^game_id, winner: :tie}}
+    end
+
+    test "ignores attempts to terminate non-existent games" do
+      Game.terminate("456")
+    end
+
+    test "ignores attempts to terminate already-terminated games" do
+      Game.terminate(@game_id)
+      Game.terminate(@game_id)
     end
 
     test "resets the timeout each time a move is played" do

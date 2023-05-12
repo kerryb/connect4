@@ -78,6 +78,17 @@ defmodule Connect4.Game.Game do
     end
   end
 
+  @spec terminate(GenServer.server()) :: :ok
+  def terminate(id) do
+    with [{pid, _name}] <- Registry.lookup(GameRegistry, id),
+         true <- Process.alive?(pid) do
+      GenServer.call(pid, :terminate)
+      :ok
+    else
+      _not_found -> :ok
+    end
+  end
+
   @impl GenServer
   def init(opts) do
     game = %__MODULE__{id: opts[:id]}
@@ -107,6 +118,10 @@ defmodule Connect4.Game.Game do
       true ->
         play_move(game, play_as, column)
     end
+  end
+
+  def handle_call(:terminate, _from, game) do
+    complete_game(game, :tie)
   end
 
   defp parse_column(column_str) do
