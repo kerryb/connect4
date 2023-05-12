@@ -87,7 +87,7 @@ defmodule Connect4.Game.Scheduler do
     |> Enum.shuffle()
     |> Enum.chunk_every(2, 2, :discard)
     |> Enum.each(fn [player_1, player_2] ->
-      Runner.start_game(player_1.code, player_2.code, :timer.seconds(5), :timer.seconds(30))
+      Runner.start_game(player_1.code, player_2.code, :timer.seconds(1), :timer.seconds(30))
     end)
 
     PubSub.broadcast!(Connect4.PubSub, "scheduler", :round_started)

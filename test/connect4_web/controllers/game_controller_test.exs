@@ -26,9 +26,9 @@ defmodule Connect4Web.GameControllerTest do
 
     test "sleeps for a second, then returns a 404 error, if the game isn’t found",
          %{conn: conn} do
-      Process.send_after(self(), :at_least_a_second_has_elapsed, 1000)
+      Process.send_after(self(), :delay, 500)
       conn = get(conn, ~p"/games/non-existent-code")
-      assert_received :at_least_a_second_has_elapsed
+      assert_received :delay
       assert %{"error" => "Game not found"} = json_response(conn, 404)
     end
   end
@@ -43,17 +43,21 @@ defmodule Connect4Web.GameControllerTest do
 
     test "sleeps for a second, then returns a 404 error, if the game isn’t found",
          %{conn: conn} do
-      Process.send_after(self(), :at_least_a_second_has_elapsed, 1000)
+      Process.send_after(self(), :delay, 500)
       conn = post(conn, ~p"/games/non-existent-code/0")
-      assert_received :at_least_a_second_has_elapsed
+      assert_received :delay
       assert %{"error" => "Game not found"} = json_response(conn, 404)
     end
 
-    test "sleeps for a second, then returns any other error from the game", %{conn: conn, code_1: code_1, code_2: code_2} do
-      Process.send_after(self(), :at_least_a_second_has_elapsed, 1000)
+    test "sleeps for a second, then returns any other error from the game", %{
+      conn: conn,
+      code_1: code_1,
+      code_2: code_2
+    } do
+      Process.send_after(self(), :delay, 500)
       Runner.start_game(code_1, code_2, 50, 100)
       conn = post(conn, ~p"/games/#{code_2}/0")
-      assert_received :at_least_a_second_has_elapsed
+      assert_received :delay
       assert %{"error" => "Not your turn"} = json_response(conn, 400)
     end
   end

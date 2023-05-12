@@ -23,7 +23,7 @@ defmodule Connect4Web.GameController do
   defp not_found(conn), do: handle_error(conn, "Game not found", 404)
 
   defp handle_error(conn, message, status \\ :bad_request) do
-    Process.sleep(1000)
+    Process.sleep(500)
 
     conn
     |> put_status(status)
