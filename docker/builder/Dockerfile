@@ -43,8 +43,7 @@ COPY rel rel
 
 RUN mix compile
 
-RUN mix esbuild default --minify
-RUN mix phx.digest
+RUN mix do assets.setup, assets.build, assets.deploy
 
 RUN set -xe \
   && rm -rf _build/prod/rel/connect4/releases/* \
