@@ -31,7 +31,7 @@ defmodule Connect4.Game.Runner do
     )
   end
 
-  @spec play(String.t(), integer()) :: {:ok, Game.player(), Game.t()} | {:error, any()}
+  @spec play(String.t(), String.t()) :: {:ok, Game.player(), Game.t()} | {:error, any()}
   def play(player_code, column) do
     GenServer.call(__MODULE__, {:play, player_code, column})
   end
