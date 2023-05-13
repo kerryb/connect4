@@ -74,16 +74,17 @@ set_up_nginx() {
 }
 
 install_postgres() {
-  yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-  yum install -y postgresql14-server
+  dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  dnf -qy module disable postgresql
+  dnf install -y postgresql15-server
 }
 
 set_up_postgres() {
   if [[ ! -e ${database_root}/base ]] ; then
-    /usr/pgsql-14/bin/postgresql-14-setup initdb
-    systemctl enable postgresql-14
-    systemctl stop postgresql-14
-    systemctl start postgresql-14
+    /usr/pgsql-15/bin/postgresql-15-setup initdb
+    systemctl enable postgresql-15
+    systemctl stop postgresql-15
+    systemctl start postgresql-15
   fi
 }
 
