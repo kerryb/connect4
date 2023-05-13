@@ -1,3 +1,4 @@
+# credo:disable-for-this-file
 defmodule Connect4.Release do
   @moduledoc """
   Used for executing DB release tasks when run in production without Mix
