@@ -11,6 +11,13 @@ import Config
 # before starting your production server.
 config :connect4, Connect4Web.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :connect4, Connect4Web.Endpoint,
+  url: [host: "connect4.nat.bt.com", scheme: "https", port: 443],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  server: true,
+  root: ".",
+  check_origin: ["//connect4.nat.bt.com", "//localhost", "//127.0.0.1"]
+
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Connect4.Finch
 
