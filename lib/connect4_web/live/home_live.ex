@@ -65,7 +65,7 @@ defmodule Connect4Web.HomeLive do
   def handle_event("show-games-" <> id_str, _params, socket) do
     id = String.to_integer(id_str)
     player = Enum.find(socket.assigns.players, &(&1.id == id))
-    games = Enum.sort_by(player.games_as_o ++ player.games_as_x, & &1.inserted_at, :desc)
+    games = extract_games(player)
     {:noreply, assign(socket, player: player, games: games)}
   end
 
@@ -79,7 +79,15 @@ defmodule Connect4Web.HomeLive do
   end
 
   def handle_info({:game_finished, game}, socket) do
-    {:noreply, update(socket, :players, &update_players(&1, game))}
+    players = update_players(socket.assigns.players, game)
+
+    if socket.assigns.player && socket.assigns.player.id in [game.player_o_id, game.player_x_id] do
+      player = Enum.find(players, &(&1.id == socket.assigns.player.id))
+      games = extract_games(player)
+      {:noreply, assign(socket, players: players, player: player, games: games)}
+    else
+      {:noreply, assign(socket, players: players)}
+    end
   end
 
   def handle_info({:seconds_to_go, seconds_to_go}, socket) do
@@ -91,6 +99,8 @@ defmodule Connect4Web.HomeLive do
   end
 
   def handle_info(_message, socket), do: {:noreply, socket}
+
+  defp extract_games(player), do: Enum.sort_by(player.games_as_o ++ player.games_as_x, & &1.inserted_at, :desc)
 
   defp update_players(players, game) do
     players

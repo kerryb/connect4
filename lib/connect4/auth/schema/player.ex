@@ -209,7 +209,7 @@ defmodule Connect4.Auth.Schema.Player do
   Calculates played/won/tied/lost stats and populates the virtual fields.
   """
   def calculate_stats(player) do
-    player_with_games = Repo.preload(player, [:games_as_o, :games_as_x])
+    player_with_games = Repo.preload(player, games_as_o: [:player_o, :player_x], games_as_x: [:player_o, :player_x])
     played = played(player_with_games)
     won = won(player_with_games)
     tied = tied(player_with_games)
