@@ -1,0 +1,18 @@
+[Unit]
+Description=Connect4 Phoenix application
+After=network.target
+
+[Service]
+Type=simple
+User=connect4
+Group=connect4
+WorkingDirectory=/opt/connect4
+ExecStart=/opt/connect4/current/bin/connect4 start
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=/opt/connect4/connect4.env
+SyslogIdentifier=connect4
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target
