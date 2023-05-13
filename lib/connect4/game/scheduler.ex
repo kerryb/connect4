@@ -85,7 +85,7 @@ defmodule Connect4.Game.Scheduler do
 
     PlayerQueries.active()
     |> Enum.shuffle()
-    |> Enum.chunk_every(2, 2, :discard)
+    |> Enum.chunk_every(2, 2, [%{code: "bot-simple"}])
     |> Enum.each(fn [player_1, player_2] ->
       Runner.start_game(player_1.code, player_2.code, :timer.seconds(1), :timer.seconds(30))
     end)

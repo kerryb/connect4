@@ -81,7 +81,8 @@ CREATE TABLE public.players (
     email public.citext NOT NULL,
     hashed_password character varying(255) NOT NULL,
     confirmed_at timestamp(0) without time zone,
-    admin boolean DEFAULT false NOT NULL
+    admin boolean DEFAULT false NOT NULL,
+    internal_bot boolean
 );
 
 
@@ -269,3 +270,4 @@ INSERT INTO public."schema_migrations" (version) VALUES (20230505153447);
 INSERT INTO public."schema_migrations" (version) VALUES (20230506201423);
 INSERT INTO public."schema_migrations" (version) VALUES (20230507135102);
 INSERT INTO public."schema_migrations" (version) VALUES (20230508104403);
+INSERT INTO public."schema_migrations" (version) VALUES (20230513210618);
