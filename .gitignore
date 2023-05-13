@@ -35,3 +35,5 @@ connect4-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Release tarballs
+connect4*.tar.gz
