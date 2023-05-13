@@ -60,6 +60,7 @@ defmodule Connect4.MixProject do
       {:faker, "~> 0.17", only: [:dev, :test]},
       {:finch, "~> 0.13"},
       {:floki, ">= 0.30.0", only: :test},
+      {:gen_smtp, "~> 1.1"},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:phoenix, "~> 1.7.2"},
