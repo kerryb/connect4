@@ -6,7 +6,7 @@ set -x
 set -e
 user="connect4"
 base_dir="/opt/connect4"
-database_root="/var/postgres"
+database_root="/var/lib/pgsql"
 database_password=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 set -u
 set -o pipefail
@@ -81,7 +81,7 @@ install_postgres() {
 }
 
 set_up_postgres() {
-  if [[ ! -e ${database_root}/base ]] ; then
+  if [[ ! -e ${database_root}/15/data ]] ; then
     /usr/pgsql-15/bin/postgresql-15-setup initdb
     systemctl enable postgresql-15
     systemctl stop postgresql-15
