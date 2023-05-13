@@ -109,6 +109,7 @@ RUN_ERL_LOG_MAXSIZE=200000
 RUN_ERL_LOG_GENERATIONS=50
 SECRET_KEY_BASE='$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 128 | head -n 1)'
 DATABASE_URL='ecto://connect4:${database_password}@localhost/connect4'
+PHX_SERVER=true
 EOF
   fi
 
