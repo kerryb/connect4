@@ -74,7 +74,6 @@ set_up_nginx() {
 }
 
 install_postgres() {
-  yum update -y
   yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
   yum install -y postgresql15-server
 }
