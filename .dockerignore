@@ -1,0 +1,13 @@
+*.dump
+*.gz
+.docker_ls
+.git
+_build
+cover
+deps
+doc
+docker
+tags
+tags.lock
+test
+var
