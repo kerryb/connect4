@@ -40,7 +40,7 @@ link_release() {
 }
 
 migrate_database() {
-  ./current/bin/connect4 migrate
+  ./current/bin/migrate
 }
 
 stop_server() {
