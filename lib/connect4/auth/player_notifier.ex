@@ -13,7 +13,7 @@ defmodule Connect4.Auth.PlayerNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Connect4", "contact@example.com"})
+      |> from({"Connect4", "noreply@connect4.nat.bt.com"})
       |> subject(subject)
       |> text_body(body)
 
