@@ -14,7 +14,7 @@ set -o pipefail
 umask 022
 
 deploy() {
-  base_dir="/opt/ytd"
+  base_dir="/opt/connect4"
   release_dir="$base_dir/releases/$version"
   shared_var_dir="$base_dir/shared/var"
   unpack_release
@@ -40,7 +40,7 @@ link_release() {
 }
 
 migrate_database() {
-  ./current/bin/ytd migrate
+  ./current/bin/connect4 migrate
 }
 
 stop_server() {
