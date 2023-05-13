@@ -44,11 +44,11 @@ migrate_database() {
 }
 
 stop_server() {
-  sudo systemctl stop $USER
+  sudo systemctl stop connect4
 }
 
 start_server() {
-  sudo systemctl start $USER
+  sudo systemctl start connect4
 }
 
 remove_old_releases() {
