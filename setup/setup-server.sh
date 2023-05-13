@@ -21,6 +21,7 @@ setup() {
   set_up_nginx
   install_postgres
   set_up_postgres  
+  create_database
   set_up_environment
   install_systemd_service
   post_install_message
@@ -91,10 +92,10 @@ set_up_postgres() {
 create_database() {
   sudo -iu postgres <<EOSUDO
 
-  if ! psql -tac '\dg' | grep -q 'ytd' ; then
+  if ! psql -tac '\dg' | grep -q 'connect4' ; then
     psql <<EOSQL
-    create role ytd with encrypted password '${database_password}' createdb login;
-    create database ytd owner ytd;
+    create role connect4 with encrypted password '${database_password}' createdb login;
+    create database connect4 owner connect4;
 EOSQL
   fi
 EOSUDO
@@ -107,9 +108,7 @@ RELEASE_NAME='connect4'
 RUN_ERL_LOG_MAXSIZE=200000
 RUN_ERL_LOG_GENERATIONS=50
 SECRET_KEY_BASE='$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 128 | head -n 1)'
-YTD_DATABASE_USERNAME='ytd'
-YTD_DATABASE_PASSWORD='${database_password}'
-YTD_DATABASE='ytd'
+DATABASE_URL="ecto://connect4:${database_password}@localhost/connect4
 EOF
   fi
 
