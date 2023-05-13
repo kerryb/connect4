@@ -4,7 +4,7 @@ defmodule Connect4.MixProject do
   def project do
     [
       app: :connect4,
-      version: "0.1.0",
+      version: version(),
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -19,6 +19,14 @@ defmodule Connect4.MixProject do
       ]
     ]
   end
+
+  defp version, do: "VERSION" |> File.read() |> extract_version()
+
+  # A small hack so we can run `mix deps.get` etc in the release process
+  # without the docker cache being invalidated just because `VERSION` has
+  # changed
+  defp extract_version({:ok, version}), do: String.trim(version)
+  defp extract_version(_), do: "0.0.0"
 
   # Configuration for the OTP application.
   #
