@@ -49,7 +49,7 @@ defmodule Connect4Web.HomeLiveTest do
       refute view |> element("#player-code", player.code) |> has_element?()
     end
 
-    test "Allows a player’s game history to be shown", %{conn: conn} do
+    test "allows a player’s game history to be shown", %{conn: conn} do
       player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
       player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
 
@@ -77,6 +77,15 @@ defmodule Connect4Web.HomeLiveTest do
 
       view |> element("#close-games") |> render_click()
       assert view |> element("h1", "Help") |> has_element?()
+    end
+
+    test "only shows completed games", %{conn: conn} do
+      player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
+      insert(:game, player_o: player_1, player_x: player_2, winner: nil, board: %{})
+      {:ok, view, _html} = live(conn, ~p"/")
+      view |> element("tr", "Alice") |> render_click()
+      refute view |> element("h2") |> has_element?()
     end
 
     test "Updates scores and re-sorts table as games complete", %{conn: conn} do

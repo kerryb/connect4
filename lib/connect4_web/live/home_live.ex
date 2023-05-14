@@ -47,7 +47,7 @@ defmodule Connect4Web.HomeLive do
   def handle_params(%{"player_id" => id_str}, _uri, socket) do
     id = String.to_integer(id_str)
     player = Enum.find(socket.assigns.players, &(&1.id == id))
-    games = extract_games(player)
+    games = extract_completed_games(player)
     {:noreply, assign(socket, player: player, games: games)}
   end
 
@@ -106,7 +106,7 @@ defmodule Connect4Web.HomeLive do
 
     if socket.assigns.player && socket.assigns.player.id in [game.player_o_id, game.player_x_id] do
       player = Enum.find(players, &(&1.id == socket.assigns.player.id))
-      games = extract_games(player)
+      games = extract_completed_games(player)
       {:noreply, assign(socket, players: players, player: player, games: games)}
     else
       {:noreply, assign(socket, players: players)}
@@ -130,7 +130,11 @@ defmodule Connect4Web.HomeLive do
 
   def handle_info(_message, socket), do: {:noreply, socket}
 
-  defp extract_games(player), do: Enum.sort_by(player.games_as_o ++ player.games_as_x, & &1.inserted_at, :desc)
+  defp extract_completed_games(player) do
+    (player.games_as_o ++ player.games_as_x)
+    |> Enum.reject(&is_nil(&1.winner))
+    |> Enum.sort_by(& &1.inserted_at, :desc)
+  end
 
   defp update_players(players, game) do
     players
