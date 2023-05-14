@@ -89,6 +89,8 @@ defmodule Connect4.Game.Runner do
     {:noreply, state}
   end
 
+  def handle_info(_message, state), do: {:noreply, state}
+
   defp register_game(state, player_o_code, player_x_code, game_id) do
     complete_existing_game(state.games[player_o_code])
     complete_existing_game(state.games[player_x_code])

@@ -4,6 +4,7 @@ defmodule Connect4Web.GameController do
 
   alias Connect4.Game.Runner
   alias Connect4Web.GameJSON
+  alias Phoenix.PubSub
 
   def show(conn, %{"code" => code}) do
     case Runner.find_game(code) do
@@ -13,10 +14,22 @@ defmodule Connect4Web.GameController do
   end
 
   def play(conn, %{"code" => code, "column" => column}) do
+    :ok = PubSub.subscribe(Connect4.PubSub, "games")
+
     case Runner.play(code, column) do
-      {:ok, player, game} -> json(conn, GameJSON.render(game, player))
+      {:ok, player, game} -> successfule_move(conn, player, game)
       {:error, :not_found} -> not_found(conn)
       {:error, message} -> handle_error(conn, message)
+    end
+  end
+
+  defp successfule_move(conn, player, game) do
+    receive do
+      {:move, updated_game} when updated_game.next_player != game.next_player ->
+        json(conn, GameJSON.render(updated_game, player))
+    after
+      500 ->
+        json(conn, GameJSON.render(game, player))
     end
   end
 

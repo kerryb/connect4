@@ -159,6 +159,7 @@ defmodule Connect4.Game.Game do
         player
       )
 
+    broadcast_move(game)
     {:reply, {:ok, game}, game}
   end
 
@@ -194,6 +195,10 @@ defmodule Connect4.Game.Game do
 
   defp stop_timer(nil), do: :ok
   defp stop_timer(ref), do: Process.cancel_timer(ref)
+
+  defp broadcast_move(game) do
+    PubSub.broadcast!(Connect4.PubSub, "games", {:move, game})
+  end
 
   defp broadcast_completion(game) do
     PubSub.broadcast!(Connect4.PubSub, "games", {:completed, game})

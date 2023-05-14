@@ -135,6 +135,12 @@
   The response will be JSON in the same format as for the GET request above.
 </p>
 
+<p class="mt-4">
+  If your opponent plays within half a second, the response will take their
+  move into account. If the <em>next_player</em> field indicates that it’s your
+  turn, there’s no need to query the game again before making your next move.
+</p>
+
 <h2 class="font-bold text-lg mt-4">Errors</h2>
 
 <p class="mt-4">

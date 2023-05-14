@@ -94,6 +94,8 @@ defmodule Connect4.Game.Scheduler do
     {:noreply, %{state | round_timer_ref: round_timer_ref}}
   end
 
+  def handle_info(_message, state), do: {:noreply, state}
+
   defp calculate_seconds_to_go(interval_minutes, now \\ NaiveDateTime.utc_now()) do
     with {:ok, crontab} <- Crontab.CronExpression.Parser.parse("*/#{interval_minutes}"),
          {:ok, next_game_at} <- Crontab.Scheduler.get_next_run_date(crontab, now) do
