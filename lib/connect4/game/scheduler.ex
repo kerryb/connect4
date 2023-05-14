@@ -8,7 +8,7 @@ defmodule Connect4.Game.Scheduler do
   alias Connect4.Game.Runner
   alias Phoenix.PubSub
 
-  defstruct active?: false, interval_minutes: 10, tick_timer_ref: nil, round_timer_ref: nil
+  defstruct active?: false, interval_minutes: 5, tick_timer_ref: nil, round_timer_ref: nil
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
