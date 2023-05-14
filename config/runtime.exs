@@ -20,6 +20,11 @@ if System.get_env("PHX_SERVER") do
   config :connect4, Connect4Web.Endpoint, server: true
 end
 
+config :connect4,
+  default_interval: String.to_integer(System.get_env("DEFAULT_INTERVAL") || "5"),
+  move_timeout: String.to_integer(System.get_env("MOVE_TIMEOUT") || "1000"),
+  first_move_timeout: String.to_integer(System.get_env("FIRST_MOVE_TIMEOUT") || "30000")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

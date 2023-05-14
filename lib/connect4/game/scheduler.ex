@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule Connect4.Game.Scheduler do
   @moduledoc """
   A GenServer to start games at regular intervals.
@@ -8,7 +9,7 @@ defmodule Connect4.Game.Scheduler do
   alias Connect4.Game.Runner
   alias Phoenix.PubSub
 
-  defstruct active?: false, interval_minutes: 5, tick_timer_ref: nil, round_timer_ref: nil
+  defstruct active?: false, interval_minutes: nil, tick_timer_ref: nil, round_timer_ref: nil
 
   @spec start_link(any()) :: GenServer.on_start()
   def start_link(opts) do
@@ -31,7 +32,7 @@ defmodule Connect4.Game.Scheduler do
   def seconds_to_go(now \\ NaiveDateTime.utc_now()), do: GenServer.call(__MODULE__, {:seconds_to_go, now})
 
   @impl GenServer
-  def init(_opts), do: {:ok, %__MODULE__{}}
+  def init(_opts), do: {:ok, %__MODULE__{interval_minutes: Application.get_env(:connect4, :default_interval)}}
 
   @impl GenServer
   def handle_call(:active?, _from, state), do: {:reply, state.active?, state}
@@ -82,12 +83,14 @@ defmodule Connect4.Game.Scheduler do
   def handle_info(:start_round, state) do
     seconds_to_go = calculate_seconds_to_go(state.interval_minutes)
     round_timer_ref = Process.send_after(self(), :start_round, :timer.seconds(seconds_to_go))
+    move_timeout = Application.get_env(:connect4, :move_timeout)
+    first_move_timeout = Application.get_env(:connect4, :first_move_timeout)
 
     PlayerQueries.active()
     |> Enum.shuffle()
     |> Enum.chunk_every(2, 2, [%{code: "bot-simple"}])
     |> Enum.each(fn [player_1, player_2] ->
-      Runner.start_game(player_1.code, player_2.code, :timer.seconds(1), :timer.seconds(30))
+      Runner.start_game(player_1.code, player_2.code, move_timeout, first_move_timeout)
     end)
 
     PubSub.broadcast!(Connect4.PubSub, "scheduler", :round_started)
