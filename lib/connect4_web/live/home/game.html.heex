@@ -1,13 +1,17 @@
 <div>
-  <h2 class="font-bold text-lg mt-4">
-    <%= cond do %>
-      <% @game.winner == "O" -> %>
-        <%= @game.player_o.name %> (O) beat <%= @game.player_x.name %> (X)
-      <% @game.winner == "X" -> %>
-        <%= @game.player_x.name %> (X) beat <%= @game.player_o.name %> (O)
-      <% true -> %>
-        <%= @game.player_o.name %> (O) tied with <%= @game.player_x.name %> (X)
-    <% end %>
+  <h2 class="text-lg mt-4">
+    <%= Timex.format!(@game.inserted_at, "{h24}:{m}") %>:
+    <span class="font-bold">
+      <%= cond do %>
+        <% @game.winner == "O" -> %>
+          <%= @game.player_o.name %> (O) beat <%= @game.player_x.name %> (X)
+        <% @game.winner == "X" -> %>
+          <%= @game.player_x.name %> (X) beat <%= @game.player_o.name %> (O)
+        <% true -> %>
+          <%= @game.player_o.name %> (O) tied with <%= @game.player_x.name %> (X)
+      <% end %>
+    </span>
+    in <%= Timex.diff(@game.updated_at, @game.inserted_at, :seconds) %>s
   </h2>
   <table class="border-collapse mt-2 border-2 border-slate-300">
     <tr :for={row <- 5..0}>

@@ -74,6 +74,7 @@ defmodule Connect4.MixProject do
       {:styler, "~> 0.5", only: [:dev, :test], runtime: false},
       {:swoosh, "~> 1.3"},
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
+      {:timex, "~> 3.7"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"}
     ]
