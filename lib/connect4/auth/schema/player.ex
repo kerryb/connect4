@@ -30,6 +30,7 @@ defmodule Connect4.Auth.Schema.Player do
     field(:tied, :integer, virtual: true)
     field(:lost, :integer, virtual: true)
     field(:points, :integer, virtual: true)
+    field(:currently_playing, :boolean, virtual: true)
 
     has_many(:games_as_o, Game, foreign_key: :player_o_id)
     has_many(:games_as_x, Game, foreign_key: :player_x_id)

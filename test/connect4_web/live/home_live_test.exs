@@ -96,6 +96,18 @@ defmodule Connect4Web.HomeLiveTest do
       assert render(view) =~ ~r/Bob.*Alice/ms
     end
 
+    test "Shows an icon when a player has a game in progress", %{conn: conn} do
+      player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
+      {:ok, view, _html} = live(conn, ~p"/")
+      PubSub.broadcast!(Connect4.PubSub, "runner", :game_started)
+      assert view |> element("td.c4-player .hero-bolt:not(.invisible)") |> has_element?()
+
+      game = insert(:game, player_o: player_1, player_x: player_2, winner: "X", board: %{})
+      PubSub.broadcast!(Connect4.PubSub, "runner", {:game_finished, game})
+      assert view |> element("td.c4-player .hero-bolt.invisible") |> has_element?()
+    end
+
     test "Updates the game list if visible when a game completes", %{conn: conn} do
       player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
       player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())

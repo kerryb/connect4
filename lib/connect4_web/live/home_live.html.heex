@@ -36,7 +36,10 @@
       </button>
     </form>
   <% end %>
-  <div :if={@current_player && @current_player.confirmed_at && not @current_player.admin} class="ml-auto">
+  <div
+    :if={@current_player && @current_player.confirmed_at && not @current_player.admin}
+    class="ml-auto"
+  >
     Player code:
     <div :if={@show_code?} class="inline-block" id="player-code">
       <div class="inline-block w-24 text-center"><%= @current_player.code %></div>
@@ -68,7 +71,15 @@
       }
       row_click={fn player -> "show-games-#{player.id}" end}
     >
-      <:col :let={player} class="c4-player" label="Name"><%= player.name %></:col>
+      <:col :let={player} class="c4-player" label="Name">
+        <div class="flex items-center">
+          <%= player.name %>
+          <.icon
+            name="hero-bolt"
+            class={"ml-1 w-4 h-4 animate-pulse #{unless player.currently_playing, do: "invisible"}"}
+          />
+        </div>
+      </:col>
       <:col :let={player} class="c4-played" label="Played"><%= player.played %></:col>
       <:col :let={player} class="c4-won" label="Won"><%= player.won %></:col>
       <:col :let={player} class="c4-tied" label="Tied"><%= player.tied %></:col>

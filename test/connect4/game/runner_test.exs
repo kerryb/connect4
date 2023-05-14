@@ -28,6 +28,12 @@ defmodule Connect4.Game.RunnerTest do
       assert [{_pid, nil}] = Registry.lookup(GameRegistry, id)
     end
 
+    test "broadcasts a message" do
+      PubSub.subscribe(Connect4.PubSub, "runner")
+      {:ok, _id} = Runner.start_game("one", "two", 50, 100)
+      assert_receive :game_started
+    end
+
     test "passes the timeouts to the game" do
       PubSub.subscribe(Connect4.PubSub, "games")
       {:ok, game_id} = Runner.start_game("one", "two", 50, 100)

@@ -53,6 +53,7 @@ defmodule Connect4.Game.Runner do
     with {:ok, game} <- GameQueries.insert_from_codes(player_o_code, player_x_code),
          {:ok, _pid} <-
            Game.start_link(id: game.id, timeout: timeout, first_move_timeout: first_move_timeout) do
+      Phoenix.PubSub.broadcast!(Connect4.PubSub, "runner", :game_started)
       {:reply, {:ok, game.id}, register_game(state, player_o_code, player_x_code, game.id)}
     else
       error -> {:reply, error, state}

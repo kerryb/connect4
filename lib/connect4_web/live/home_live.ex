@@ -90,6 +90,10 @@ defmodule Connect4Web.HomeLive do
     end
   end
 
+  def handle_info(:game_started, socket) do
+    {:noreply, update(socket, :players, fn players -> Enum.map(players, &%{&1 | currently_playing: true}) end)}
+  end
+
   def handle_info({:seconds_to_go, seconds_to_go}, socket) do
     {:noreply, assign(socket, active?: true, time_until_next_game: format_time(seconds_to_go))}
   end
