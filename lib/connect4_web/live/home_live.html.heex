@@ -7,7 +7,7 @@
       <a
         href="#"
         phx-click="deactivate"
-        class="rounded-full bg-white hover:bg-slate-300 border border-black px-2 py-1"
+        class="rounded-full bg-white hover:bg-slate-300 border border-black px-3 py-1"
       >
         Deactivate
       </a>
@@ -30,11 +30,18 @@
       />
       <button
         type="submit"
-        class="rounded-r-full bg-white hover:bg-slate-300 border border-black mx-0 px-2 py-1"
+        class="rounded-r-full bg-white hover:bg-slate-300 border border-black mx-0 px-3 py-1"
       >
         Activate
       </button>
     </form>
+    <button
+      class="ml-8 rounded-full bg-white hover:bg-slate-300 border border-black mx-0 px-3 py-1"
+      phx-click="reset"
+      data-confirm="This will delete all games and reset scores to zero. Are you sure?"
+    >
+      Reset
+    </button>
   <% end %>
   <div
     :if={@current_player && @current_player.confirmed_at && not @current_player.admin}

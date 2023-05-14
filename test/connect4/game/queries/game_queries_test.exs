@@ -28,4 +28,14 @@ defmodule Connect4.Game.Queries.GameQueriesTest do
       assert {:error, "Game not found"} = GameQueries.update_winner(123, :O, %{})
     end
   end
+
+  describe "Connect4.Game.Queries.GameQueries.delete_all/0" do
+    test "deletes all games" do
+      player_1 = insert(:player, confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, confirmed_at: DateTime.utc_now())
+      insert(:game, player_o: player_1, player_x: player_2, winner: "O")
+      GameQueries.delete_all()
+      assert Repo.all(Game) == []
+    end
+  end
 end

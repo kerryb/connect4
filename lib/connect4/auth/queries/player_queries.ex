@@ -27,7 +27,7 @@ defmodule Connect4.Auth.Queries.PlayerQueries do
 
   @spec from_code(String.t()) :: Player.t() | nil
   def from_code(code) do
-    Repo.one(from p in Player, where: p.code == ^code)
+    Repo.one(from(p in Player, where: p.code == ^code))
   end
 
   @spec reload_player_with_game_and_stats(integer()) :: Player.t()

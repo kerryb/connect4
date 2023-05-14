@@ -33,4 +33,9 @@ defmodule Connect4.Game.Queries.GameQueries do
         |> Repo.update()
     end
   end
+
+  @spec delete_all :: {non_neg_integer(), nil | [any()]}
+  def delete_all do
+    Repo.delete_all(Game)
+  end
 end

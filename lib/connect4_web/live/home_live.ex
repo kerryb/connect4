@@ -1,10 +1,12 @@
 # credo:disable-for-this-file Credo.Check.Readability.Specs
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule Connect4Web.HomeLive do
   @moduledoc false
   use Connect4Web, :live_view
 
   alias Connect4.Auth.Queries.PlayerQueries
   alias Connect4.Auth.Schema.Player
+  alias Connect4.Game.Queries.GameQueries
   alias Connect4.Game.Scheduler
   alias Phoenix.LiveView
   alias Phoenix.PubSub
@@ -17,6 +19,7 @@ defmodule Connect4Web.HomeLive do
       PubSub.subscribe(Connect4.PubSub, "runner")
       PubSub.subscribe(Connect4.PubSub, "players")
       PubSub.subscribe(Connect4.PubSub, "scheduler")
+      PubSub.subscribe(Connect4.PubSub, "home-live")
     end
 
     players = Enum.map(PlayerQueries.active_with_games(), &Player.calculate_stats(&1))
@@ -66,6 +69,12 @@ defmodule Connect4Web.HomeLive do
     {:noreply, assign(socket, active?: false)}
   end
 
+  def handle_event("reset", _params, socket) do
+    GameQueries.delete_all()
+    PubSub.broadcast!(Connect4.PubSub, "home-live", :reset)
+    {:noreply, socket}
+  end
+
   def handle_event("show-code", _params, socket) do
     {:noreply, assign(socket, show_code?: true)}
   end
@@ -83,6 +92,11 @@ defmodule Connect4Web.HomeLive do
   end
 
   @impl LiveView
+  def handle_info(:reset, socket) do
+    players = Enum.map(PlayerQueries.active_with_games(), &Player.calculate_stats(&1))
+    {:noreply, assign(socket, players: players, games: [])}
+  end
+
   def handle_info({:new_player, player}, socket) do
     {:noreply, update(socket, :players, &[Player.calculate_stats(player) | &1])}
   end

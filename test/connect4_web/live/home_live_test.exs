@@ -162,6 +162,27 @@ defmodule Connect4Web.HomeLiveTest do
       refute Scheduler.active?()
     end
 
+    test "allows admins to reset the tournament", %{conn: conn} do
+      admin = insert(:player, confirmed_at: DateTime.utc_now(), admin: true)
+      player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
+
+      insert(:game,
+        player_o: player_1,
+        player_x: player_2,
+        winner: "X",
+        board: %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 1 => :X, 2 => :X}}
+      )
+
+      {:ok, view, _html} = conn |> log_in_player(admin) |> live(~p"/players/#{player_1.id}/games")
+      assert view |> element(".c4-played", "1") |> has_element?()
+      assert view |> element("h2", "Bob (X) beat Alice (O)") |> has_element?()
+
+      view |> element("button", "Reset") |> render_click()
+      assert view |> element(".c4-played", "0") |> eventually_has_element?()
+      refute view |> element("h2", "Bob (X) beat Alice (O)") |> has_element?()
+    end
+
     test "ignores unexpected messages", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/")
       send(view.pid, :wibble)
