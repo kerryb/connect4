@@ -63,7 +63,7 @@ defmodule Connect4Web.HomeLiveTest do
       insert(:game, player_o: player_2, player_x: player_1, winner: "tie", board: %{})
 
       {:ok, view, _html} = live(conn, ~p"/")
-      html = view |> element("td.c4-player", "Alice") |> render_click()
+      html = view |> element("tr", "Alice") |> render_click()
       assert html =~ "Bob (X) beat Alice (O)"
       assert html =~ "Bob (O) tied with Alice (X)"
 
@@ -113,7 +113,7 @@ defmodule Connect4Web.HomeLiveTest do
       player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
 
       {:ok, view, _html} = live(conn, ~p"/")
-      view |> element("td.c4-player", "Alice") |> render_click()
+      view |> element("tr", "Alice") |> render_click()
 
       game = insert(:game, player_o: player_1, player_x: player_2, winner: "X", board: %{})
       PubSub.broadcast!(Connect4.PubSub, "runner", {:game_finished, game})

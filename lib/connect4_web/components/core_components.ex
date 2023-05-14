@@ -467,10 +467,14 @@ defmodule Connect4Web.CoreComponents do
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
           class="relative divide-y divide-slate-100 border-t border-slate-200 text-sm leading-6 text-slate-700"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-slate-50">
+          <tr
+            :for={row <- @rows}
+            id={@row_id && @row_id.(row)}
+            phx-click={@row_click && @row_click.(row)}
+            class="group hover:bg-slate-50"
+          >
             <td
               :for={{col, i} <- Enum.with_index(@col)}
-              phx-click={@row_click && @row_click.(row)}
               class={["relative p-0", @row_click && "hover:cursor-pointer", col[:class]]}
             >
               <div class="block py-4 pr-6">
