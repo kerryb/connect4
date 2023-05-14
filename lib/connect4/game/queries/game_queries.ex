@@ -11,9 +11,8 @@ defmodule Connect4.Game.Queries.GameQueries do
   alias Connect4.Game.Schema.Game
   alias Connect4.Repo
   alias Ecto.Changeset
-  alias Ecto.Schema
 
-  @spec insert_from_codes(String.t(), String.t()) :: {:ok, Schema.t()} | {:error, Changeset.t()}
+  @spec insert_from_codes(String.t(), String.t()) :: {:ok, Game.t()} | {:error, Changeset.t(Game.t())}
   def insert_from_codes(player_o_code, player_x_code) do
     player_o = Repo.one(from(p in Player, where: p.code == ^player_o_code))
     player_x = Repo.one(from(p in Player, where: p.code == ^player_x_code))
@@ -21,7 +20,7 @@ defmodule Connect4.Game.Queries.GameQueries do
   end
 
   @spec update_winner(integer(), Connect4.Game.Game.player(), Connect4.Game.Game.board()) ::
-          {:ok, Schema.t()} | {:error, Changeset.t()} | {:error, String.t()}
+          {:ok, Game.t()} | {:error, Changeset.t(Game.t())} | {:error, String.t()}
   def update_winner(id, winner, board) do
     case Repo.get(Game, id) do
       nil ->
