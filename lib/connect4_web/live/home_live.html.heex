@@ -3,55 +3,54 @@
     <div class="my-auto">
       Next game in <span class="font-bold"><%= @time_until_next_game %></span>
     </div>
-    <%= if @current_player && @current_player.admin do %>
-      <div class="ml-auto">
-        <a
-          href="#"
-          phx-click="deactivate"
-          class="rounded-full bg-white hover:bg-slate-300 border border-black px-2 py-1"
-        >
-          Deactivate
-        </a>
-      </div>
-    <% end %>
+    <div :if={@current_player && @current_player.admin} class="ml-auto">
+      <a
+        href="#"
+        phx-click="deactivate"
+        class="rounded-full bg-white hover:bg-slate-300 border border-black px-2 py-1"
+      >
+        Deactivate
+      </a>
+    </div>
   <% else %>
     <div class="my-auto">The tournament is not currently active</div>
-    <%= if @current_player && @current_player.admin do %>
-      <form id="runner" class="ml-auto p-0" phx-submit="activate">
-        <label for="interval">Interval:</label>
-        <input
-          name="interval"
-          id="interval"
-          type="number"
-          value={@interval_minutes}
-          class="w-20 py-1 mx-0"
-        />
-        <button
-          type="submit"
-          class="rounded-r-full bg-white hover:bg-slate-300 border border-black mx-0 px-2 py-1"
-        >
-          Activate
-        </button>
-      </form>
-    <% end %>
+    <form
+      :if={@current_player && @current_player.admin}
+      id="runner"
+      class="ml-auto p-0"
+      phx-submit="activate"
+    >
+      <label for="interval">Interval:</label>
+      <input
+        name="interval"
+        id="interval"
+        type="number"
+        value={@interval_minutes}
+        class="w-20 py-1 mx-0"
+      />
+      <button
+        type="submit"
+        class="rounded-r-full bg-white hover:bg-slate-300 border border-black mx-0 px-2 py-1"
+      >
+        Activate
+      </button>
+    </form>
   <% end %>
-  <%= if @current_player && not(@current_player.admin) do %>
-    <div class="ml-auto">
-      Player code:
-      <div :if={@show_code?} class="inline-block" id="player-code">
-        <div class="inline-block w-24 text-center"><%= @current_player.code %></div>
-        <.link id="hide-code" phx-click="hide-code">
-          <.icon name="hero-eye-slash-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
-        </.link>
-      </div>
-      <div :if={not @show_code?} class="inline-block" id="player-code" class="w-32 px-2">
-        <div class="inline-block w-24 text-center">•••••••</div>
-        <.link id="show-code" phx-click="show-code">
-          <.icon name="hero-eye-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
-        </.link>
-      </div>
+  <div :if={@current_player && not @current_player.admin} class="ml-auto">
+    Player code:
+    <div :if={@show_code?} class="inline-block" id="player-code">
+      <div class="inline-block w-24 text-center"><%= @current_player.code %></div>
+      <.link id="hide-code" phx-click="hide-code">
+        <.icon name="hero-eye-slash-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
+      </.link>
     </div>
-  <% end %>
+    <div :if={not @show_code?} class="inline-block" id="player-code" class="w-32 px-2">
+      <div class="inline-block w-24 text-center">•••••••</div>
+      <.link id="show-code" phx-click="show-code">
+        <.icon name="hero-eye-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
+      </.link>
+    </div>
+  </div>
 </div>
 
 <div class="flex mt-4 divide-x divide-slate-200">
