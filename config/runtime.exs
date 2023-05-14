@@ -114,5 +114,5 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
   config :connect4, Connect4.Mailer,
     adapter: Swoosh.Adapters.SMTP,
-    relay: "smtp.intra.bt.com"
+    relay: "smtpc.intra.bt.com"
 end
