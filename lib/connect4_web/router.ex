@@ -85,7 +85,6 @@ defmodule Connect4Web.Router do
     live_session :current_player,
       on_mount: [{Connect4Web.PlayerAuth, :mount_current_player}] do
       live("/players/confirm/:token", PlayerConfirmationLive, :edit)
-      live("/players/confirm", PlayerConfirmationInstructionsLive, :new)
       live("/", HomeLive)
     end
   end

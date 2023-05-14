@@ -13,6 +13,11 @@ defmodule Connect4Web.PlayerSettingsLive do
     </.header>
 
     <div class="space-y-12 divide-y">
+      <div :if={is_nil(@current_player.confirmed_at)} class="mt-8">
+        <.button phx-click="resend-confirmation" phx-disable-with="Sending...">
+          Resend Confirmation Email
+        </.button>
+      </div>
       <div>
         <.simple_form
           for={@email_form}
@@ -103,6 +108,16 @@ defmodule Connect4Web.PlayerSettingsLive do
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
+  end
+
+  def handle_event("resend-confirmation", _params, socket) do
+    player = socket.assigns.current_player
+    Auth.deliver_player_confirmation_instructions(player, &url(~p"/players/confirm/#{&1}"))
+
+    info =
+      "If your email is in our system and it has not been confirmed yet, you will receive an email with instructions shortly."
+
+    {:noreply, put_flash(socket, :info, info)}
   end
 
   def handle_event("validate_email", params, socket) do

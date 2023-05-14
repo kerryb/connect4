@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.OnePipePerLine
 # credo:disable-for-this-file Credo.Check.Refactor.VariableRebinding
 defmodule Connect4Web.PlayerSettingsLiveTest do
   use Connect4Web.ConnCase, async: false
@@ -6,6 +7,8 @@ defmodule Connect4Web.PlayerSettingsLiveTest do
   import Phoenix.LiveViewTest
 
   alias Connect4.Auth
+  alias Connect4.Auth.Schema.PlayerToken
+  alias Connect4.Repo
   alias Phoenix.Flash
 
   describe "Settings page" do
@@ -25,6 +28,22 @@ defmodule Connect4Web.PlayerSettingsLiveTest do
       assert {:redirect, %{to: path, flash: flash}} = redirect
       assert path == ~p"/players/log_in"
       assert %{"error" => "You must log in to access this page."} = flash
+    end
+  end
+
+  describe "resend confirmation email button" do
+    test "sends a new confirmation token", %{conn: conn} do
+      player = player_fixture()
+
+      {:ok, lv, _html} =
+        conn
+        |> log_in_player(player)
+        |> live(~p"/players/settings")
+
+      Repo.delete_all(PlayerToken)
+      lv |> element("button", "Resend Confirmation Email") |> render_click()
+      assert lv |> element("#flash", "If your email is in our system") |> has_element?()
+      assert Repo.get_by!(PlayerToken, player_id: player.id).context == "confirm"
     end
   end
 
