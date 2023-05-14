@@ -154,7 +154,7 @@ defmodule Connect4Web.CoreComponents do
     <.flash
       id="disconnected"
       kind={:error}
-      title="We can't find the internet"
+      title="Connection to server lost"
       phx-disconnected={show("#disconnected")}
       phx-connected={hide("#disconnected")}
       hidden
