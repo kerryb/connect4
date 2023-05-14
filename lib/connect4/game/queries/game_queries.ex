@@ -17,7 +17,7 @@ defmodule Connect4.Game.Queries.GameQueries do
   def insert_from_codes(player_o_code, player_x_code) do
     player_o = Repo.one(from(p in Player, where: p.code == ^player_o_code))
     player_x = Repo.one(from(p in Player, where: p.code == ^player_x_code))
-    Repo.insert(%Game{player_o: player_o, player_x: player_x})
+    Repo.insert(%Game{player_o: player_o, player_x: player_x, board: %{}})
   end
 
   @spec update_winner(integer(), Connect4.Game.Game.player(), Connect4.Game.Game.board()) ::

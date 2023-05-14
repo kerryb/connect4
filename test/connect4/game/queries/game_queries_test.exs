@@ -6,12 +6,12 @@ defmodule Connect4.Game.Queries.GameQueriesTest do
   alias Connect4.Repo
 
   describe "Connect4.Game.Queries.GameQueries.insert_from_codes/2" do
-    test "inserts a Game record" do
+    test "inserts a Game record with an empty board" do
       %{id: player_1_id} = insert(:player, code: "one")
       %{id: player_2_id} = insert(:player, code: "two")
       {:ok, _game} = GameQueries.insert_from_codes("one", "two")
 
-      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, winner: nil}] = Repo.all(Game)
+      assert [%{player_o_id: ^player_1_id, player_x_id: ^player_2_id, board: %{}, winner: nil}] = Repo.all(Game)
     end
   end
 
