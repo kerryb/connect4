@@ -36,7 +36,7 @@
       </button>
     </form>
   <% end %>
-  <div :if={@current_player && not @current_player.admin} class="ml-auto">
+  <div :if={@current_player && @current_player.confirmed_at && not @current_player.admin} class="ml-auto">
     Player code:
     <div :if={@show_code?} class="inline-block" id="player-code">
       <div class="inline-block w-24 text-center"><%= @current_player.code %></div>
