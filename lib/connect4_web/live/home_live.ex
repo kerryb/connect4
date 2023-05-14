@@ -9,7 +9,7 @@ defmodule Connect4Web.HomeLive do
   alias Phoenix.LiveView
   alias Phoenix.PubSub
 
-  embed_templates "home/*"
+  embed_templates("home/*")
 
   @impl LiveView
   def mount(_params, _session, socket) do
@@ -41,6 +41,18 @@ defmodule Connect4Web.HomeLive do
   end
 
   @impl LiveView
+  def handle_params(%{"player_id" => id_str}, _uri, socket) do
+    id = String.to_integer(id_str)
+    player = Enum.find(socket.assigns.players, &(&1.id == id))
+    games = extract_games(player)
+    {:noreply, assign(socket, player: player, games: games)}
+  end
+
+  def handle_params(_params, _uri, socket) do
+    {:noreply, assign(socket, player: nil, games: nil)}
+  end
+
+  @impl LiveView
   def handle_event("activate", params, socket) do
     params["interval"]
     |> String.to_integer()
@@ -62,15 +74,12 @@ defmodule Connect4Web.HomeLive do
     {:noreply, assign(socket, show_code?: false)}
   end
 
-  def handle_event("show-games-" <> id_str, _params, socket) do
-    id = String.to_integer(id_str)
-    player = Enum.find(socket.assigns.players, &(&1.id == id))
-    games = extract_games(player)
-    {:noreply, assign(socket, player: player, games: games)}
+  def handle_event("show-games-" <> player_id, _params, socket) do
+    {:noreply, push_patch(socket, to: "/players/#{player_id}/games")}
   end
 
   def handle_event("close-games", _params, socket) do
-    {:noreply, assign(socket, player: nil, games: nil)}
+    {:noreply, push_patch(socket, to: "/")}
   end
 
   @impl LiveView
@@ -91,7 +100,10 @@ defmodule Connect4Web.HomeLive do
   end
 
   def handle_info(:game_started, socket) do
-    {:noreply, update(socket, :players, fn players -> Enum.map(players, &%{&1 | currently_playing: true}) end)}
+    {:noreply,
+     update(socket, :players, fn players ->
+       Enum.map(players, &%{&1 | currently_playing: true})
+     end)}
   end
 
   def handle_info({:seconds_to_go, seconds_to_go}, socket) do
