@@ -1,6 +1,6 @@
 # credo:disable-for-this-file Credo.Check.Refactor.VariableRebinding
 defmodule Connect4.AuthTest do
-  use Connect4.DataCase, async: true
+  use Connect4.DataCase, async: false
 
   import Connect4.AuthFixtures
 
