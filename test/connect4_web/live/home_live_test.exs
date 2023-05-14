@@ -60,12 +60,20 @@ defmodule Connect4Web.HomeLiveTest do
         board: %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 1 => :X, 2 => :X}}
       )
 
+      insert(:game,
+        player_o: player_2,
+        player_x: player_1,
+        winner: "X",
+        board: %{0 => %{0 => :O, 1 => :O, 2 => :O, 3 => :O}, 1 => %{0 => :X, 1 => :X, 2 => :X}}
+      )
+
       insert(:game, player_o: player_2, player_x: player_1, winner: "tie", board: %{})
 
       {:ok, view, _html} = live(conn, ~p"/")
-      html = view |> element("tr", "Alice") |> render_click()
-      assert html =~ "Bob (X) beat Alice (O)"
-      assert html =~ "Bob (O) tied with Alice (X)"
+      view |> element("tr", "Alice") |> render_click()
+      assert view |> element("h2:has(.hero-hand-thumb-down-solid) span", "Bob (X) beat Alice (O)") |> has_element?()
+      assert view |> element("h2:has(.hero-hand-thumb-up-solid) span", "Alice (X) beat Bob (O)") |> has_element?()
+      assert view |> element("h2:has(.hero-scale-solid) span", "Bob (O) tied with Alice (X)") |> has_element?()
 
       view |> element("#close-games") |> render_click()
       assert view |> element("h1", "Help") |> has_element?()

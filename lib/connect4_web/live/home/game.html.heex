@@ -1,5 +1,13 @@
 <div>
-  <h2 class="text-lg mt-4">
+  <h2 class="flex items-center text-lg mt-4">
+    <%= cond do %>
+      <% @game.winner == "tie" -> %>
+        <.icon name="hero-scale-solid" class="text-slate-700 mr-2 h-5 w-5" />
+      <% @game.winner == "O" and @game.player_o_id == @player_id or @game.winner == "X" and @game.player_x_id == @player_id -> %>
+        <.icon name="hero-hand-thumb-up-solid" class="text-green-700 mr-2 h-5 w-5" />
+      <% true -> %>
+        <.icon name="hero-hand-thumb-down-solid" class="text-red-700 mr-2 h-5 w-5" />
+    <% end %>
     <%= Timex.format!(@game.inserted_at, "{h24}:{m}") %>:
     <span class="font-bold">
       <%= cond do %>

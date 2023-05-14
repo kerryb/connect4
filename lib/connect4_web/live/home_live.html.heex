@@ -108,7 +108,7 @@
         Close
       </button>
     </div>
-    <.game :for={game <- @games} game={game} />
+    <.game :for={game <- @games} player_id={@player.id} game={game} />
   </div>
   <div :if={is_nil(@player)} class="pl-4">
     <.help />
