@@ -48,7 +48,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "connect.nat.bt.com"
+  host = System.get_env("PHX_HOST") || "connect4.nat.bt.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :connect4, Connect4Web.Endpoint,
