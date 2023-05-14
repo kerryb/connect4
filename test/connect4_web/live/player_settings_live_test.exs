@@ -47,6 +47,21 @@ defmodule Connect4Web.PlayerSettingsLiveTest do
     end
   end
 
+  describe "regenerate code button" do
+    test "sets a new code", %{conn: conn} do
+      player = player_fixture()
+
+      {:ok, lv, _html} =
+        conn
+        |> log_in_player(player)
+        |> live(~p"/players/settings")
+
+      lv |> element("button", "Regenerate Player Code") |> render_click()
+      assert lv |> element("#flash", "Your player code has been regenerated") |> has_element?()
+      refute player.code == Repo.reload!(player).code
+    end
+  end
+
   describe "update email form" do
     setup %{conn: conn} do
       password = valid_player_password()

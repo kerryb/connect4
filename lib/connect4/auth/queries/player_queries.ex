@@ -36,4 +36,11 @@ defmodule Connect4.Auth.Queries.PlayerQueries do
     |> Repo.one()
     |> Player.calculate_stats()
   end
+
+  @spec regenerate_code(Player.t()) :: Player.t()
+  def regenerate_code(player) do
+    player
+    |> Player.create_random_code()
+    |> Repo.update!()
+  end
 end

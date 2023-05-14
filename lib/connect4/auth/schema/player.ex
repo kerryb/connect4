@@ -1,4 +1,5 @@
 # credo:disable-for-this-file Credo.Check.Readability.Specs
+# credo:disable-for-this-file Credo.Check.Refactor.ModuleDependencies
 defmodule Connect4.Auth.Schema.Player do
   @moduledoc """
   Details of a player (or pair, team etc).
@@ -14,6 +15,7 @@ defmodule Connect4.Auth.Schema.Player do
   alias Connect4.Auth.Schema.Player
   alias Connect4.Game.Schema.Game
   alias Connect4.Repo
+  alias Ecto.Changeset
 
   @type t :: %__MODULE__{}
 
@@ -70,8 +72,9 @@ defmodule Connect4.Auth.Schema.Player do
     |> validate_password(opts)
   end
 
-  defp create_random_code(changeset) do
-    change(changeset, %{code: for(_n <- 0..6, into: "", do: <<Enum.random(?A..?Z)>>)})
+  @spec create_random_code(t() | Changeset.t(t())) :: Changeset.t(t())
+  def create_random_code(player) do
+    change(player, %{code: for(_n <- 0..6, into: "", do: <<Enum.random(?A..?Z)>>)})
   end
 
   defp validate_email(changeset, opts) do

@@ -67,4 +67,12 @@ defmodule Connect4.Auth.Queries.PlayerQueriesTest do
                PlayerQueries.reload_player_with_game_and_stats(player_1.id)
     end
   end
+
+  describe "Connect4.Game.Queries.GameQueries.regenerate_code/1" do
+    test "generates a new player code" do
+      player = insert(:player)
+      PlayerQueries.regenerate_code(player)
+      refute player.code == Repo.reload!(player).code
+    end
+  end
 end

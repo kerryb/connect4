@@ -4,6 +4,7 @@ defmodule Connect4Web.PlayerSettingsLive do
   use Connect4Web, :live_view
 
   alias Connect4.Auth
+  alias Connect4.Auth.Queries.PlayerQueries
 
   def render(assigns) do
     ~H"""
@@ -13,9 +14,22 @@ defmodule Connect4Web.PlayerSettingsLive do
     </.header>
 
     <div class="space-y-12 divide-y">
-      <div :if={is_nil(@current_player.confirmed_at)} class="mt-8">
+      <div :if={is_nil(@current_player.confirmed_at)} class="pt-8">
+        <p class="mb-4">
+          Your account hasn’t been confirmed yet, so you won’t appear in the
+          tournament. If you didn’t get the email, you can try resending it.
+        </p>
         <.button phx-click="resend-confirmation" phx-disable-with="Sending...">
           Resend Confirmation Email
+        </.button>
+      </div>
+      <div class="pt-8">
+        <p class="mb-4">
+          If you think someone else is using your player code nefariously
+          (note: this is highly frowned on!), you can generate a new one.
+        </p>
+        <.button phx-click="regenerate-code" phx-disable-with="Sending...">
+          Regenerate Player Code
         </.button>
       </div>
       <div>
@@ -117,6 +131,12 @@ defmodule Connect4Web.PlayerSettingsLive do
     info =
       "If your email is in our system and it has not been confirmed yet, you will receive an email with instructions shortly."
 
+    {:noreply, put_flash(socket, :info, info)}
+  end
+
+  def handle_event("regenerate-code", _params, socket) do
+    PlayerQueries.regenerate_code(socket.assigns.current_player)
+    info = "Your player code has been regenerated. You can find the new code on the home page."
     {:noreply, put_flash(socket, :info, info)}
   end
 
