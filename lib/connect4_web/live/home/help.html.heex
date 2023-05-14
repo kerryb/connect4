@@ -39,10 +39,11 @@
 <h2 class="font-bold text-lg mt-4">Retrieving current game status</h2>
 
 <p class="mt-4">
-  Make a GET request to <span class="font-bold text-blue-500"><%= url(~p"/games/CODE") %></span>, replacing
-  <em>CODE</em>
-  with your secret player
-  code. You can get your code using the button on the home page.
+  Make a GET request to <span class="font-bold text-blue-500"><%= url(~p"/games/CODE") %></span>,
+  replacing <em>CODE</em>
+  with your secret player code. Once you’ve confirmed
+  your email, you can reveal your code using the <.icon name="hero-eye-solid" />
+  icon in the panel at the top of this page.
 </p>
 
 <p class="mt-4">
@@ -136,13 +137,20 @@
 
 <h2 class="font-bold text-lg mt-4">Errors</h2>
 
-<p class="mt-4">If something goes wrong (eg no game is in progress, or it’s not
-  your turn, you’ll get a response with 4xx status code and a JSON body
-  containing the error, eg:</p>
+<p class="mt-4">
+  If something goes wrong (eg no game is in progress, or it’s not your turn,
+  you’ll get a response with 4xx status code and a JSON body containing the
+  error, eg:
+</p>
 
 <pre class="mt-4 bg-slate-100 p-4">
   {"error":"Game not found"}
 </pre>
+
+<p class="mt-4">
+  Error responses have a short delay built in, so you can continually poll to
+  check whether it’s your turn, without (hopefully) overloading the server.
+</p>
 
 <h2 class="font-bold text-lg mt-4">Timeouts</h2>
 
