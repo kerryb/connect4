@@ -25,8 +25,8 @@ defmodule Connect4Web.Router do
     get("/games/:code", GameController, :show)
     post("/games/:code/:column", GameController, :play)
 
-    get("/test/:code", TestController, :show)
-    post("/test/:code/:column", TestController, :play)
+    # get("/test/:code", TestController, :show)
+    # post("/test/:code/:column", TestController, :play)
   end
 
   # Other scopes may use custom stacks.
