@@ -14,34 +14,31 @@
     </div>
   <% else %>
     <div class="my-auto">The tournament is not currently active</div>
-    <form
-      :if={@current_player && @current_player.admin}
-      id="runner"
-      class="ml-auto p-0"
-      phx-submit="activate"
-    >
-      <label for="interval">Interval:</label>
-      <input
-        name="interval"
-        id="interval"
-        type="number"
-        value={@interval_minutes}
-        class="w-20 py-1 mx-0"
-      />
+    <%= if @current_player && @current_player.admin do %>
+      <form id="runner" class="ml-auto p-0" phx-submit="activate">
+        <label for="interval">Interval:</label>
+        <input
+          name="interval"
+          id="interval"
+          type="number"
+          value={@interval_minutes}
+          class="w-20 py-1 mx-0"
+        />
+        <button
+          type="submit"
+          class="rounded-r-full bg-white hover:bg-slate-300 border border-black mx-0 px-3 py-1"
+        >
+          Activate
+        </button>
+      </form>
       <button
-        type="submit"
-        class="rounded-r-full bg-white hover:bg-slate-300 border border-black mx-0 px-3 py-1"
+        class="ml-8 rounded-full bg-white hover:bg-slate-300 border border-black mx-0 px-3 py-1"
+        phx-click="reset"
+        data-confirm="This will delete all games and reset scores to zero. Are you sure?"
       >
-        Activate
+        Reset
       </button>
-    </form>
-    <button
-      class="ml-8 rounded-full bg-white hover:bg-slate-300 border border-black mx-0 px-3 py-1"
-      phx-click="reset"
-      data-confirm="This will delete all games and reset scores to zero. Are you sure?"
-    >
-      Reset
-    </button>
+    <% end %>
   <% end %>
   <div
     :if={@current_player && @current_player.confirmed_at && not @current_player.admin}
