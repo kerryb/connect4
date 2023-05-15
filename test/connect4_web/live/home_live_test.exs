@@ -24,17 +24,22 @@ defmodule Connect4Web.HomeLiveTest do
       refute view |> element("tr:not(has(.bg-purple-100)) td", player_2.name) |> has_element?()
     end
 
-    test "Adds newly-confirmed players to the list", %{conn: conn} do
-      player = insert(:player, confirmed_at: nil)
-      {encoded_token, player_token} = PlayerToken.build_email_token(player, "confirm")
+    test "Adds newly-confirmed players to the list, maintaining sorting", %{conn: conn} do
+      player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
+      insert(:game, player_o: player_1, player_x: player_2, winner: "O", board: %{})
+      new_player = insert(:player, name: "Fred", confirmed_at: nil)
+
+      {encoded_token, player_token} = PlayerToken.build_email_token(new_player, "confirm")
       Repo.insert!(player_token)
 
       {:ok, view, _html} = live(conn, ~p"/")
-      refute view |> element("td", player.name) |> has_element?()
+      refute view |> element("td", new_player.name) |> has_element?()
 
       {:ok, _player} = Auth.confirm_player(encoded_token)
-      assert view |> element("td.c4-player", player.name) |> has_element?()
+      assert view |> element("td.c4-player", new_player.name) |> has_element?()
       assert view |> element("td.c4-points", "0") |> has_element?()
+      assert render(view) =~ ~r/Alice.*Fred/ms
     end
 
     test "allows players to view their codes", %{conn: conn} do
@@ -86,6 +91,14 @@ defmodule Connect4Web.HomeLiveTest do
       {:ok, view, _html} = live(conn, ~p"/")
       view |> element("tr", "Alice") |> render_click()
       refute view |> element("h2") |> has_element?()
+    end
+
+    test "sorts table by descending score", %{conn: conn} do
+      player_1 = insert(:player, name: "Alice", confirmed_at: DateTime.utc_now())
+      player_2 = insert(:player, name: "Bob", confirmed_at: DateTime.utc_now())
+      insert(:game, player_o: player_1, player_x: player_2, winner: "X", board: %{})
+      {:ok, view, _html} = live(conn, ~p"/")
+      assert render(view) =~ ~r/Bob.*Alice/ms
     end
 
     test "Updates scores and re-sorts table as games complete", %{conn: conn} do

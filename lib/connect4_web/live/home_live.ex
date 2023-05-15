@@ -22,7 +22,11 @@ defmodule Connect4Web.HomeLive do
       PubSub.subscribe(Connect4.PubSub, "home-live")
     end
 
-    players = Enum.map(PlayerQueries.active_with_games(), &Player.calculate_stats(&1))
+    players =
+      PlayerQueries.active_with_games()
+      |> Enum.map(&Player.calculate_stats(&1))
+      |> sort_players()
+
     active? = Scheduler.active?()
     interval_minutes = Scheduler.interval_minutes()
 
@@ -98,7 +102,7 @@ defmodule Connect4Web.HomeLive do
   end
 
   def handle_info({:new_player, player}, socket) do
-    {:noreply, update(socket, :players, &[Player.calculate_stats(player) | &1])}
+    {:noreply, update(socket, :players, &sort_players([Player.calculate_stats(player) | &1]))}
   end
 
   def handle_info({:game_finished, game}, socket) do
@@ -131,15 +135,13 @@ defmodule Connect4Web.HomeLive do
   def handle_info(_message, socket), do: {:noreply, socket}
 
   defp extract_completed_games(player) do
-    (player.games_as_o ++ player.games_as_x)
-    |> Enum.reject(&is_nil(&1.winner))
-    |> Enum.sort_by(& &1.inserted_at, :desc)
+    Enum.reject(player.games_as_o ++ player.games_as_x, &is_nil(&1.winner))
   end
 
   defp update_players(players, game) do
     players
     |> Enum.map(&update_player(&1, game))
-    |> Enum.sort_by(&{-&1.points, -&1.won, &1.name})
+    |> sort_players()
   end
 
   defp update_player(player, game) do
@@ -149,6 +151,8 @@ defmodule Connect4Web.HomeLive do
       player
     end
   end
+
+  defp sort_players(players), do: Enum.sort_by(players, &{-&1.points, -&1.won, &1.name})
 
   defp format_time(seconds_to_go) do
     minutes = div(seconds_to_go, 60)
