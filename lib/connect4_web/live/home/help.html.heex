@@ -82,16 +82,22 @@
   0–6, and rows 0–5).
 </p>
 
-<p class="mt-4">
-  The first, <em>board</em>, is a map of column indexes to rows, where each row
-  is a map of row indexes to the player occupying that space. Only non-empty
-  columns and rows are included.
-</p>
-
-<p class="mt-4">
-  The second, <em>board_as_array</em>, is a two-dimensional array, with rows
-  nested in columns. Empty spaces are returned as null.
-</p>
+<dl class="divide-y divide-gray-100">
+  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+    <dt class="font-bold">board</dt>
+    <dd class="sm:col-span-2 sm:mt-0">
+      a map of column indexes to rows, where each row is a map of row indexes
+      to the player occupying that space (only non-empty columns and rows are
+      included)
+    </dd>
+  </div>
+  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+    <dt class="font-bold">board_as_array</dt>
+    <dd class="sm:col-span-2 sm:mt-0">
+      a two-dimensional array, with rows nested in columns (empty spaces are returned as null)
+    </dd>
+  </div>
+</dl>
 
 <p class="mt-4">
   The other columns should be largely self-explanatory, but here’s an explanation anyway:
@@ -144,7 +150,7 @@
 <h2 class="font-bold text-lg mt-4">Errors</h2>
 
 <p class="mt-4">
-  If something goes wrong (eg no game is in progress, or it’s not your turn,
+  If something goes wrong (eg no game is in progress, or it’s not your turn),
   you’ll get a response with 4xx status code and a JSON body containing the
   error, eg:
 </p>
