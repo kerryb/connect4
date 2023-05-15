@@ -24,13 +24,7 @@ defmodule Connect4Web.GameController do
   end
 
   defp successfule_move(conn, player, game) do
-    receive do
-      {:move, updated_game} when updated_game.next_player != game.next_player ->
-        json(conn, GameJSON.render(updated_game, player))
-    after
-      500 ->
-        json(conn, GameJSON.render(game, player))
-    end
+    json(conn, GameJSON.render(game, player))
   end
 
   defp not_found(conn), do: handle_error(conn, "Game not found", 404)
