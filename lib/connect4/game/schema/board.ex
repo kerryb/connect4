@@ -17,7 +17,7 @@ defmodule Connect4.Game.Schema.Board do
   def dump(board), do: {:ok, board}
 
   @impl Type
-  def load(data), do: {:ok, Enum.into(data, %{}, &restore_types/1)}
+  def load(data), do: {:ok, Map.new(data, &restore_types/1)}
 
   defp restore_types({key, value}) when is_binary(value) do
     # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom
@@ -25,6 +25,6 @@ defmodule Connect4.Game.Schema.Board do
   end
 
   defp restore_types({key, value}) do
-    {String.to_integer(key), Enum.into(value, %{}, &restore_types/1)}
+    {String.to_integer(key), Map.new(value, &restore_types/1)}
   end
 end
