@@ -19,9 +19,25 @@ interface with a simple HTTP API.
 
 Just run `make`.
 
+## Setup and Deployment
+
+### Server Setup
+
+There’s a setup script to get things installed on a CentOS/OEL 7 server.
+Temporarily check the project out on the server (or just copy the `setup`
+directory) and run `setup/setup-server.sh`, then follow the manual steps
+printed out at the end.
+
+### Building and Deploying Releases
+
+Update the `VERSION` file and commit it, then run `make release`.
+
+To deploy to the server, run `make deploy` (this assumes ssh access to the
+`connect4` user on the server).
+
 ## Standard Phoenix Stuff
 
-To start your Phoenix server:
+To start your Phoenix server locally:
 
   * Run `mix setup` to install and setup dependencies
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
